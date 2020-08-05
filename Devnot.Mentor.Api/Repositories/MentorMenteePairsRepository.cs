@@ -1,4 +1,5 @@
 ﻿using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +18,12 @@ namespace DevnotMentor.Api.Repositories
 
         public int GetCountForContinuesStatusByMenteeUserId(int menteeUserId)
         {
-            return _context.MentorMenteePairs.Where(i => i.Mentee.UserId == menteeUserId).Count();
+            return _context.MentorMenteePairs.Where(i => i.Mentee.UserId == menteeUserId && i.State == MentorMenteePairStatus.Continues.ToInt()).Count();
         }
 
         public int GetCountForContinuesStatusByMentorUserId(int mentorUserId)
         {
-            return _context.MentorMenteePairs.Where(i => i.Mentor.UserId == mentorUserId).Count();
+            return _context.MentorMenteePairs.Where(i => i.Mentor.UserId == mentorUserId && i.State == MentorMenteePairStatus.Continues.ToInt()).Count();
         }
     }
 }
