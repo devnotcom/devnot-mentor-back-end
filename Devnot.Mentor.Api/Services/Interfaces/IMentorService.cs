@@ -17,6 +17,6 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task UpdateMentorProfile(MentorProfileModel model);
 
         Task<List<MentorProfileModel>> SearchMentor(SearchMentorModel model);
-
+        Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId);
     }
 }

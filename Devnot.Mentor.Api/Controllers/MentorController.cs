@@ -14,16 +14,17 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MentorController : BaseController
     {
-        IMentorService service;
+        IMentorService mentorService;
+
         public MentorController(IMentorService service)
         {
-            this.service = service;
+            mentorService = service;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get(string userName)
         {
-            var result = await service.GetMentorProfile(userName);
+            var result = await mentorService.GetMentorProfile(userName);
 
             if (result.Success)
             {
@@ -36,11 +37,11 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]MentorProfileModel model)
+        public async Task<IActionResult> Post([FromBody] MentorProfileModel model)
         {
-            var result = await service.CreateMentorProfile(model);
+            var result = await mentorService.CreateMentorProfile(model);
 
-            if(result.Success)
+            if (result.Success)
             {
                 return Success(result);
             }
@@ -50,6 +51,18 @@ namespace DevnotMentor.Api.Controllers
             }
         }
 
-        
+        [HttpPost]
+        [Route("/mentors/{mentorUserId}/mentees/waitings/{menteeUserId}/accept")]
+        public async Task<IActionResult> AcceptMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
+        {
+            var result = await mentorService.AcceptMentee(mentorUserId, menteeUserId);
+
+            if (result.Success)
+            {
+                return Success(result);
+            }
+
+            return Error<object>(result.Message, null);
+        }
     }
 }

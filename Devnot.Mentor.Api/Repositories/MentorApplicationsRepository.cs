@@ -22,5 +22,13 @@ namespace DevnotMentor.Api.Repositories
                 .Where(i => i.Mentor.UserId == mentorUserId && i.Mentee.UserId == menteeUserId)
                 .AnyAsync();
         }
+
+        public async Task<MentorApplications> GetAsync(int mentorUserId, int menteeUserId)
+        {
+            return await _context
+                .MentorApplications
+                .Where(i => i.Mentor.User.Id == mentorUserId && i.Mentee.User.Id == menteeUserId)
+                .FirstOrDefaultAsync();
+        }
     }
 }
