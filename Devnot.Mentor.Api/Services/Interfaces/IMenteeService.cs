@@ -1,4 +1,5 @@
 ﻿using DevnotMentor.Api.Common;
+using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,6 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model);
 
         //void UpdateMenteeProfile(MenteeProfileModel model);
-
+        Task<ApiResponse> ApplyToMentor(ApplyMentorModel model);
     }
 }

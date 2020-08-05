@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
+using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
@@ -16,32 +18,39 @@ namespace DevnotMentor.Api.Services
 {
     public class MenteeService : BaseService, IMenteeService
     {
-        MenteeRepository repository;
+        MenteeRepository menteeRepository;
         MenteeLinksRepository menteeLinksRepository;
         MenteeTagsRepository menteeTagsRepository;
         TagRepository tagRepository;
         UserRepository userRepository;
+        MentorRepository mentorRepository;
+        MentorApplicationsRepository mentorApplicationsRepository;
 
         public MenteeService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) : base(appSettings, responseMessages, mapper, context)
         {
+            // TODO: I will take fields with dependency injection when application successfully done :)
+
             this.mapper = mapper;
-            repository = new MenteeRepository(context);
+            menteeRepository = new MenteeRepository(context);
             menteeLinksRepository = new MenteeLinksRepository(context);
             menteeTagsRepository = new MenteeTagsRepository(context);
             tagRepository = new TagRepository(context);
             userRepository = new UserRepository(context);
+            mentorRepository = new MentorRepository(context);
+            mentorApplicationsRepository = new MentorApplicationsRepository(context);
         }
 
         public async Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName)
         {
             var response = new ApiResponse<MenteeProfileModel>();
 
-            await RunInTry(response, async () => {
+            await RunInTry(response, async () =>
+            {
                 var user = userRepository.Filter(u => u.UserName == userName).FirstOrDefault();
 
                 if (user != null)
                 {
-                    var mentee = repository.Filter(m => m.UserId == user.Id).FirstOrDefault();
+                    var mentee = menteeRepository.Filter(m => m.UserId == user.Id).FirstOrDefault();
 
                     if (mentee != null)
                     {
@@ -66,13 +75,14 @@ namespace DevnotMentor.Api.Services
         {
             var response = new ApiResponse<MenteeProfileModel>();
 
-            await RunInTry(response, async () => {
+            await RunInTry(response, async () =>
+            {
 
                 var user = userRepository.Filter(u => u.UserName == model.UserName).FirstOrDefault();
 
                 if (user != null)
                 {
-                    var isRegisteredMentee = repository.Filter(m => m.UserId == user.Id).Any();
+                    var isRegisteredMentee = menteeRepository.Filter(m => m.UserId == user.Id).Any();
 
                     if (!isRegisteredMentee)
                     {
@@ -103,7 +113,7 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        
+
 
 
         //public void UpdateMenteeProfile(MenteeProfileModel model)
@@ -120,7 +130,7 @@ namespace DevnotMentor.Api.Services
                 var newMentee = mapper.Map<Mentee>(model);
                 newMentee.UserId = user.Id;
 
-                mentee = repository.Create(newMentee);
+                mentee = menteeRepository.Create(newMentee);
                 if (mentee != null)
                 {
                     menteeLinksRepository.Create(mentee.Id, model.MenteeLinks);
@@ -141,7 +151,7 @@ namespace DevnotMentor.Api.Services
                             }
                         }
                     }
-                    await repository.SaveChangesAsync();
+                    await menteeRepository.SaveChangesAsync();
                     transaction.Complete();
                 }
             }
@@ -149,5 +159,63 @@ namespace DevnotMentor.Api.Services
             return mentee;
         }
 
+        public async Task<ApiResponse> ApplyToMentor(ApplyMentorModel model)
+        {
+            var apiResponse = new ApiResponse();
+
+            if (model.MenteeUserId == model.MentorUserId)
+            {
+                apiResponse.Message = responseMessages.Values["MenteeCanNotBeSelfMentor"];
+                return apiResponse;
+            }
+
+            var checkIsMenteeUserExists = await userRepository.AnyByIdAsync(model.MenteeUserId);
+            var checkIsMentorUserExists = await userRepository.AnyByIdAsync(model.MentorUserId);
+
+            if (!checkIsMenteeUserExists || !checkIsMentorUserExists)
+            {
+                apiResponse.Message = responseMessages.Values["UserNotFound"];
+                return apiResponse;
+            }
+
+            bool checkIsMenteeExists = await menteeRepository.AnyByUserIdAsync(model.MenteeUserId);
+
+            if (!checkIsMenteeExists)
+            {
+                apiResponse.Message = responseMessages.Values["MenteeNotFound"];
+                return apiResponse;
+            }
+
+            bool checkIsMentorExists = await mentorRepository.AnyByUserIdAsync(model.MentorUserId);
+
+            if (!checkIsMentorExists)
+            {
+                apiResponse.Message = responseMessages.Values["MentorNotFound"];
+                return apiResponse;
+            }
+
+            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.AnyPairByUserIdAsync(model.MentorUserId, model.MenteeUserId);
+
+            if (checkAreThereExistsMenteeAndMentorPair)
+            {
+                apiResponse.Message = responseMessages.Values["MentorMenteePairAlreadyExists"];
+                return apiResponse;
+            }
+
+            int menteeId = await menteeRepository.GetIdByUserIdAsync(model.MenteeUserId);
+            int mentorId = await mentorRepository.GetIdByUserIdAsync(model.MentorUserId);
+
+            mentorApplicationsRepository.Create(new MentorApplications
+            {
+                ApllicationNotes = model.ApplicationNotes,
+                ApplyDate = DateTime.Now,
+                MenteeId = menteeId,
+                MentorId = mentorId,
+                Status = MentorMenteePairStatus.Waiting.ToInt()
+            });
+
+            apiResponse.Success = true;
+            return apiResponse;
+        }
     }
 }
