@@ -26,6 +26,14 @@ namespace DevnotMentor.Api.Repositories
             return newEntry.Entity;
         }
 
+        public T Update(T entity)
+        {
+            var newEntry = context.Set<T>().Update(entity);
+            context.SaveChanges();
+
+            return newEntry.Entity;
+        }
+
         public void Delete(T entity)
         {
             context.Set<T>().Remove(entity);
