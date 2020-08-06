@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
@@ -17,34 +18,44 @@ namespace DevnotMentor.Api.Services
 {
     public class MentorService : BaseService, IMentorService
     {
-        MentorRepository repository;
+        MentorRepository mentorRepository;
+        MenteeRepository menteeRepository;
         MentorLinksRepository mentorLinksRepository;
         MentorTagsRepository mentorTagsRepository;
         TagRepository tagRepository;
         UserRepository userRepository;
+        MentorApplicationsRepository mentorApplicationsRepository;
+        MentorMenteePairsRepository mentorMenteePairsRepository;
+
+        private int MAX_MENTEE_COUNT = 5;
+        private int MAX_MENTOR_COUNT = 5;
 
         public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) : base(appSettings, responseMessages, mapper, context)
         {
             this.mapper = mapper;
-            repository = new MentorRepository(context);
+            mentorRepository = new MentorRepository(context);
             mentorLinksRepository = new MentorLinksRepository(context);
             mentorTagsRepository = new MentorTagsRepository(context);
             tagRepository = new TagRepository(context);
             userRepository = new UserRepository(context);
+            menteeRepository = new MenteeRepository(context);
+            mentorApplicationsRepository = new MentorApplicationsRepository(context);
+            mentorMenteePairsRepository = new MentorMenteePairsRepository(context);
         }
 
         public async Task<ApiResponse<MentorProfileModel>> GetMentorProfile(string userName)
         {
             var response = new ApiResponse<MentorProfileModel>();
 
-            await RunInTry(response, async () => {
+            await RunInTry(response, async () =>
+            {
                 var user = userRepository.Filter(u => u.UserName == userName).FirstOrDefault();
 
-                if(user != null)
+                if (user != null)
                 {
-                    var mentor = repository.Filter(m => m.UserId == user.Id).FirstOrDefault();
+                    var mentor = mentorRepository.Filter(m => m.UserId == user.Id).FirstOrDefault();
 
-                    if(mentor != null)
+                    if (mentor != null)
                     {
                         response.Data = mapper.Map<MentorProfileModel>(mentor);
                         response.Success = true;
@@ -67,13 +78,14 @@ namespace DevnotMentor.Api.Services
         {
             var response = new ApiResponse<MentorProfileModel>();
 
-            await RunInTry(response, async () => {
-                
+            await RunInTry(response, async () =>
+            {
+
                 var user = userRepository.Filter(u => u.UserName == model.UserName).FirstOrDefault();
-                
-                if(user != null)
-                { 
-                    var isRegisteredMentor = repository.Filter(m => m.UserId == user.Id).Any();
+
+                if (user != null)
+                {
+                    var isRegisteredMentor = mentorRepository.Filter(m => m.UserId == user.Id).Any();
 
                     if (!isRegisteredMentor)
                     {
@@ -114,7 +126,6 @@ namespace DevnotMentor.Api.Services
             throw new NotImplementedException();
         }
 
-
         private async Task<Mentor> CreateNewMentor(MentorProfileModel model, User user)
         {
             Mentor mentor = null;
@@ -124,7 +135,7 @@ namespace DevnotMentor.Api.Services
                 var newMentor = mapper.Map<Mentor>(model);
                 newMentor.UserId = user.Id;
 
-                mentor = repository.Create(newMentor);
+                mentor = mentorRepository.Create(newMentor);
                 if (mentor != null)
                 {
                     mentorLinksRepository.Create(mentor.Id, model.MentorLinks);
@@ -145,12 +156,119 @@ namespace DevnotMentor.Api.Services
                             }
                         }
                     }
-                    await repository.SaveChangesAsync();
+                    await mentorRepository.SaveChangesAsync();
                     transaction.Complete();
                 }
             }
 
             return mentor;
+        }
+
+        public async Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId)
+        {
+            var apiResponse = new ApiResponse();
+
+            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorUserId, menteeUserId);
+
+            if (mentorApplication == null)
+            {
+                apiResponse.Message = responseMessages.Values["MentorMenteePairNotFound"];
+                return apiResponse;
+            }
+
+            if (mentorApplication.Status == MentorMenteePairStatus.Approved.ToInt())
+            {
+                apiResponse.Message = responseMessages.Values["ApplicationAlreadyApproved"];
+                return apiResponse;
+            }
+
+            bool checkMenteeCountGtOrEqual = MenteeCountOfMentorGtOrEqMaxCount(mentorUserId);
+
+            if (checkMenteeCountGtOrEqual)
+            {
+                apiResponse.Message = responseMessages.Values["MentorAlreadyHasTheMaxMenteeCount"];
+                return apiResponse;
+            }
+
+            bool checkMentorCountGtOrEqual = MentorCountOfMenteeGtOrEqMaxCount(menteeUserId);
+
+            if (checkMentorCountGtOrEqual)
+            {
+                apiResponse.Message = responseMessages.Values["MenteeAlreadyHasTheMaxMentorCount"];
+                return apiResponse;
+            }
+
+            DateTime now = DateTime.Now;
+
+            mentorApplication.Status = MentorMenteePairStatus.Approved.ToInt();
+            mentorApplication.CompleteDate = now;
+
+            mentorApplicationsRepository.Update(mentorApplication);
+
+            int mentorId = await mentorRepository.GetIdByUserIdAsync(mentorUserId);
+            int menteeId = await menteeRepository.GetIdByUserIdAsync(menteeUserId);
+
+            var mentorMenteePairs = new MentorMenteePairs
+            {
+                MentorId = mentorId,
+                MenteeId = menteeId,
+                MentorStartDate = now,
+                State = MentorMenteePairStatus.Continues.ToInt()
+            };
+
+            mentorMenteePairsRepository.Create(mentorMenteePairs);
+
+            apiResponse.Success = true;
+            return apiResponse;
+        }
+
+        public async Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId)
+        {
+            var apiResponse = new ApiResponse();
+
+            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorUserId, menteeUserId);
+
+            if (mentorApplication == null)
+            {
+                apiResponse.Message = responseMessages.Values["MentorMenteePairNotFound"];
+                return apiResponse;
+            }
+
+            if (mentorApplication.Status != MentorMenteePairStatus.Waiting.ToInt())
+            {
+                apiResponse.Message = responseMessages.Values["ApplicationNotFoundWhenWaitingStatus"];
+                return apiResponse;
+            }
+
+            mentorApplication.Status = MentorMenteePairStatus.Rejected.ToInt();
+
+            mentorApplicationsRepository.Update(mentorApplication);
+
+            apiResponse.Success = true;
+            return apiResponse;
+
+        }
+
+        /// <summary>
+        /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
+        /// </summary>
+        /// <param name="menteeUserId">user id of mentee</param>
+        /// <returns>Number of mentor of the mentee is greater than or equal to default max. value?</returns>
+        private bool MentorCountOfMenteeGtOrEqMaxCount(int menteeUserId)
+        {
+            int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMenteeUserId(menteeUserId);
+            return count >= MAX_MENTOR_COUNT;
+        }
+
+        /// <summary>
+        /// This method checks that the number of mentee of the mentor is greater than or equal to default max. value
+        /// </summary>
+        /// <param name="mentorUserId">user id of mentor.</param>
+        /// <returns>Number of mentee of the mentor is greater than or equal to default max. value?</returns>
+        private bool MenteeCountOfMentorGtOrEqMaxCount(int mentorUserId)
+        {
+            int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMentorUserId(mentorUserId);
+            return count >= MAX_MENTEE_COUNT;
         }
     }
 }

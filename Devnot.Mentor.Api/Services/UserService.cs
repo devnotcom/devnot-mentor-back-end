@@ -5,6 +5,7 @@ using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Services.Interfaces;
+using DevnotMentor.Api.Utilities.Security.Token;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -24,17 +25,20 @@ namespace DevnotMentor.Api.Services
     public class UserService : BaseService, IUserService
     {
         UserRepository repository;
+        private ITokenService tokenService;
 
-        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) :base(appSettings, responseMessages, mapper, context)
+        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService) : base(appSettings, responseMessages, mapper, context)
         {
             repository = new UserRepository(context);
+            this.tokenService = tokenService;
         }
 
         public async Task<ApiResponse<User>> Login(LoginModel model)
         {
             var response = new ApiResponse<User>();
 
-            await RunInTry(response, async() => {
+            await RunInTry(response, async () =>
+            {
                 var user = await repository.GetUser(model.UserName, model.Password);
 
                 if (user == null)
@@ -47,12 +51,14 @@ namespace DevnotMentor.Api.Services
                 }
                 else
                 {
-                    user.Token = GenerateToken(user.UserName);
+                    var tokenData = tokenService.CreateToken(user.Id, user.UserName);
+
+                    user.Token = tokenData.Token;
+                    user.TokenExpireDate = tokenData.ExpiredDate;
+
                     response = new ApiResponse<User> { Success = true, Data = user };
                 }
             });
-
-            
 
             return response;
         }
@@ -63,7 +69,7 @@ namespace DevnotMentor.Api.Services
 
             await RunInTry(response, async () =>
             {
-                if(!FileHelper.IsValidProfileImage(model.ProfileImage))
+                if (!FileHelper.IsValidProfileImage(model.ProfileImage))
                 {
                     response.Message = responseMessages.Values["InvalidProfileImage"];
                     return;
@@ -79,26 +85,5 @@ namespace DevnotMentor.Api.Services
 
             return response;
         }
-
-        public string GenerateToken(string userName)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[] {
-                    new Claim(ClaimTypes.Email, userName)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(appSettings.SecretExpirationInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        //public async Task<bool> IsValidToken(string userName, string token)
-        //{
-        //    return new Task<bool>();
-        //}
     }
 }

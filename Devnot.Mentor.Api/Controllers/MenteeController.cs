@@ -14,16 +14,17 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MenteeController : BaseController
     {
-        IMenteeService service;
-        public MenteeController(IMenteeService service)
+        private IMenteeService _menteeService;
+
+        public MenteeController(IMenteeService menteeService)
         {
-            this.service = service;
+            _menteeService = menteeService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get(string userName)
         {
-            var result = await service.GetMenteeProfile(userName);
+            var result = await _menteeService.GetMenteeProfile(userName);
 
             if (result.Success)
             {
@@ -36,9 +37,9 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]MenteeProfileModel model)
+        public async Task<IActionResult> Post([FromBody] MenteeProfileModel model)
         {
-            var result = await service.CreateMenteeProfile(model);
+            var result = await _menteeService.CreateMenteeProfile(model);
 
             if (result.Success)
             {
@@ -49,5 +50,23 @@ namespace DevnotMentor.Api.Controllers
                 return Error(result);
             }
         }
+
+        [HttpPost]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        [Route("~/mentees/{menteeId}/mentors")]
+        public async Task<IActionResult> ApplyToMentor(ApplyMentorModel model)
+        {
+            var checkResult = await _menteeService.ApplyToMentor(model);
+
+            return Ok(checkResult);
+        }
+
+    }
+    public class ApplyMentorModel
+    {
+        public int MenteeUserId { get; set; }
+        public int MentorUserId { get; set; }
+        public string ApplicationNotes { get; set; }
+        public int Status { get; set; }
     }
 }

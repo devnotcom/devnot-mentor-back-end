@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using DevnotMentor.Api.Middleware;
 using DevnotMentor.Api.ActionFilters;
+using DevnotMentor.Api.Utilities.Security.Token;
 
 namespace DevnotMentor.Api
 {
@@ -42,6 +43,9 @@ namespace DevnotMentor.Api
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
+
+            services.AddSingleton<ITokenService, JwtTokenService>();
+            services.AddSingleton<TokenAuthentication>();
 
             services.AddCors(options =>
             {
@@ -84,7 +88,7 @@ namespace DevnotMentor.Api
             {
                 endpoints.MapControllers();
             });
-            
+
         }
     }
 }
