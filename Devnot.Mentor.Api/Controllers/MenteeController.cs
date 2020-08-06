@@ -52,6 +52,7 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(TokenAuthentication))]
         [Route("~/mentees/{menteeId}/mentors")]
         public async Task<IActionResult> ApplyToMentor(ApplyMentorModel model)
         {
