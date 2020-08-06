@@ -64,5 +64,19 @@ namespace DevnotMentor.Api.Controllers
 
             return Error<object>(result.Message, null);
         }
+
+        [HttpPost]
+        [Route("/mentors/{mentorUserId}/mentees/waitings/{menteeUserId}/reject")]
+        public async Task<IActionResult> RejectMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
+        {
+            var result = await mentorService.RejectMentee(mentorUserId, menteeUserId);
+
+            if (result.Success)
+            {
+                return Success(result);
+            }
+
+            return Error<object>(result.Message, null);
+        }
     }
 }

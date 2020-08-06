@@ -222,6 +222,33 @@ namespace DevnotMentor.Api.Services
             return apiResponse;
         }
 
+        public async Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId)
+        {
+            var apiResponse = new ApiResponse();
+
+            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorUserId, menteeUserId);
+
+            if (mentorApplication == null)
+            {
+                apiResponse.Message = responseMessages.Values["MentorMenteePairNotFound"];
+                return apiResponse;
+            }
+
+            if (mentorApplication.Status != MentorMenteePairStatus.Waiting.ToInt())
+            {
+                apiResponse.Message = responseMessages.Values["ApplicationNotFoundWhenWaitingStatus"];
+                return apiResponse;
+            }
+
+            mentorApplication.Status = MentorMenteePairStatus.Rejected.ToInt();
+
+            mentorApplicationsRepository.Update(mentorApplication);
+
+            apiResponse.Success = true;
+            return apiResponse;
+
+        }
+
         /// <summary>
         /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
         /// </summary>
