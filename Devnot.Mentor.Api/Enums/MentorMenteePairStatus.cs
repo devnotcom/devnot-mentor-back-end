@@ -12,13 +12,4 @@ namespace DevnotMentor.Api.Enums
         Continues = 3,
         Rejected = 4
     }
-
-    public static class MentorMenteePairStatusExtensions
-    {
-        public static int? ToInt(this MentorMenteePairStatus status)
-        {
-            return (int?)status;
-        }
-    }
-
 }

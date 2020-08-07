@@ -4,6 +4,7 @@ using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
+using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Services.Interfaces;
