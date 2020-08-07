@@ -52,7 +52,7 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
-        [Route("/mentors/{mentorUserId}/mentees/waitings/{menteeUserId}/accept")]
+        [Route("/mentors/{mentorUserId}/mentees/{menteeUserId}/accept")]
         public async Task<IActionResult> AcceptMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
         {
             var result = await mentorService.AcceptMentee(mentorUserId, menteeUserId);
@@ -66,7 +66,7 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
-        [Route("/mentors/{mentorUserId}/mentees/waitings/{menteeUserId}/reject")]
+        [Route("/mentors/{mentorUserId}/mentees/{menteeUserId}/reject")]
         public async Task<IActionResult> RejectMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
         {
             var result = await mentorService.RejectMentee(mentorUserId, menteeUserId);
