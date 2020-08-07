@@ -28,9 +28,6 @@ namespace DevnotMentor.Api.Services
         MentorApplicationsRepository mentorApplicationsRepository;
         MentorMenteePairsRepository mentorMenteePairsRepository;
 
-        private int MAX_MENTEE_COUNT = 5;
-        private int MAX_MENTOR_COUNT = 5;
-
         public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) : base(appSettings, responseMessages, mapper, context)
         {
             mentorRepository = new MentorRepository(context);
@@ -257,7 +254,7 @@ namespace DevnotMentor.Api.Services
         private bool MentorCountOfMenteeGtOrEqMaxCount(int menteeUserId)
         {
             int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMenteeUserId(menteeUserId);
-            return count >= MAX_MENTOR_COUNT;
+            return count >= appSettings.MaxMentorCountOfMentee;
         }
 
         /// <summary>
@@ -268,7 +265,7 @@ namespace DevnotMentor.Api.Services
         private bool MenteeCountOfMentorGtOrEqMaxCount(int mentorUserId)
         {
             int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMentorUserId(mentorUserId);
-            return count >= MAX_MENTEE_COUNT;
+            return count >= appSettings.MaxMenteeCountOfMentor;
         }
     }
 }
