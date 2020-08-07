@@ -170,8 +170,8 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            var checkIsMenteeUserExists = await userRepository.AnyByIdAsync(model.MenteeUserId);
-            var checkIsMentorUserExists = await userRepository.AnyByIdAsync(model.MentorUserId);
+            var checkIsMenteeUserExists = await userRepository.IsExistsById(model.MenteeUserId);
+            var checkIsMentorUserExists = await userRepository.IsExistsById(model.MentorUserId);
 
             if (!checkIsMenteeUserExists || !checkIsMentorUserExists)
             {
@@ -179,7 +179,7 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            bool checkIsMenteeExists = await menteeRepository.AnyByUserIdAsync(model.MenteeUserId);
+            bool checkIsMenteeExists = await menteeRepository.IsExistsByUserId(model.MenteeUserId);
 
             if (!checkIsMenteeExists)
             {
@@ -187,7 +187,7 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            bool checkIsMentorExists = await mentorRepository.AnyByUserIdAsync(model.MentorUserId);
+            bool checkIsMentorExists = await mentorRepository.IsExistsByUserId(model.MentorUserId);
 
             if (!checkIsMentorExists)
             {
@@ -195,7 +195,7 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.AnyPairByUserIdAsync(model.MentorUserId, model.MenteeUserId);
+            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(model.MentorUserId, model.MenteeUserId);
 
             if (checkAreThereExistsMenteeAndMentorPair)
             {
@@ -203,8 +203,8 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(model.MenteeUserId);
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(model.MentorUserId);
+            int menteeId = await menteeRepository.GetIdByUserId(model.MenteeUserId);
+            int mentorId = await mentorRepository.GetIdByUserId(model.MentorUserId);
 
             mentorApplicationsRepository.Create(new MentorApplications
             {

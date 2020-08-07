@@ -169,7 +169,7 @@ namespace DevnotMentor.Api.Services
         {
             var apiResponse = new ApiResponse();
 
-            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorUserId, menteeUserId);
+            var mentorApplication = await mentorApplicationsRepository.Get(mentorUserId, menteeUserId);
 
             if (mentorApplication == null)
             {
@@ -206,8 +206,8 @@ namespace DevnotMentor.Api.Services
 
             mentorApplicationsRepository.Update(mentorApplication);
 
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(mentorUserId);
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(menteeUserId);
+            int mentorId = await mentorRepository.GetIdByUserId(mentorUserId);
+            int menteeId = await menteeRepository.GetIdByUserId(menteeUserId);
 
             var mentorMenteePairs = new MentorMenteePairs
             {
@@ -227,7 +227,7 @@ namespace DevnotMentor.Api.Services
         {
             var apiResponse = new ApiResponse();
 
-            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorUserId, menteeUserId);
+            var mentorApplication = await mentorApplicationsRepository.Get(mentorUserId, menteeUserId);
 
             if (mentorApplication == null)
             {

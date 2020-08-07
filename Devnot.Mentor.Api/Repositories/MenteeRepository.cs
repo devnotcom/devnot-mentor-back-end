@@ -17,12 +17,12 @@ namespace DevnotMentor.Api.Repositories
             _context = context;
         }
 
-        public async Task<int> GetIdByUserIdAsync(int userId)
+        public async Task<int> GetIdByUserId(int userId)
         {
             return await _context.Mentee.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
         }
 
-        public async Task<bool> AnyByUserIdAsync(int userId)
+        public async Task<bool> IsExistsByUserId(int userId)
         {
             return await _context.Mentee.AnyAsync(i => i.UserId == userId);
         }
