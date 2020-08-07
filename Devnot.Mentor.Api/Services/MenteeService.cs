@@ -31,7 +31,6 @@ namespace DevnotMentor.Api.Services
         {
             // TODO: I will take fields with dependency injection when application successfully done :)
 
-            this.mapper = mapper;
             menteeRepository = new MenteeRepository(context);
             menteeLinksRepository = new MenteeLinksRepository(context);
             menteeTagsRepository = new MenteeTagsRepository(context);

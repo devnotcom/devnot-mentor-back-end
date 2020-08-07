@@ -33,7 +33,6 @@ namespace DevnotMentor.Api.Services
 
         public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) : base(appSettings, responseMessages, mapper, context)
         {
-            this.mapper = mapper;
             mentorRepository = new MentorRepository(context);
             mentorLinksRepository = new MentorLinksRepository(context);
             mentorTagsRepository = new MentorTagsRepository(context);
