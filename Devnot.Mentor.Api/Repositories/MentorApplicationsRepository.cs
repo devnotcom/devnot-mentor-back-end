@@ -15,7 +15,7 @@ namespace DevnotMentor.Api.Repositories
             _context = context;
         }
 
-        public async Task<bool> AnyPairByUserIdAsync(int mentorUserId, int menteeUserId)
+        public async Task<bool> IsExistsByUserId(int mentorUserId, int menteeUserId)
         {
             return await _context
                 .MentorApplications
@@ -23,7 +23,7 @@ namespace DevnotMentor.Api.Repositories
                 .AnyAsync();
         }
 
-        public async Task<MentorApplications> GetAsync(int mentorUserId, int menteeUserId)
+        public async Task<MentorApplications> Get(int mentorUserId, int menteeUserId)
         {
             return await _context
                 .MentorApplications

@@ -4,6 +4,7 @@ using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
+using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Services.Interfaces;
@@ -30,7 +31,6 @@ namespace DevnotMentor.Api.Services
         {
             // TODO: I will take fields with dependency injection when application successfully done :)
 
-            this.mapper = mapper;
             menteeRepository = new MenteeRepository(context);
             menteeLinksRepository = new MenteeLinksRepository(context);
             menteeTagsRepository = new MenteeTagsRepository(context);
@@ -169,41 +169,29 @@ namespace DevnotMentor.Api.Services
                 return apiResponse;
             }
 
-            var checkIsMenteeUserExists = await userRepository.AnyByIdAsync(model.MenteeUserId);
-            var checkIsMentorUserExists = await userRepository.AnyByIdAsync(model.MentorUserId);
+            int menteeId = await menteeRepository.GetIdByUserId(model.MenteeUserId);
 
-            if (!checkIsMenteeUserExists || !checkIsMentorUserExists)
-            {
-                apiResponse.Message = responseMessages.Values["UserNotFound"];
-                return apiResponse;
-            }
-
-            bool checkIsMenteeExists = await menteeRepository.AnyByUserIdAsync(model.MenteeUserId);
-
-            if (!checkIsMenteeExists)
+            if (menteeId == default)
             {
                 apiResponse.Message = responseMessages.Values["MenteeNotFound"];
                 return apiResponse;
             }
 
-            bool checkIsMentorExists = await mentorRepository.AnyByUserIdAsync(model.MentorUserId);
+            int mentorId = await mentorRepository.GetIdByUserId(model.MentorUserId);
 
-            if (!checkIsMentorExists)
+            if (mentorId == default)
             {
                 apiResponse.Message = responseMessages.Values["MentorNotFound"];
                 return apiResponse;
             }
 
-            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.AnyPairByUserIdAsync(model.MentorUserId, model.MenteeUserId);
+            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(model.MentorUserId, model.MenteeUserId);
 
             if (checkAreThereExistsMenteeAndMentorPair)
             {
                 apiResponse.Message = responseMessages.Values["MentorMenteePairAlreadyExists"];
                 return apiResponse;
             }
-
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(model.MenteeUserId);
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(model.MentorUserId);
 
             mentorApplicationsRepository.Create(new MentorApplications
             {
