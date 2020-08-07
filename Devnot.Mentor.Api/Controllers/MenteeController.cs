@@ -58,7 +58,12 @@ namespace DevnotMentor.Api.Controllers
         {
             var checkResult = await _menteeService.ApplyToMentor(model);
 
-            return Ok(checkResult);
+            if (checkResult.Success)
+            {
+                return Success(checkResult.Message);
+            }
+
+            return Error<object>(checkResult.Message, null);
         }
 
     }
