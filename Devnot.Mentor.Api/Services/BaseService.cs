@@ -18,7 +18,7 @@ namespace DevnotMentor.Api.Services
         protected ResponseMessages responseMessages;
         protected IMapper mapper;
         protected MentorDBContext context;
-        protected Logger logger;
+        protected LoggerRepository logger;
 
         public BaseService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context)
         {
@@ -26,7 +26,7 @@ namespace DevnotMentor.Api.Services
             this.mapper = mapper;
             this.context = context;
             this.responseMessages = responseMessages.Value;
-            logger = new Logger(this.context);
+            logger = new LoggerRepository(this.context);
         }
 
         public async Task RunInTry(Func<Task> action)
