@@ -5,8 +5,13 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Common
 {
-    public class ApiResponse<T>: ApiResponse
+    public class ApiResponse<T> : ApiResponse
     {
+        public ApiResponse()
+        {
+
+        }
+
         public T Data { get; set; }
     }
 
