@@ -53,12 +53,11 @@ namespace DevnotMentor.Api.Aspects.Autofac.Exception
 
         private void CreateDefaultReturnGenericValue(IInvocation invocation)
         {
-            Type[] argTypes = invocation.Method.ReturnType.GetGenericArguments();
+            string returnValueFullName = invocation.Method.ReturnType.FullName;
 
-            Type resultType = invocation.Method.ReturnType.MakeGenericType(argTypes);
-            Type genericResultType = resultType.MakeGenericType(argTypes);
+            Type returnType = Type.GetType(returnValueFullName);
 
-            invocation.ReturnValue = Activator.CreateInstance(genericResultType);
+            invocation.ReturnValue = Activator.CreateInstance(returnType);
         }
 
         private void CreateDefaultReturnGenericTaskValue(IInvocation invocation)
