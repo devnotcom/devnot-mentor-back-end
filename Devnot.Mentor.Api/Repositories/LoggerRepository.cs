@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
-    public class Logger : Repository<Log>
+    public class LoggerRepository : Repository<Log>
     {
-        public Logger(MentorDBContext context) : base(context)
+        public LoggerRepository(MentorDBContext context) : base(context)
         {
 
         }
@@ -28,7 +28,7 @@ namespace DevnotMentor.Api.Repositories
             var message = ex.Message;
             var stackTrace = ex.StackTrace;
 
-            if(ex.InnerException != null)
+            if (ex.InnerException != null)
             {
                 message += Environment.NewLine + "InnerException: " + ex.InnerException.Message;
                 stackTrace += Environment.NewLine + "InnerException: " + ex.InnerException.StackTrace;
@@ -38,14 +38,16 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task WriteLog(string message, string stackTrace, string level)
         {
-            var log = new Log() { 
+            var log = new Log()
+            {
+                Id = Guid.NewGuid(),
                 Level = level,
                 Message = message,
                 StackTrace = stackTrace,
                 InsertDate = DateTime.Now
             };
 
-            Create(log);
+            context.Log.Add(log);
             await context.SaveChangesAsync();
         }
     }
