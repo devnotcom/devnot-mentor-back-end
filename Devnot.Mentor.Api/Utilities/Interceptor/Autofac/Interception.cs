@@ -27,7 +27,6 @@ namespace DevnotMentor.Api.Utilities.Interceptor.Autofac
                 isSuccess = false;
 
                 OnException(invocation, e);
-                throw;
             }
             finally
             {
