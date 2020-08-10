@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DevnotMentor.Api.Aspects.Autofac.Exception;
+using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
@@ -17,7 +19,7 @@ using System.Transactions;
 
 namespace DevnotMentor.Api.Services
 {
-    public class MentorService : BaseService, IMentorService
+    public class MentorService : IMentorService
     {
         MentorRepository mentorRepository;
         MenteeRepository menteeRepository;
@@ -28,7 +30,12 @@ namespace DevnotMentor.Api.Services
         MentorApplicationsRepository mentorApplicationsRepository;
         MentorMenteePairsRepository mentorMenteePairsRepository;
 
-        public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context) : base(appSettings, responseMessages, mapper, context)
+        ResponseMessages responseMessages;
+        AppSettings appSettings;
+
+        IMapper mapper;
+
+        public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context)
         {
             mentorRepository = new MentorRepository(context);
             mentorLinksRepository = new MentorLinksRepository(context);
@@ -38,35 +45,37 @@ namespace DevnotMentor.Api.Services
             menteeRepository = new MenteeRepository(context);
             mentorApplicationsRepository = new MentorApplicationsRepository(context);
             mentorMenteePairsRepository = new MentorMenteePairsRepository(context);
+
+            this.responseMessages = responseMessages.Value;
+            this.appSettings = appSettings.Value;
+            this.mapper = mapper;
         }
 
-        public async Task<ApiResponse<MentorProfileModel>> GetMentorProfile(string userName)
+        [ExceptionHandlingAspect]
+        public ApiResponse<MentorProfileModel> GetMentorProfile(string userName)
         {
             var response = new ApiResponse<MentorProfileModel>();
 
-            await RunInTry(response, async () =>
+            var user = userRepository.Filter(u => u.UserName == userName).FirstOrDefault();
+
+            if (user != null)
             {
-                var user = userRepository.Filter(u => u.UserName == userName).FirstOrDefault();
+                var mentor = mentorRepository.Filter(m => m.UserId == user.Id).FirstOrDefault();
 
-                if (user != null)
+                if (mentor != null)
                 {
-                    var mentor = mentorRepository.Filter(m => m.UserId == user.Id).FirstOrDefault();
-
-                    if (mentor != null)
-                    {
-                        response.Data = mapper.Map<MentorProfileModel>(mentor);
-                        response.Success = true;
-                    }
-                    else
-                    {
-                        response.Message = responseMessages.Values["MentorNotFound"];
-                    }
+                    response.Data = mapper.Map<MentorProfileModel>(mentor);
+                    response.Success = true;
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["UserNotFound"];
+                    response.Message = responseMessages.Values["MentorNotFound"];
                 }
-            });
+            }
+            else
+            {
+                response.Message = responseMessages.Values["UserNotFound"];
+            }
 
             return response;
         }
@@ -75,40 +84,36 @@ namespace DevnotMentor.Api.Services
         {
             var response = new ApiResponse<MentorProfileModel>();
 
-            await RunInTry(response, async () =>
+            var user = userRepository.Filter(u => u.UserName == model.UserName).FirstOrDefault();
+
+            if (user != null)
             {
+                var isRegisteredMentor = mentorRepository.Filter(m => m.UserId == user.Id).Any();
 
-                var user = userRepository.Filter(u => u.UserName == model.UserName).FirstOrDefault();
-
-                if (user != null)
+                if (!isRegisteredMentor)
                 {
-                    var isRegisteredMentor = mentorRepository.Filter(m => m.UserId == user.Id).Any();
+                    var mentor = await CreateNewMentor(model, user);
 
-                    if (!isRegisteredMentor)
+                    if (mentor != null)
                     {
-                        var mentor = await CreateNewMentor(model, user);
-
-                        if (mentor != null)
-                        {
-                            response.Data = mapper.Map<MentorProfileModel>(mentor);
-                            response.Success = true;
-                        }
-                        else
-                        {
-                            response.Message = responseMessages.Values["UnhandledException"];
-                        }
+                        response.Data = mapper.Map<MentorProfileModel>(mentor);
+                        response.Success = true;
                     }
                     else
                     {
-                        response.Message = responseMessages.Values["AlreadyRegisteredMentor"];
+                        response.Message = responseMessages.Values["UnhandledException"];
                     }
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["UserNotFound"];
+                    response.Message = responseMessages.Values["AlreadyRegisteredMentor"];
                 }
+            }
+            else
+            {
+                response.Message = responseMessages.Values["UserNotFound"];
+            }
 
-            });
 
             return response;
         }
@@ -123,44 +128,43 @@ namespace DevnotMentor.Api.Services
             throw new NotImplementedException();
         }
 
+        [ExceptionHandlingAspect]
+        [DevnotUnitOfWorkAspect]
         private async Task<Mentor> CreateNewMentor(MentorProfileModel model, User user)
         {
             Mentor mentor = null;
 
-            using (var transaction = new TransactionScope())
+            var newMentor = mapper.Map<Mentor>(model);
+            newMentor.UserId = user.Id;
+
+            mentor = mentorRepository.Create(newMentor);
+            if (mentor != null)
             {
-                var newMentor = mapper.Map<Mentor>(model);
-                newMentor.UserId = user.Id;
+                mentorLinksRepository.Create(mentor.Id, model.MentorLinks);
 
-                mentor = mentorRepository.Create(newMentor);
-                if (mentor != null)
+                foreach (var mentorTag in model.MentorTags)
                 {
-                    mentorLinksRepository.Create(mentor.Id, model.MentorLinks);
-
-                    foreach (var mentorTag in model.MentorTags)
+                    var tag = tagRepository.Filter(t => t.Name == mentorTag).FirstOrDefault();
+                    if (tag != null)
                     {
-                        var tag = tagRepository.Filter(t => t.Name == mentorTag).FirstOrDefault();
-                        if (tag != null)
+                        mentorTagsRepository.Create(new MentorTags { TagId = tag.Id, MentorId = mentor.Id });
+                    }
+                    else
+                    {
+                        var newTag = tagRepository.Create(new Tag { Name = mentorTag });
+                        if (newTag != null)
                         {
-                            mentorTagsRepository.Create(new MentorTags { TagId = tag.Id, MentorId = mentor.Id });
-                        }
-                        else
-                        {
-                            var newTag = tagRepository.Create(new Tag { Name = mentorTag });
-                            if (newTag != null)
-                            {
-                                mentorTagsRepository.Create(new MentorTags { TagId = newTag.Id, MentorId = mentor.Id });
-                            }
+                            mentorTagsRepository.Create(new MentorTags { TagId = newTag.Id, MentorId = mentor.Id });
                         }
                     }
-                    await mentorRepository.SaveChangesAsync();
-                    transaction.Complete();
                 }
+                await mentorRepository.SaveChangesAsync();
             }
 
             return mentor;
         }
 
+        [ExceptionHandlingAspect]
         public async Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId)
         {
             var apiResponse = new ApiResponse();
@@ -219,6 +223,7 @@ namespace DevnotMentor.Api.Services
             return apiResponse;
         }
 
+        [ExceptionHandlingAspect]
         public async Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId)
         {
             var apiResponse = new ApiResponse();

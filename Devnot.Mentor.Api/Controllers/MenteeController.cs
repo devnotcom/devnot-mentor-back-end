@@ -22,9 +22,9 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string userName)
+        public IActionResult Get(string userName)
         {
-            var result = await _menteeService.GetMenteeProfile(userName);
+            var result = _menteeService.GetMenteeProfile(userName);
 
             if (result.Success)
             {
