@@ -19,7 +19,7 @@ using System.Transactions;
 
 namespace DevnotMentor.Api.Services
 {
-    public class MentorService : IMentorService
+    public class MentorService : BaseService, IMentorService
     {
         MentorRepository mentorRepository;
         MenteeRepository menteeRepository;
@@ -30,12 +30,7 @@ namespace DevnotMentor.Api.Services
         MentorApplicationsRepository mentorApplicationsRepository;
         MentorMenteePairsRepository mentorMenteePairsRepository;
 
-        ResponseMessages responseMessages;
-        AppSettings appSettings;
-
-        IMapper mapper;
-
-        public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context)
+        public MentorService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context): base(appSettings, responseMessages, mapper, context)
         {
             mentorRepository = new MentorRepository(context);
             mentorLinksRepository = new MentorLinksRepository(context);
@@ -45,10 +40,6 @@ namespace DevnotMentor.Api.Services
             menteeRepository = new MenteeRepository(context);
             mentorApplicationsRepository = new MentorApplicationsRepository(context);
             mentorMenteePairsRepository = new MentorMenteePairsRepository(context);
-
-            this.responseMessages = responseMessages.Value;
-            this.appSettings = appSettings.Value;
-            this.mapper = mapper;
         }
 
         [ExceptionHandlingAspect]

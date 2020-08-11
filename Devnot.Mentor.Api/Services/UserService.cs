@@ -24,23 +24,16 @@ namespace DevnotMentor.Api.Services
 {
     //TODO: Aynı username ile kayıt yapılabiliyor
 
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         private UserRepository repository;
         private ITokenService tokenService;
 
-        ResponseMessages responseMessages;
-        AppSettings appSettings;
-        IMapper mapper;
-
-        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService)
+        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService) : base(appSettings, responseMessages, mapper, context)
         {
             repository = new UserRepository(context);
 
             this.tokenService = tokenService;
-            this.responseMessages = responseMessages.Value;
-            this.mapper = mapper;
-            this.appSettings = appSettings.Value;
         }
 
         [ExceptionHandlingAspect]

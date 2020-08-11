@@ -19,7 +19,7 @@ using System.Transactions;
 
 namespace DevnotMentor.Api.Services
 {
-    public class MenteeService : IMenteeService
+    public class MenteeService : BaseService, IMenteeService
     {
         MenteeRepository menteeRepository;
         MenteeLinksRepository menteeLinksRepository;
@@ -29,10 +29,7 @@ namespace DevnotMentor.Api.Services
         MentorRepository mentorRepository;
         MentorApplicationsRepository mentorApplicationsRepository;
 
-        ResponseMessages responseMessages;
-        IMapper mapper;
-
-        public MenteeService(IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context)
+        public MenteeService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context): base(appSettings, responseMessages, mapper, context)
         {
             // TODO: I will take fields with dependency injection when application successfully done :)
 
@@ -43,9 +40,6 @@ namespace DevnotMentor.Api.Services
             userRepository = new UserRepository(context);
             mentorRepository = new MentorRepository(context);
             mentorApplicationsRepository = new MentorApplicationsRepository(context);
-
-            this.responseMessages = responseMessages.Value;
-            this.mapper = mapper;
         }
 
         [ExceptionHandlingAspect]
