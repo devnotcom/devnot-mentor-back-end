@@ -7,6 +7,7 @@ using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Services.Interfaces;
+using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Token;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
@@ -26,14 +27,41 @@ namespace DevnotMentor.Api.Services
 
     public class UserService : BaseService, IUserService
     {
-        private UserRepository repository;
+        private UserRepository userRepository;
+        private IHashService hashService;
         private ITokenService tokenService;
 
-        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService) : base(appSettings, responseMessages, mapper, context)
+        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService, IHashService hashService) : base(appSettings, responseMessages, mapper, context)
         {
-            repository = new UserRepository(context);
+            userRepository = new UserRepository(context);
 
             this.tokenService = tokenService;
+            this.hashService = hashService;
+        }
+
+        public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
+        {
+            var response = new ApiResponse<bool>();
+
+            string hashedLastPassword = hashService.CreateHash(model.LastPassword);
+
+            User currentUser = await userRepository.GetUser(model.UserId, hashedLastPassword);
+
+            if (currentUser == null)
+            {
+                response.Message = responseMessages.Values["UserNotFound"];
+                return response;
+            }
+
+            string hashedNewPassword = hashService.CreateHash(model.NewPassword);
+            currentUser.Password = hashedNewPassword;
+
+            userRepository.Update(currentUser);
+
+            response.Message = responseMessages.Values["Success"];
+            response.Data = true;
+
+            return response;
         }
 
         [ExceptionHandlingAspect]
@@ -41,7 +69,7 @@ namespace DevnotMentor.Api.Services
         {
             var response = new ApiResponse<User>();
 
-            var user = await repository.GetUser(model.UserName, model.Password);
+            var user = await userRepository.GetUser(model.UserName, model.Password);
 
             if (user == null)
             {
@@ -78,8 +106,9 @@ namespace DevnotMentor.Api.Services
             }
 
             model.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
-            var newUser = repository.Create(mapper.Map<User>(model));
-            await repository.SaveChangesAsync();
+            model.Password = hashService.CreateHash(model.Password);
+
+            var newUser = userRepository.Create(mapper.Map<User>(model));
 
             response.Data = newUser;
             response.Success = true;
