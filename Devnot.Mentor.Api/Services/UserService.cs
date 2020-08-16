@@ -39,6 +39,7 @@ namespace DevnotMentor.Api.Services
             this.hashService = hashService;
         }
 
+        [ExceptionHandlingAspect]
         public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
         {
             var response = new ApiResponse<bool>();
@@ -59,6 +60,7 @@ namespace DevnotMentor.Api.Services
             userRepository.Update(currentUser);
 
             response.Message = responseMessages.Values["Success"];
+            response.Success = true;
             response.Data = true;
 
             return response;
@@ -69,7 +71,9 @@ namespace DevnotMentor.Api.Services
         {
             var response = new ApiResponse<User>();
 
-            var user = await userRepository.GetUser(model.UserName, model.Password);
+            string hashedPassword = hashService.CreateHash(model.Password);
+
+            var user = await userRepository.GetUser(model.UserName, hashedPassword);
 
             if (user == null)
             {
