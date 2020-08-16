@@ -22,9 +22,10 @@ namespace DevnotMentor.Api.Controllers
     {
         private IUserService _userService;
         private IHttpContextAccessor _httpContextAccessor;
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -92,13 +93,19 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost]
         [Route("/users/{userId}/change-password")]
-        public IActionResult ChangePassword([FromBody] PasswordUpdateModel model)
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] PasswordUpdateModel model)
         {
             model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            var checkResult = _userService.ChangePassword(model);
+            var checkResult = await _userService.ChangePassword(model);
 
-            return Ok(":D");
+            if (checkResult.Success)
+            {
+                return Success<bool>(checkResult);
+            }
+
+            return Error<bool>(checkResult);
         }
 
         protected void UpdateUser()

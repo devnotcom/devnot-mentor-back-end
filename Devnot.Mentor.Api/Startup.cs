@@ -63,6 +63,8 @@ namespace DevnotMentor.Api
             services.AddSingleton<IHashService, Sha256HashService>();
             services.AddSingleton<TokenAuthentication>();
 
+            services.AddHttpContextAccessor();
+
             services.AddCors(options =>
             {
                 options
