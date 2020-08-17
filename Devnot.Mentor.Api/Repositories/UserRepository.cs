@@ -16,12 +16,17 @@ namespace DevnotMentor.Api.Repositories
             _context = context;
         }
 
-        public async Task<User> GetUser(string userName, string hashedPassword)
+        public async Task<User> GetById(int id)
+        {
+            return await _context.User.Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> Get(string userName, string hashedPassword)
         {
             return await context.User.Where(u => u.UserName == userName && u.Password == hashedPassword).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetUser(int userId, string hashedPassword)
+        public async Task<User> Get(int userId, string hashedPassword)
         {
             return await context.User.Where(i => i.Id == userId && i.Password == hashedPassword).FirstOrDefaultAsync();
         }
