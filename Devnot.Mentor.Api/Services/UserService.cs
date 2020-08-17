@@ -46,7 +46,7 @@ namespace DevnotMentor.Api.Services
 
             string hashedLastPassword = hashService.CreateHash(model.LastPassword);
 
-            User currentUser = await userRepository.GetUser(model.UserId, hashedLastPassword);
+            User currentUser = await userRepository.Get(model.UserId, hashedLastPassword);
 
             if (currentUser == null)
             {
@@ -73,7 +73,7 @@ namespace DevnotMentor.Api.Services
 
             string hashedPassword = hashService.CreateHash(model.Password);
 
-            var user = await userRepository.GetUser(model.UserName, hashedPassword);
+            var user = await userRepository.Get(model.UserName, hashedPassword);
 
             if (user == null)
             {
@@ -115,6 +115,42 @@ namespace DevnotMentor.Api.Services
             var newUser = userRepository.Create(mapper.Map<User>(model));
 
             response.Data = newUser;
+            response.Success = true;
+
+            return response;
+        }
+
+        [ExceptionHandlingAspect]
+        public async Task<ApiResponse<User>> Update(UserUpdateModel model)
+        {
+            var response = new ApiResponse<User>();
+
+            var currentUser = await userRepository.GetById(model.UserId);
+
+            if (currentUser == null)
+            {
+                response.Message = responseMessages.Values["UserNotFound"];
+                return response;
+            }
+
+            if (model.ProfileImage != null)
+            {
+                if (!FileHelper.IsValidProfileImage(model.ProfileImage))
+                {
+                    response.Message = responseMessages.Values["InvalidProfileImage"];
+                    return response;
+                }
+
+                currentUser.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
+            }
+
+            currentUser.Name = model.Name;
+            currentUser.SurName = model.SurName;
+
+            userRepository.Update(currentUser);
+
+            response.Data = currentUser;
+            response.Message = responseMessages.Values["Success"];
             response.Success = true;
 
             return response;

@@ -11,8 +11,8 @@ namespace DevnotMentor.Api.Services.Interfaces
     public interface IUserService
     {
         Task<ApiResponse<User>> Login(LoginModel model);
-
         Task<ApiResponse<User>> Register(UserModel model);
         Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model);
+        Task<ApiResponse<User>> Update(UserUpdateModel model);
     }
 }

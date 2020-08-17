@@ -108,9 +108,20 @@ namespace DevnotMentor.Api.Controllers
             return Error<bool>(checkResult);
         }
 
-        protected void UpdateUser()
+        [HttpPost]
+        [Route("/users/{userId}/update-profile")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> UpdateUserAsync([FromForm] UserUpdateModel model)
         {
+            model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
+            var checkResult = await _userService.Update(model);
+
+            if (checkResult.Success)
+            {
+                return Success(checkResult);
+            }
+            return Error(checkResult);
         }
     }
 }
