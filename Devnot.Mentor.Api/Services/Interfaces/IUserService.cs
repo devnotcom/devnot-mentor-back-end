@@ -14,5 +14,7 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<User>> Register(UserModel model);
         Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model);
         Task<ApiResponse<User>> Update(UserUpdateModel model);
+        Task<ApiResponse> RemindPassword(string email);
+        Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model);
     }
 }

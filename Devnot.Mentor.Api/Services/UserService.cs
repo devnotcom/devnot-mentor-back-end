@@ -7,6 +7,7 @@ using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Services.Interfaces;
+using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Token;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -30,13 +31,15 @@ namespace DevnotMentor.Api.Services
         private UserRepository userRepository;
         private IHashService hashService;
         private ITokenService tokenService;
+        private IMailService mailService;
 
-        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService, IHashService hashService) : base(appSettings, responseMessages, mapper, context)
+        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService, IHashService hashService, IMailService mailService) : base(appSettings, responseMessages, mapper, context)
         {
             userRepository = new UserRepository(context);
 
             this.tokenService = tokenService;
             this.hashService = hashService;
+            this.mailService = mailService;
         }
 
         [ExceptionHandlingAspect]
@@ -121,6 +124,46 @@ namespace DevnotMentor.Api.Services
         }
 
         [ExceptionHandlingAspect]
+        public async Task<ApiResponse> RemindPassword(string email)
+        {
+            var response = new ApiResponse();
+
+            if (String.IsNullOrWhiteSpace(email))
+            {
+                response.Message = responseMessages.Values["InvalidModel"];
+                return response;
+            }
+
+            var currentUser = await userRepository.Get(email);
+
+            if (currentUser == null)
+            {
+                response.Message = responseMessages.Values["UserNotFound"];
+                return response;
+            }
+
+            currentUser.SecurityKey = Guid.NewGuid();
+            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(appSettings.SecurityKeyExpiryFromHours);
+
+            userRepository.Update(currentUser);
+
+            await SendRemindPasswordMail(currentUser);
+
+            response.Success = true;
+            return response;
+        }
+
+        private async Task SendRemindPasswordMail(User user)
+        {
+            var to = new List<string> { user.Email };
+            string subject = "Devnot Mentor Programı | Parola Sıfırlama İsteği";
+            string remindPasswordUrl = $"{appSettings.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
+            string body = $"Merhaba {user.Name} {user.SurName}, <a href='{remindPasswordUrl}' target='_blank'>buradan</a> parolanızı sıfırlayabilirsiniz.";
+
+            await mailService.SendEmailAsync(to, subject, body);
+        }
+
+        [ExceptionHandlingAspect]
         public async Task<ApiResponse<User>> Update(UserUpdateModel model)
         {
             var response = new ApiResponse<User>();
@@ -154,6 +197,36 @@ namespace DevnotMentor.Api.Services
             response.Success = true;
 
             return response;
+        }
+
+        [ExceptionHandlingAspect]
+        public async Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model)
+        {
+            var apiResponse = new ApiResponse();
+
+            var currentUser = await userRepository.Get(model.SecurityKey);
+
+            if (currentUser == null)
+            {
+                apiResponse.Message = responseMessages.Values["InvalidSecurityKey"];
+                return apiResponse;
+            }
+
+            if (currentUser.SecurityKeyExpiryDate < DateTime.Now)
+            {
+                apiResponse.Message = responseMessages.Values["SecurityKeyExpiryDateAlreadyExpired"];
+                return apiResponse;
+            }
+
+            currentUser.SecurityKey = null;
+            currentUser.Password = hashService.CreateHash(model.Password);
+
+            userRepository.Update(currentUser);
+
+            apiResponse.Success = true;
+            apiResponse.Message = responseMessages.Values["Success"];
+
+            return apiResponse;
         }
     }
 }

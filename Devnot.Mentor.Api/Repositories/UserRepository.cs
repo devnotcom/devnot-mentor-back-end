@@ -31,6 +31,16 @@ namespace DevnotMentor.Api.Repositories
             return await context.User.Where(i => i.Id == userId && i.Password == hashedPassword).FirstOrDefaultAsync();
         }
 
+        public async Task<User> Get(string email)
+        {
+            return await context.User.Where(i => i.Email == email).FirstOrDefaultAsync();
+        }
+
+        public async Task<User> Get(Guid securityKey)
+        {
+            return await context.User.Where(i => i.SecurityKey == securityKey).FirstOrDefaultAsync();
+        }
+
         public async Task<bool> IsExistsById(int id)
         {
             return await _context.User.AnyAsync(i => i.Id == id);

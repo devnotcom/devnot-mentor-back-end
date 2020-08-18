@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using DevnotMentor.Api.ActionFilters;
+using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
@@ -86,15 +87,10 @@ namespace DevnotMentor.Api.Controllers
             }
         }
 
-        protected void RemindPassword()
-        {
-
-        }
-
         [HttpPost]
         [Route("/users/{userId}/change-password")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] PasswordUpdateModel model)
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordUpdateModel model)
         {
             model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
@@ -111,7 +107,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpPost]
         [Route("/users/{userId}/update-profile")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> UpdateUserAsync([FromForm] UserUpdateModel model)
+        public async Task<IActionResult> UpdateUser([FromForm] UserUpdateModel model)
         {
             model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
@@ -122,6 +118,32 @@ namespace DevnotMentor.Api.Controllers
                 return Success(checkResult);
             }
             return Error(checkResult);
+        }
+
+        [Route("/user/remind-password")]
+        public async Task<IActionResult> RemindPassword(string email)
+        {
+            var result = await _userService.RemindPassword(email);
+
+            if (result.Success)
+            {
+                return Success<string>("Mail başarıyla gönderildi..");
+            }
+            return Error<bool>(result.Message, false);
+        }
+
+        [HttpPost]
+        [Route("/user/remind-password-complete")]
+        public async Task<IActionResult> RemindPasswordCompleteAsync(RemindPasswordCompleteModel model)
+        {
+            var result = await _userService.RemindPasswordComplete(model);
+
+            if (result.Success)
+            {
+                return Success<string>(result.Message);
+            }
+
+            return Error<string>(result.Message, null);
         }
     }
 }
