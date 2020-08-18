@@ -23,6 +23,7 @@ namespace DevnotMentor.Api.Entities
         public string Token { get; set; }
         public DateTime? TokenExpireDate { get; set; }
         public string ProfileUrl { get; set; }
+        public DateTime? SecurityKeyExpiryDate { get; set; }
         public Guid? SecurityKey { get; set; }
 
         public virtual ICollection<Mentee> Mentee { get; set; }
