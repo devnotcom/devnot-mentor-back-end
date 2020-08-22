@@ -26,6 +26,7 @@ namespace DevnotMentor.Api.Services
 {
     //TODO: Aynı username ile kayıt yapılabiliyor
 
+    [ExceptionHandlingAspect]
     public class UserService : BaseService, IUserService
     {
         private UserRepository userRepository;
@@ -42,7 +43,6 @@ namespace DevnotMentor.Api.Services
             this.mailService = mailService;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
         {
             var response = new ApiResponse<bool>();
@@ -69,7 +69,6 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse<User>> Login(LoginModel model)
         {
             var response = new ApiResponse<User>();
@@ -100,7 +99,6 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        [ExceptionHandlingAspect]
         [DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<User>> Register(UserModel model)
         {
@@ -123,7 +121,6 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse> RemindPassword(string email)
         {
             var response = new ApiResponse();
@@ -163,7 +160,6 @@ namespace DevnotMentor.Api.Services
             await mailService.SendEmailAsync(to, subject, body);
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse<User>> Update(UserUpdateModel model)
         {
             var response = new ApiResponse<User>();
@@ -199,7 +195,6 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model)
         {
             var apiResponse = new ApiResponse();

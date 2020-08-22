@@ -19,6 +19,7 @@ using System.Transactions;
 
 namespace DevnotMentor.Api.Services
 {
+    [ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
         MentorRepository mentorRepository;
@@ -42,7 +43,6 @@ namespace DevnotMentor.Api.Services
             mentorMenteePairsRepository = new MentorMenteePairsRepository(context);
         }
 
-        [ExceptionHandlingAspect]
         public ApiResponse<MentorProfileModel> GetMentorProfile(string userName)
         {
             var response = new ApiResponse<MentorProfileModel>();
@@ -119,7 +119,6 @@ namespace DevnotMentor.Api.Services
             throw new NotImplementedException();
         }
 
-        [ExceptionHandlingAspect]
         [DevnotUnitOfWorkAspect]
         private async Task<Mentor> CreateNewMentor(MentorProfileModel model, User user)
         {
@@ -155,7 +154,6 @@ namespace DevnotMentor.Api.Services
             return mentor;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId)
         {
             var apiResponse = new ApiResponse();
@@ -214,7 +212,6 @@ namespace DevnotMentor.Api.Services
             return apiResponse;
         }
 
-        [ExceptionHandlingAspect]
         public async Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId)
         {
             var apiResponse = new ApiResponse();
