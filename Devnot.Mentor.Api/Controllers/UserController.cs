@@ -21,12 +21,12 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private IUserService _userService;
-        private IHttpContextAccessor _httpContextAccessor;
+        private IUserService userService;
+        private IHttpContextAccessor httpContextAccessor;
         public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
-            _userService = userService;
-            _httpContextAccessor = httpContextAccessor;
+            this.userService = userService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -61,7 +61,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            var result = await _userService.Login(model);
+            var result = await userService.Login(model);
 
             if (!result.Success)
             {
@@ -75,7 +75,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Register([FromForm] UserModel model)
         {
-            var result = await _userService.Register(model);
+            var result = await userService.Register(model);
 
             if (result.Success)
             {
@@ -92,9 +92,9 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordUpdateModel model)
         {
-            model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            var checkResult = await _userService.ChangePassword(model);
+            var checkResult = await userService.ChangePassword(model);
 
             if (checkResult.Success)
             {
@@ -109,9 +109,9 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> UpdateUser([FromForm] UserUpdateModel model)
         {
-            model.UserId = _httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            var checkResult = await _userService.Update(model);
+            var checkResult = await userService.Update(model);
 
             if (checkResult.Success)
             {
@@ -123,7 +123,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("/user/remind-password")]
         public async Task<IActionResult> RemindPassword(string email)
         {
-            var result = await _userService.RemindPassword(email);
+            var result = await userService.RemindPassword(email);
 
             if (result.Success)
             {
@@ -136,7 +136,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("/user/remind-password-complete")]
         public async Task<IActionResult> RemindPasswordCompleteAsync(RemindPasswordCompleteModel model)
         {
-            var result = await _userService.RemindPasswordComplete(model);
+            var result = await userService.RemindPasswordComplete(model);
 
             if (result.Success)
             {
