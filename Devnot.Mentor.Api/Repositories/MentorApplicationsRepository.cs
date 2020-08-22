@@ -9,15 +9,14 @@ namespace DevnotMentor.Api.Repositories
 {
     public class MentorApplicationsRepository : Repository<MentorApplications>
     {
-        private MentorDBContext _context;
         public MentorApplicationsRepository(MentorDBContext context) : base(context)
         {
-            _context = context;
+
         }
 
         public async Task<bool> IsExistsByUserId(int mentorUserId, int menteeUserId)
         {
-            return await _context
+            return await context
                 .MentorApplications
                 .Where(i => i.Mentor.UserId == mentorUserId && i.Mentee.UserId == menteeUserId)
                 .AnyAsync();
@@ -25,7 +24,7 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<MentorApplications> Get(int mentorUserId, int menteeUserId)
         {
-            return await _context
+            return await context
                 .MentorApplications
                 .Where(i => i.Mentor.User.Id == mentorUserId && i.Mentee.User.Id == menteeUserId)
                 .FirstOrDefaultAsync();

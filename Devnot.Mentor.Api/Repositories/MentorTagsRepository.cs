@@ -11,7 +11,5 @@ namespace DevnotMentor.Api.Repositories
         public MentorTagsRepository(MentorDBContext context):base(context)
         {
         }
-
-       
     }
 }

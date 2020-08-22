@@ -9,16 +9,13 @@ namespace DevnotMentor.Api.Repositories
 {
     public class UserRepository : Repository<User>
     {
-        private MentorDBContext _context;
-
         public UserRepository(MentorDBContext context) : base(context)
         {
-            _context = context;
         }
 
         public async Task<User> GetById(int id)
         {
-            return await _context.User.Where(i => i.Id == id).FirstOrDefaultAsync();
+            return await context.User.Where(i => i.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<User> Get(string userName, string hashedPassword)
@@ -43,7 +40,7 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<bool> IsExistsById(int id)
         {
-            return await _context.User.AnyAsync(i => i.Id == id);
+            return await context.User.AnyAsync(i => i.Id == id);
         }
     }
 }
