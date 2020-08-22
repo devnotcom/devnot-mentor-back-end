@@ -21,6 +21,11 @@ namespace DevnotMentor.Api.Utilities.Interceptor.Autofac
             try
             {
                 invocation.Proceed();
+
+                if (invocation.ReturnValue is Task task && task.Exception != null)
+                {
+                    throw task.Exception;
+                }
             }
             catch (Exception e)
             {
