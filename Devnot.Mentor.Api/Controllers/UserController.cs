@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using DevnotMentor.Api.ActionFilters;
+using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
+using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Services.Interfaces;
@@ -18,11 +21,12 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        IUserService userService;
-
-        public UserController(IUserService userService)
+        private IUserService userService;
+        private IHttpContextAccessor httpContextAccessor;
+        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             this.userService = userService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -69,11 +73,11 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Register([FromForm]UserModel model)
+        public async Task<IActionResult> Register([FromForm] UserModel model)
         {
             var result = await userService.Register(model);
 
-            if(result.Success)
+            if (result.Success)
             {
                 return Success(result);
             }
@@ -83,19 +87,63 @@ namespace DevnotMentor.Api.Controllers
             }
         }
 
-        protected void RemindPassword()
+        [HttpPost]
+        [Route("/users/{userId}/change-password")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordUpdateModel model)
         {
+            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
+            var checkResult = await userService.ChangePassword(model);
+
+            if (checkResult.Success)
+            {
+                return Success<bool>(checkResult);
+            }
+
+            return Error<bool>(checkResult);
         }
 
-        protected void ChangePassword()
+        [HttpPost]
+        [Route("/users/{userId}/update-profile")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> UpdateUser([FromForm] UserUpdateModel model)
         {
+            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
+            var checkResult = await userService.Update(model);
+
+            if (checkResult.Success)
+            {
+                return Success(checkResult);
+            }
+            return Error(checkResult);
         }
 
-        protected void UpdateUser()
+        [Route("/user/remind-password")]
+        public async Task<IActionResult> RemindPassword(string email)
         {
+            var result = await userService.RemindPassword(email);
 
+            if (result.Success)
+            {
+                return Success<string>("Mail başarıyla gönderildi..");
+            }
+            return Error<bool>(result.Message, false);
+        }
+
+        [HttpPost]
+        [Route("/user/remind-password-complete")]
+        public async Task<IActionResult> RemindPasswordCompleteAsync(RemindPasswordCompleteModel model)
+        {
+            var result = await userService.RemindPasswordComplete(model);
+
+            if (result.Success)
+            {
+                return Success<string>(result.Message);
+            }
+
+            return Error<string>(result.Message, null);
         }
     }
 }

@@ -14,17 +14,17 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MenteeController : BaseController
     {
-        private IMenteeService _menteeService;
+        private IMenteeService menteeService;
 
         public MenteeController(IMenteeService menteeService)
         {
-            _menteeService = menteeService;
+            this.menteeService = menteeService;
         }
 
         [HttpGet]
         public IActionResult Get(string userName)
         {
-            var result = _menteeService.GetMenteeProfile(userName);
+            var result = menteeService.GetMenteeProfile(userName);
 
             if (result.Success)
             {
@@ -39,7 +39,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] MenteeProfileModel model)
         {
-            var result = await _menteeService.CreateMenteeProfile(model);
+            var result = await menteeService.CreateMenteeProfile(model);
 
             if (result.Success)
             {
@@ -56,7 +56,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("~/mentees/{menteeId}/mentors")]
         public async Task<IActionResult> ApplyToMentor(ApplyMentorModel model)
         {
-            var checkResult = await _menteeService.ApplyToMentor(model);
+            var checkResult = await menteeService.ApplyToMentor(model);
 
             if (checkResult.Success)
             {

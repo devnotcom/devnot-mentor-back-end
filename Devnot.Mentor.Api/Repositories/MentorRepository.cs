@@ -9,21 +9,18 @@ namespace DevnotMentor.Api.Repositories
 {
     public class MentorRepository : Repository<Mentor>
     {
-        private MentorDBContext _context;
-
         public MentorRepository(MentorDBContext context) : base(context)
         {
-            _context = context;
         }
 
         public async Task<int> GetIdByUserId(int userId)
         {
-            return await _context.Mentor.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
+            return await context.Mentor.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsExistsByUserId(int userId)
         {
-            return await _context.Mentor.AnyAsync(i => i.UserId == userId);
+            return await context.Mentor.AnyAsync(i => i.UserId == userId);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace DevnotMentor.Api.Entities
 
         public int Id { get; set; }
         public string UserName { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
         public string SurName { get; set; }
@@ -22,6 +23,7 @@ namespace DevnotMentor.Api.Entities
         public string Token { get; set; }
         public DateTime? TokenExpireDate { get; set; }
         public string ProfileUrl { get; set; }
+        public DateTime? SecurityKeyExpiryDate { get; set; }
         public Guid? SecurityKey { get; set; }
 
         public virtual ICollection<Mentee> Mentee { get; set; }
