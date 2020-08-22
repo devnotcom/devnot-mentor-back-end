@@ -10,8 +10,8 @@ namespace DevnotMentor.Api.Helpers.Extensions
     {
         public static int GetUserId(this IEnumerable<Claim> claims)
         {
-            Claim userIdClaim = claims.Where(i => i.Type == "UserId").First();
-            return int.Parse(userIdClaim.Value);
+            Claim userIdClaim = claims.Where(i => i.Type == "UserId").FirstOrDefault();
+            return userIdClaim == default ? default : int.Parse(userIdClaim.Value);
         }
     }
 }
