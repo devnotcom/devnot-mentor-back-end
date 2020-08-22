@@ -150,6 +150,7 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
+        // TODO: İlerleyen zamanlarda template olarak veri tabanı ya da dosyadan okunulacak.
         private async Task SendRemindPasswordMail(User user)
         {
             var to = new List<string> { user.Email };
@@ -165,12 +166,6 @@ namespace DevnotMentor.Api.Services
             var response = new ApiResponse<User>();
 
             var currentUser = await userRepository.GetById(model.UserId);
-
-            if (currentUser == null)
-            {
-                response.Message = responseMessages.Values["UserNotFound"];
-                return response;
-            }
 
             if (model.ProfileImage != null)
             {

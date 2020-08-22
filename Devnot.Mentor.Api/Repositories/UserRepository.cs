@@ -38,7 +38,7 @@ namespace DevnotMentor.Api.Repositories
             return await context.User.Where(i => i.SecurityKey == securityKey).FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsExistsById(int id)
+        public async Task<bool> IsExists(int id)
         {
             return await context.User.AnyAsync(i => i.Id == id);
         }
