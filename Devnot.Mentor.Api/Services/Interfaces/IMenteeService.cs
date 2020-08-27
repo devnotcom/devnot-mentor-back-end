@@ -10,7 +10,7 @@ namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IMenteeService
     {
-        ApiResponse<MenteeProfileModel> GetMenteeProfile(string userName);
+        Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName);
 
         Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model);
 

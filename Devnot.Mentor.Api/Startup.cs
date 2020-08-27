@@ -24,6 +24,8 @@ using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Hash.Sha256;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Email.Gmail;
+using DevnotMentor.Api.Repositories;
+using DevnotMentor.Api.Repositories.Interfaces;
 
 namespace DevnotMentor.Api
 {
@@ -54,9 +56,13 @@ namespace DevnotMentor.Api
             services.Configure<AppSettings>(appSettingsSection);
             services.Configure<ResponseMessages>(Configuration.GetSection("ResponseMessages"));
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
+
             services.AddControllers();
             services.AddTokenAuthentication(appSettingsSection);
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddSingleton<TokenAuthentication>();
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
@@ -64,7 +70,22 @@ namespace DevnotMentor.Api
             services.AddScoped<IMailService, GmailService>();
             services.AddSingleton<ITokenService, JwtTokenService>();
             services.AddSingleton<IHashService, Sha256HashService>();
-            services.AddSingleton<TokenAuthentication>();
+
+            #region Repositories
+
+            services.AddScoped<ILoggerRepository, LoggerRepository>();
+            services.AddScoped<IMenteeLinksRepository, MenteeLinksRepository>();
+            services.AddScoped<IMenteeRepository, MenteeRepository>();
+            services.AddScoped<IMenteeTagsRepository, MenteeTagsRepository>();
+            services.AddScoped<IMentorApplicationsRepository, MentorApplicationsRepository>();
+            services.AddScoped<IMentorLinksRepository, MentorLinksRepository>();
+            services.AddScoped<IMentorMenteePairsRepository, MentorMenteePairsRepository>();
+            services.AddScoped<IMentorRepository, MentorRepository>();
+            services.AddScoped<IMentorTagsRepository, MentorTagsRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            #endregion
 
             services.AddHttpContextAccessor();
 

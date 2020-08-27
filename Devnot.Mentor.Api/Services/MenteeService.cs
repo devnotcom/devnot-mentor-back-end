@@ -9,6 +9,7 @@ using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
+using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using System;
@@ -22,36 +23,47 @@ namespace DevnotMentor.Api.Services
     [ExceptionHandlingAspect]
     public class MenteeService : BaseService, IMenteeService
     {
-        MenteeRepository menteeRepository;
-        MenteeLinksRepository menteeLinksRepository;
-        MenteeTagsRepository menteeTagsRepository;
-        TagRepository tagRepository;
-        UserRepository userRepository;
-        MentorRepository mentorRepository;
-        MentorApplicationsRepository mentorApplicationsRepository;
+        private IMenteeRepository menteeRepository;
+        private IMenteeLinksRepository menteeLinksRepository;
+        private IMenteeTagsRepository menteeTagsRepository;
+        private ITagRepository tagRepository;
+        private IUserRepository userRepository;
+        private IMentorRepository mentorRepository;
+        private IMentorApplicationsRepository mentorApplicationsRepository;
 
-        public MenteeService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context): base(appSettings, responseMessages, mapper, context)
+        public MenteeService(
+            IOptions<AppSettings> appSettings,
+            IOptions<ResponseMessages> responseMessages,
+            IMapper mapper,
+            IMenteeRepository menteeRepository,
+            IMenteeLinksRepository menteeLinksRepository,
+            IMenteeTagsRepository menteeTagsRepository,
+            ITagRepository tagRepository,
+            IUserRepository userRepository,
+            IMentorRepository mentorRepository,
+            IMentorApplicationsRepository mentorApplicationsRepository,
+            ILoggerRepository loggerRepository
+            )
+            : base(appSettings, responseMessages, mapper, loggerRepository)
         {
-            // TODO: I will take fields with dependency injection when application successfully done :)
-
-            menteeRepository = new MenteeRepository(context);
-            menteeLinksRepository = new MenteeLinksRepository(context);
-            menteeTagsRepository = new MenteeTagsRepository(context);
-            tagRepository = new TagRepository(context);
-            userRepository = new UserRepository(context);
-            mentorRepository = new MentorRepository(context);
-            mentorApplicationsRepository = new MentorApplicationsRepository(context);
+            this.menteeRepository = menteeRepository;
+            this.menteeLinksRepository = menteeLinksRepository;
+            this.menteeTagsRepository = menteeTagsRepository;
+            this.tagRepository = tagRepository;
+            this.userRepository = userRepository;
+            this.mentorRepository = mentorRepository;
+            this.mentorApplicationsRepository = mentorApplicationsRepository;
         }
 
-        public ApiResponse<MenteeProfileModel> GetMenteeProfile(string userName)
+        public async Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName)
         {
             var response = new ApiResponse<MenteeProfileModel>();
 
-            var user = userRepository.Filter(u => u.UserName == userName).FirstOrDefault();
+            var user = await userRepository.GetByUserName(userName);
 
             if (user != null)
             {
-                var mentee = menteeRepository.Filter(m => m.UserId == user.Id).FirstOrDefault();
+                var mentee = await menteeRepository.GetByUserId(user.Id);
 
                 if (mentee != null)
                 {
@@ -71,18 +83,18 @@ namespace DevnotMentor.Api.Services
             return response;
         }
 
-        [DevnotUnitOfWorkAspect]
+        //[DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model)
         {
             var response = new ApiResponse<MenteeProfileModel>();
 
-            var user = userRepository.Filter(u => u.UserName == model.UserName).FirstOrDefault();
+            var user = await userRepository.GetByUserName(model.UserName);
 
             if (user != null)
             {
-                var isRegisteredMentee = menteeRepository.Filter(m => m.UserId == user.Id).Any();
+                var registeredMentee = await menteeRepository.GetByUserId(user.Id);
 
-                if (!isRegisteredMentee)
+                if (registeredMentee == null)
                 {
                     var mentee = await CreateNewMentee(model, user);
 
@@ -118,13 +130,15 @@ namespace DevnotMentor.Api.Services
             newMentee.UserId = user.Id;
 
             mentee = menteeRepository.Create(newMentee);
+
             if (mentee != null)
             {
                 menteeLinksRepository.Create(mentee.Id, model.MenteeLinks);
 
                 foreach (var menteeTag in model.MenteeTags)
                 {
-                    var tag = tagRepository.Filter(t => t.Name == menteeTag).FirstOrDefault();
+                    var tag = tagRepository.Get(menteeTag);
+
                     if (tag != null)
                     {
                         menteeTagsRepository.Create(new MenteeTags { TagId = tag.Id, MenteeId = mentee.Id });
@@ -138,7 +152,6 @@ namespace DevnotMentor.Api.Services
                         }
                     }
                 }
-                await menteeRepository.SaveChangesAsync();
             }
 
             return mentee;

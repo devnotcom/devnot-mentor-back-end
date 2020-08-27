@@ -1,4 +1,5 @@
 ﻿using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
-    public class MentorApplicationsRepository : Repository<MentorApplications>
+    public class MentorApplicationsRepository : BaseRepository<MentorApplications>, IMentorApplicationsRepository
     {
         public MentorApplicationsRepository(MentorDBContext context) : base(context)
         {
@@ -16,7 +17,7 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<bool> IsExistsByUserId(int mentorUserId, int menteeUserId)
         {
-            return await context
+            return await DbContext
                 .MentorApplications
                 .Where(i => i.Mentor.UserId == mentorUserId && i.Mentee.UserId == menteeUserId)
                 .AnyAsync();
@@ -24,7 +25,7 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<MentorApplications> Get(int mentorUserId, int menteeUserId)
         {
-            return await context
+            return await DbContext
                 .MentorApplications
                 .Where(i => i.Mentor.User.Id == mentorUserId && i.Mentee.User.Id == menteeUserId)
                 .FirstOrDefaultAsync();
