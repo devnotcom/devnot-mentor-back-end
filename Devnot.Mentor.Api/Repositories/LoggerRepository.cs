@@ -1,4 +1,5 @@
 ﻿using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
-    public class LoggerRepository : Repository<Log>
+    public class LoggerRepository : BaseRepository<Log>, ILoggerRepository
     {
         public LoggerRepository(MentorDBContext context) : base(context)
         {
-
         }
 
         public async Task WriteInfo(string message)
@@ -47,8 +47,8 @@ namespace DevnotMentor.Api.Repositories
                 InsertDate = DateTime.Now
             };
 
-            context.Log.Add(log);
-            await context.SaveChangesAsync();
+            DbContext.Log.Add(log);
+            await DbContext.SaveChangesAsync();
         }
     }
 }

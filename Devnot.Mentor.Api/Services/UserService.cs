@@ -6,6 +6,7 @@ using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories;
+using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Hash;
@@ -29,18 +30,26 @@ namespace DevnotMentor.Api.Services
     [ExceptionHandlingAspect]
     public class UserService : BaseService, IUserService
     {
-        private UserRepository userRepository;
+        private IUserRepository userRepository;
         private IHashService hashService;
         private ITokenService tokenService;
         private IMailService mailService;
 
-        public UserService(IOptions<AppSettings> appSettings, IOptions<ResponseMessages> responseMessages, IMapper mapper, MentorDBContext context, ITokenService tokenService, IHashService hashService, IMailService mailService) : base(appSettings, responseMessages, mapper, context)
+        public UserService(
+            IOptions<AppSettings> appSettings,
+            IOptions<ResponseMessages> responseMessages,
+            IMapper mapper,
+            ITokenService tokenService,
+            IHashService hashService,
+            IMailService mailService,
+            IUserRepository userRepository,
+            ILoggerRepository loggerRepository
+            ) : base(appSettings, responseMessages, mapper, loggerRepository)
         {
-            userRepository = new UserRepository(context);
-
             this.tokenService = tokenService;
             this.hashService = hashService;
             this.mailService = mailService;
+            this.userRepository = userRepository;
         }
 
         public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
@@ -131,7 +140,7 @@ namespace DevnotMentor.Api.Services
                 return response;
             }
 
-            var currentUser = await userRepository.Get(email);
+            var currentUser = await userRepository.GetByEmail(email);
 
             if (currentUser == null)
             {

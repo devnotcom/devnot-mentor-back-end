@@ -1,4 +1,5 @@
 ﻿using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
-    public class MentorLinksRepository : Repository<MentorLinks>
+    public class MentorLinksRepository : BaseRepository<MentorLinks>, IMentorLinksRepository
     {
         public MentorLinksRepository(MentorDBContext context) : base(context)
         {
@@ -17,7 +18,7 @@ namespace DevnotMentor.Api.Repositories
         {
             foreach (var item in list)
             {
-                Create(new MentorLinks { Link = item, MentorId = mentorId } );
+                Create(new MentorLinks { Link = item, MentorId = mentorId });
             }
         }
     }
