@@ -23,6 +23,10 @@
         /// Jwt valid issuer.
         /// </summary>
         public string JwtValidIssuer { get; }
+        /// <summary>
+        /// Jwt valid audience.
+        /// </summary>
+        public string JwtValidAudience { get; }
 
         /// <summary>
         /// Profile image path. It should be relative.

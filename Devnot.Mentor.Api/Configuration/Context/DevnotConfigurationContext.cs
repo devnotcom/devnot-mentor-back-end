@@ -15,6 +15,8 @@ namespace DevnotMentor.Api.Configuration.Context
 
             JwtValidIssuer = environmentService.Configuration["JWT:ValidIssuer"];
 
+            JwtValidAudience = environmentService.Configuration["JWT:ValidAudience"];
+
 
 
             SmtpHost = environmentService.Configuration["SMTP:Host"];
@@ -43,6 +45,7 @@ namespace DevnotMentor.Api.Configuration.Context
         public string JwtSecret { get; }
         public int JwtSecretExpirationInMinutes { get; }
         public string JwtValidIssuer { get; }
+        public string JwtValidAudience { get; }
         public string ProfileImagePath { get; }
         public int MaxMentorCountOfMentee { get; }
         public int MaxMenteeCountOfMentor { get; }
