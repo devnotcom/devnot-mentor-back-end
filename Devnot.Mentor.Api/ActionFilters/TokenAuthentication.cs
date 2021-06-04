@@ -36,9 +36,18 @@ namespace DevnotMentor.Api.ActionFilters
 
             try
             {
-                var claims = _tokenService.ReadToken(token);
+                var resolveTokenResult = _tokenService.ResolveToken(token);
 
-                var claimsIdentity = new ClaimsIdentity(claims);
+                if (!resolveTokenResult.IsValid)
+                {
+                    context.Result = new UnauthorizedObjectResult(new ApiResponse
+                    {
+                        Success = false,
+                        Message = resolveTokenResult.ErrorMessage
+                    });
+                }
+
+                var claimsIdentity = new ClaimsIdentity(resolveTokenResult.Claims);
 
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 

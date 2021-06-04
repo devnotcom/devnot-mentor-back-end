@@ -19,6 +19,8 @@ using DevnotMentor.Api.Middleware;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Utilities.Security.Token;
 using Autofac;
+using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.Configuration.Environment;
 using DevnotMentor.Api.Utilities.Interceptor;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Hash.Sha256;
@@ -26,6 +28,7 @@ using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Email.Gmail;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
+using DevnotMentor.Api.Utilities.Security.Token.Jwt;
 
 namespace DevnotMentor.Api
 {
@@ -70,6 +73,10 @@ namespace DevnotMentor.Api
             services.AddScoped<IMailService, GmailService>();
             services.AddSingleton<ITokenService, JwtTokenService>();
             services.AddSingleton<IHashService, Sha256HashService>();
+
+            services.AddSingleton<IDevnotConfigurationContext, DevnotConfigurationContext>();
+            services.AddSingleton<IEnvironmentService, EnvironmentService>();
+
 
             #region Repositories
 
