@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AutoMapper;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
@@ -22,9 +19,9 @@ using DevnotMentor.Api.Utilities.Interceptor;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Hash.Sha256;
 using DevnotMentor.Api.Utilities.Email;
-using DevnotMentor.Api.Utilities.Email.Gmail;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
+using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
 
 namespace DevnotMentor.Api
@@ -65,7 +62,7 @@ namespace DevnotMentor.Api
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
 
-            services.AddScoped<IMailService, GmailService>();
+            services.AddScoped<IMailService, SmtpMailService>();
             services.AddSingleton<ITokenService, JwtTokenService>();
             services.AddSingleton<IHashService, Sha256HashService>();
 
