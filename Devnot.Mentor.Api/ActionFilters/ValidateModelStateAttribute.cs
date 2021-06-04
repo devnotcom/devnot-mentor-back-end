@@ -1,9 +1,7 @@
 ﻿using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Options;
-using System;
+using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.ActionFilters
 {
@@ -14,15 +12,7 @@ namespace DevnotMentor.Api.ActionFilters
         {
             if (!context.ModelState.IsValid)
             {
-				var responseMessages = context.HttpContext.RequestServices.GetService(typeof(IOptions<ResponseMessages>)) as IOptions<ResponseMessages>;
-
-				context.Result = new BadRequestObjectResult(new ApiResponse
-				{
-					Success = false,
-					Message = responseMessages.Value.Values["InvalidModel"]
-				});
-
-				base.OnActionExecuting(context);
+                context.Result = new BadRequestObjectResult(new ErrorApiResponse(ResultMessage.InvalidModel));
             }
         }
     }
