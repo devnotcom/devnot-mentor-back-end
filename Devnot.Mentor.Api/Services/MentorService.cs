@@ -9,7 +9,6 @@ using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
@@ -58,92 +57,71 @@ namespace DevnotMentor.Api.Services
 
             var user = await userRepository.GetByUserName(userName);
 
-            if (user != null)
+            if (user == null)
             {
-                var mentor = await mentorRepository.GetByUserId(user.Id);
-
-                if (mentor != null)
-                {
-                    response.Data = mapper.Map<MentorProfileModel>(mentor);
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Message = ResultMessage.NotFoundMentor;
-                }
-            }
-            else
-            {
-                response.Message = ResultMessage.NotFoundUser;
+                return new ErrorApiResponse<MentorProfileModel>(data: default, ResultMessage.NotFoundUser);
             }
 
-            return response;
+            var mentor = await mentorRepository.GetByUserId(user.Id);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<MentorProfileModel>(data: default, ResultMessage.NotFoundMentor);
+            }
+
+            var mappedMentor = mapper.Map<MentorProfileModel>(mentor);
+            return new SuccessApiResponse<MentorProfileModel>(mappedMentor);
         }
 
         public async Task<ApiResponse<MentorProfileModel>> CreateMentorProfile(MentorProfileModel model)
         {
-            var response = new ApiResponse<MentorProfileModel>();
-
             var user = await userRepository.GetByUserName(model.UserName);
 
-            if (user != null)
+            if (user == null)
             {
-                var registeredMentor = await mentorRepository.GetByUserId(user.Id);
-
-                if (registeredMentor == null)
-                {
-                    var mentor = await CreateNewMentor(model, user);
-
-                    if (mentor != null)
-                    {
-                        response.Data = mapper.Map<MentorProfileModel>(mentor);
-                        response.Success = true;
-                    }
-                    else
-                    {
-                        response.Message = ResultMessage.UnhandledException;
-                    }
-                }
-                else
-                {
-                    response.Message = ResultMessage.MentorAlreadyRegistered;
-                }
-            }
-            else
-            {
-
-                response.Message = ResultMessage.NotFoundUser;
+                return new ErrorApiResponse<MentorProfileModel>(data: default, message: ResultMessage.NotFoundUser);
             }
 
+            var registeredMentor = await mentorRepository.GetByUserId(user.Id);
 
-            return response;
-        }
+            if (registeredMentor != null)
+            {
+                return new ErrorApiResponse<MentorProfileModel>(data: default, message: ResultMessage.MentorAlreadyRegistered);
+            }
 
-        public Task<List<MentorProfileModel>> SearchMentor(SearchMentorModel model)
-        {
-            throw new NotImplementedException();
-        }
+            var mentor = CreateNewMentor(model, user);
 
-        public Task UpdateMentorProfile(MentorProfileModel model)
-        {
-            throw new NotImplementedException();
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<MentorProfileModel>(data: default, message: ResultMessage.FailedToAddMentor);
+            }
+
+            var mappedMentor = mapper.Map<MentorProfileModel>(mentor);
+            return new SuccessApiResponse<MentorProfileModel>(mappedMentor);
         }
 
         [DevnotUnitOfWorkAspect]
-        private async Task<Mentor> CreateNewMentor(MentorProfileModel model, User user)
+        private Mentor CreateNewMentor(MentorProfileModel model, User user)
         {
             Mentor mentor = null;
 
             var newMentor = mapper.Map<Mentor>(model);
+
             newMentor.UserId = user.Id;
 
             mentor = mentorRepository.Create(newMentor);
+
             if (mentor != null)
             {
                 mentorLinksRepository.Create(mentor.Id, model.MentorLinks);
 
                 foreach (var mentorTag in model.MentorTags)
                 {
+                    if (String.IsNullOrWhiteSpace(mentorTag))
+                    {
+                        continue;
+                    }
+
                     var tag = tagRepository.Get(mentorTag);
 
                     if (tag != null)
@@ -153,6 +131,7 @@ namespace DevnotMentor.Api.Services
                     else
                     {
                         var newTag = tagRepository.Create(new Tag { Name = mentorTag });
+
                         if (newTag != null)
                         {
                             mentorTagsRepository.Create(new MentorTags { TagId = newTag.Id, MentorId = mentor.Id });

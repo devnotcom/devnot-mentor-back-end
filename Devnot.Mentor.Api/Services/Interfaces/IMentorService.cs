@@ -9,8 +9,6 @@ namespace DevnotMentor.Api.Services.Interfaces
     {
         Task<ApiResponse<MentorProfileModel>> GetMentorProfile(string userName);
         Task<ApiResponse<MentorProfileModel>> CreateMentorProfile(MentorProfileModel model);
-        Task UpdateMentorProfile(MentorProfileModel model);
-        Task<List<MentorProfileModel>> SearchMentor(SearchMentorModel model);
         Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId);
         Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId);
     }

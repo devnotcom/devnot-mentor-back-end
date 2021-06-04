@@ -51,68 +51,50 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName)
         {
-            var response = new ApiResponse<MenteeProfileModel>();
-
             var user = await userRepository.GetByUserName(userName);
 
-            if (user != null)
+            if (user == null)
             {
-                var mentee = await menteeRepository.GetByUserId(user.Id);
-
-                if (mentee != null)
-                {
-                    response.Data = mapper.Map<MenteeProfileModel>(mentee);
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Message = ResultMessage.NotFoundMentee;
-                }
-            }
-            else
-            {
-                response.Message = ResultMessage.NotFoundUser;
+                return new ErrorApiResponse<MenteeProfileModel>(data: default, message: ResultMessage.NotFoundUser);
             }
 
-            return response;
+            var mentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MenteeProfileModel>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var mappedMentee = mapper.Map<MenteeProfileModel>(mentee);
+            return new SuccessApiResponse<MenteeProfileModel>(mappedMentee);
         }
 
         [DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model)
         {
-            var response = new ApiResponse<MenteeProfileModel>();
-
             var user = await userRepository.GetByUserName(model.UserName);
 
-            if (user != null)
+            if (user == null)
             {
-                var registeredMentee = await menteeRepository.GetByUserId(user.Id);
-
-                if (registeredMentee == null)
-                {
-                    var mentee = await CreateNewMentee(model, user);
-
-                    if (mentee != null)
-                    {
-                        response.Data = mapper.Map<MenteeProfileModel>(mentee);
-                        response.Success = true;
-                    }
-                    else
-                    {
-                        response.Message = ResultMessage.UnhandledException;
-                    }
-                }
-                else
-                {
-                    response.Message = ResultMessage.MenteeAlreadyRegistered;
-                }
-            }
-            else
-            {
-                response.Message = ResultMessage.NotFoundUser;
+                return new ErrorApiResponse<MenteeProfileModel>(data: default, message: ResultMessage.NotFoundUser);
             }
 
-            return response;
+            var registeredMentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (registeredMentee != null)
+            {
+                return new ErrorApiResponse<MenteeProfileModel>(data: default, message: ResultMessage.MenteeAlreadyRegistered);
+            }
+
+            var mentee = await CreateNewMentee(model, user);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MenteeProfileModel>(data: default, ResultMessage.FailedToAddMentee);
+            }
+
+            var mappedMentee = mapper.Map<MenteeProfileModel>(mentee);
+            return new SuccessApiResponse<MenteeProfileModel>(mappedMentee);
         }
 
         [DevnotUnitOfWorkAspect]
@@ -131,6 +113,11 @@ namespace DevnotMentor.Api.Services
 
                 foreach (var menteeTag in model.MenteeTags)
                 {
+                    if (String.IsNullOrWhiteSpace(menteeTag))
+                    {
+                        continue;
+                    }
+
                     var tag = tagRepository.Get(menteeTag);
 
                     if (tag != null)
@@ -140,6 +127,7 @@ namespace DevnotMentor.Api.Services
                     else
                     {
                         var newTag = tagRepository.Create(new Tag { Name = menteeTag });
+
                         if (newTag != null)
                         {
                             menteeTagsRepository.Create(new MenteeTags { TagId = newTag.Id, MenteeId = mentee.Id });

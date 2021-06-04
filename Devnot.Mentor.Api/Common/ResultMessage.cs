@@ -25,11 +25,13 @@
 
 
         public static string NotFoundMentor => "messages.error.mentor.notFoundMentor";
+        public static string FailedToAddMentor => "messages.error.mentor.failedToAddMentor";
         public static string MentorAlreadyRegistered => "messages.error.mentor.mentorAlreadyRegistered";
         public static string MentorAlreadyHasTheMaxMenteeCount => "messages.error.mentor.mentorAlreadyHasTheMaxMenteeCount";
 
 
         public static string NotFoundMentee => "messages.error.mentee.notFoundMentee";
+        public static string FailedToAddMentee => "messages.error.mentee.failedToAddMentee";
         public static string MenteeAlreadyRegistered => "messages.error.mentee.menteeAlreadyRegistered";
         public static string MenteeCanNotBeSelfMentor => "messages.error.mentee.menteeCanNotBeSelfMentor";
         public static string MenteeAlreadyHasTheMaxMentorCount => "messages.error.mentee.menteeAlreadyHasTheMaxMentorCount";
