@@ -7,16 +7,13 @@ using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
-using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
+using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.Services
 {
@@ -34,7 +31,6 @@ namespace DevnotMentor.Api.Services
 
         public MentorService(
             IOptions<AppSettings> appSettings,
-            IOptions<ResponseMessages> responseMessages,
             IMapper mapper,
             IMentorRepository mentorRepository,
             IMenteeRepository menteeRepository,
@@ -45,7 +41,7 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository
-            ) : base(appSettings, responseMessages, mapper, loggerRepository)
+            ) : base(appSettings, mapper, loggerRepository)
         {
             this.mentorRepository = mentorRepository;
             this.menteeRepository = menteeRepository;
@@ -74,12 +70,12 @@ namespace DevnotMentor.Api.Services
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["MentorNotFound"];
+                    response.Message = ResultMessage.NotFoundMentor;
                 }
             }
             else
             {
-                response.Message = responseMessages.Values["UserNotFound"];
+                response.Message = ResultMessage.NotFoundUser;
             }
 
             return response;
@@ -106,17 +102,18 @@ namespace DevnotMentor.Api.Services
                     }
                     else
                     {
-                        response.Message = responseMessages.Values["UnhandledException"];
+                        response.Message = ResultMessage.UnhandledException;
                     }
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["AlreadyRegisteredMentor"];
+                    response.Message = ResultMessage.MentorAlreadyRegistered;
                 }
             }
             else
             {
-                response.Message = responseMessages.Values["UserNotFound"];
+
+                response.Message = ResultMessage.NotFoundUser;
             }
 
 
@@ -170,36 +167,30 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse> AcceptMentee(int mentorUserId, int menteeUserId)
         {
-            var apiResponse = new ApiResponse();
-
             var mentorApplication = await mentorApplicationsRepository.Get(mentorUserId, menteeUserId);
 
             if (mentorApplication == null)
             {
-                apiResponse.Message = responseMessages.Values["MentorMenteePairNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
             }
 
             if (mentorApplication.Status == MentorMenteePairStatus.Approved.ToInt())
             {
-                apiResponse.Message = responseMessages.Values["ApplicationAlreadyApproved"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.ApplicationAlreadyApproved);
             }
 
             bool checkMenteeCountGtOrEqual = MenteeCountOfMentorGtOrEqMaxCount(mentorUserId);
 
             if (checkMenteeCountGtOrEqual)
             {
-                apiResponse.Message = responseMessages.Values["MentorAlreadyHasTheMaxMenteeCount"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MentorAlreadyHasTheMaxMenteeCount);
             }
 
             bool checkMentorCountGtOrEqual = MentorCountOfMenteeGtOrEqMaxCount(menteeUserId);
 
             if (checkMentorCountGtOrEqual)
             {
-                apiResponse.Message = responseMessages.Values["MenteeAlreadyHasTheMaxMentorCount"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MenteeAlreadyHasTheMaxMentorCount);
             }
 
             DateTime now = DateTime.Now;
@@ -222,35 +213,28 @@ namespace DevnotMentor.Api.Services
 
             mentorMenteePairsRepository.Create(mentorMenteePairs);
 
-            apiResponse.Success = true;
-            return apiResponse;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         public async Task<ApiResponse> RejectMentee(int mentorUserId, int menteeUserId)
         {
-            var apiResponse = new ApiResponse();
-
             var mentorApplication = await mentorApplicationsRepository.Get(mentorUserId, menteeUserId);
 
             if (mentorApplication == null)
             {
-                apiResponse.Message = responseMessages.Values["MentorMenteePairNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
             }
 
             if (mentorApplication.Status != MentorMenteePairStatus.Waiting.ToInt())
             {
-                apiResponse.Message = responseMessages.Values["ApplicationNotFoundWhenWaitingStatus"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
             mentorApplication.Status = MentorMenteePairStatus.Rejected.ToInt();
 
             mentorApplicationsRepository.Update(mentorApplication);
 
-            apiResponse.Success = true;
-            return apiResponse;
-
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         /// <summary>

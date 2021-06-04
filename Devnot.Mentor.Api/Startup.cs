@@ -54,7 +54,6 @@ namespace DevnotMentor.Api
             var appSettingsSection = Configuration.GetSection("AppSettings");
 
             services.Configure<AppSettings>(appSettingsSection);
-            services.Configure<ResponseMessages>(Configuration.GetSection("ResponseMessages"));
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
 
             services.AddControllers();

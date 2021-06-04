@@ -1,22 +1,18 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Aspects.Autofac.Exception;
 using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
-using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
-using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
+using DevnotMentor.Api.Common;
+using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.Services
 {
@@ -33,7 +29,6 @@ namespace DevnotMentor.Api.Services
 
         public MenteeService(
             IOptions<AppSettings> appSettings,
-            IOptions<ResponseMessages> responseMessages,
             IMapper mapper,
             IMenteeRepository menteeRepository,
             IMenteeLinksRepository menteeLinksRepository,
@@ -44,7 +39,7 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             ILoggerRepository loggerRepository
             )
-            : base(appSettings, responseMessages, mapper, loggerRepository)
+            : base(appSettings, mapper, loggerRepository)
         {
             this.menteeRepository = menteeRepository;
             this.menteeLinksRepository = menteeLinksRepository;
@@ -72,18 +67,18 @@ namespace DevnotMentor.Api.Services
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["MenteeNotFound"];
+                    response.Message = ResultMessage.NotFoundMentee;
                 }
             }
             else
             {
-                response.Message = responseMessages.Values["UserNotFound"];
+                response.Message = ResultMessage.NotFoundUser;
             }
 
             return response;
         }
 
-        //[DevnotUnitOfWorkAspect]
+        [DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model)
         {
             var response = new ApiResponse<MenteeProfileModel>();
@@ -105,17 +100,17 @@ namespace DevnotMentor.Api.Services
                     }
                     else
                     {
-                        response.Message = responseMessages.Values["UnhandledException"];
+                        response.Message = ResultMessage.UnhandledException;
                     }
                 }
                 else
                 {
-                    response.Message = responseMessages.Values["AlreadyRegisteredMentee"];
+                    response.Message = ResultMessage.MenteeAlreadyRegistered;
                 }
             }
             else
             {
-                response.Message = responseMessages.Values["UserNotFound"];
+                response.Message = ResultMessage.NotFoundUser;
             }
 
             return response;
@@ -163,32 +158,28 @@ namespace DevnotMentor.Api.Services
 
             if (model.MenteeUserId == model.MentorUserId)
             {
-                apiResponse.Message = responseMessages.Values["MenteeCanNotBeSelfMentor"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
             }
 
             int menteeId = await menteeRepository.GetIdByUserId(model.MenteeUserId);
 
             if (menteeId == default)
             {
-                apiResponse.Message = responseMessages.Values["MenteeNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
             }
 
             int mentorId = await mentorRepository.GetIdByUserId(model.MentorUserId);
 
             if (mentorId == default)
             {
-                apiResponse.Message = responseMessages.Values["MentorNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
             bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(model.MentorUserId, model.MenteeUserId);
 
             if (checkAreThereExistsMenteeAndMentorPair)
             {
-                apiResponse.Message = responseMessages.Values["MentorMenteePairAlreadyExists"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }
 
             mentorApplicationsRepository.Create(new MentorApplications
@@ -200,8 +191,7 @@ namespace DevnotMentor.Api.Services
                 Status = MentorMenteePairStatus.Waiting.ToInt()
             });
 
-            apiResponse.Success = true;
-            return apiResponse;
+            return new SuccessApiResponse();
         }
     }
 }

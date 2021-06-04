@@ -1,10 +1,6 @@
-﻿using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Controllers;
-using DevnotMentor.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using DevnotMentor.Api.Models;
 using System.Threading.Tasks;
+using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.Services.Interfaces
 {
