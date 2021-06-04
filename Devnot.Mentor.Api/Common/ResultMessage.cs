@@ -18,6 +18,7 @@
         public static string NotFoundUser => "messages.error.user.notFoundUser";
         public static string InvalidSecurityKey => "messages.error.user.invalidSecurityKey";
         public static string InvalidProfileImage => "messages.error.user.invalidProfileImage";
+        public static string ProfileImageCanNotBeNullOrEmpty => "messages.error.user.profileImageCanNotBeNullOrEmpty";
         public static string UserNameIsNotValidated => "messages.error.user.userNameIsNotValidated";
         public static string InvalidUserNameOrPassword => "messages.error.user.invalidUserNameOrPassword";
         public static string SecurityKeyExpiryDateAlreadyExpired => "messages.error.user.securityKeyExpiryDateAlreadyExpired";
