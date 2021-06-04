@@ -4,16 +4,15 @@ using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Configuration.Context;
 
 namespace DevnotMentor.Api.Services
 {
@@ -30,7 +29,6 @@ namespace DevnotMentor.Api.Services
         private IMentorMenteePairsRepository mentorMenteePairsRepository;
 
         public MentorService(
-            IOptions<AppSettings> appSettings,
             IMapper mapper,
             IMentorRepository mentorRepository,
             IMenteeRepository menteeRepository,
@@ -40,8 +38,9 @@ namespace DevnotMentor.Api.Services
             IUserRepository userRepository,
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
-            ILoggerRepository loggerRepository
-            ) : base(appSettings, mapper, loggerRepository)
+            ILoggerRepository loggerRepository,
+            IDevnotConfigurationContext devnotConfigurationContext
+            ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.mentorRepository = mentorRepository;
             this.menteeRepository = menteeRepository;
@@ -245,7 +244,7 @@ namespace DevnotMentor.Api.Services
         private bool MentorCountOfMenteeGtOrEqMaxCount(int menteeUserId)
         {
             int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMenteeUserId(menteeUserId);
-            return count >= appSettings.MaxMentorCountOfMentee;
+            return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
         }
 
         /// <summary>
@@ -256,7 +255,7 @@ namespace DevnotMentor.Api.Services
         private bool MenteeCountOfMentorGtOrEqMaxCount(int mentorUserId)
         {
             int count = mentorMenteePairsRepository.GetCountForContinuesStatusByMentorUserId(mentorUserId);
-            return count >= appSettings.MaxMenteeCountOfMentor;
+            return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
         }
     }
 }

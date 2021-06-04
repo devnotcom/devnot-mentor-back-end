@@ -1,24 +1,21 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Helpers;
+using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.Repositories.Interfaces;
-using Microsoft.Extensions.Options;
 
 namespace DevnotMentor.Api.Services
 {
     public class BaseService
     {
-        protected AppSettings appSettings;
         protected IMapper mapper;
         protected ILoggerRepository logger;
-
+        protected IDevnotConfigurationContext devnotConfigurationContext;
         public BaseService(
-            IOptions<AppSettings> appSettings,
             IMapper mapper,
-            ILoggerRepository logger)
+            ILoggerRepository logger, IDevnotConfigurationContext devnotConfigurationContext)
         {
-            this.appSettings = appSettings.Value;
             this.mapper = mapper;
             this.logger = logger;
+            this.devnotConfigurationContext = devnotConfigurationContext;
         }
     }
 }

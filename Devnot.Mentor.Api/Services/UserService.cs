@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Token;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.Utilities.File;
 
 namespace DevnotMentor.Api.Services
 {
@@ -26,20 +26,23 @@ namespace DevnotMentor.Api.Services
         private ITokenService tokenService;
         private IMailService mailService;
 
+        private IFileService fileService;
+
         public UserService(
-            IOptions<AppSettings> appSettings,
             IMapper mapper,
             ITokenService tokenService,
             IHashService hashService,
             IMailService mailService,
             IUserRepository userRepository,
-            ILoggerRepository loggerRepository
-            ) : base(appSettings, mapper, loggerRepository)
+            ILoggerRepository loggerRepository,
+            IFileService fileService,
+            IDevnotConfigurationContext devnotConfigurationContext) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.tokenService = tokenService;
             this.hashService = hashService;
             this.mailService = mailService;
             this.userRepository = userRepository;
+            this.fileService = fileService;
         }
 
         public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
@@ -88,14 +91,15 @@ namespace DevnotMentor.Api.Services
         //[DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<User>> Register(UserModel model)
         {
-            if (!FileHelper.IsValidProfileImage(model.ProfileImage))
+            var checkFileResult = await fileService.InsertProfileImage(model.ProfileImage);
+
+            if (!checkFileResult.IsSuccess)
             {
-                return new ErrorApiResponse<User>(data: default, ResultMessage.InvalidProfileImage);
+                return new ErrorApiResponse<User>(data: default, checkFileResult.ErrorMessage);
             }
 
-            model.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
+            model.ProfileImageUrl = checkFileResult.RelativeFilePath;
             model.Password = hashService.CreateHash(model.Password);
-
 
             var newUser = userRepository.Create(mapper.Map<User>(model));
 
@@ -117,7 +121,7 @@ namespace DevnotMentor.Api.Services
             }
 
             currentUser.SecurityKey = Guid.NewGuid();
-            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(appSettings.SecurityKeyExpiryFromHours);
+            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(devnotConfigurationContext.SecurityKeyExpiryFromHours);
 
             userRepository.Update(currentUser);
 
@@ -131,7 +135,7 @@ namespace DevnotMentor.Api.Services
         {
             var to = new List<string> { user.Email };
             string subject = "Devnot Mentor Programı | Parola Sıfırlama İsteği";
-            string remindPasswordUrl = $"{appSettings.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
+            string remindPasswordUrl = $"{devnotConfigurationContext.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
             string body = $"Merhaba {user.Name} {user.SurName}, <a href='{remindPasswordUrl}' target='_blank'>buradan</a> parolanızı sıfırlayabilirsiniz.";
 
             await mailService.SendEmailAsync(to, subject, body);
@@ -143,12 +147,14 @@ namespace DevnotMentor.Api.Services
 
             if (model.ProfileImage != null)
             {
-                if (!FileHelper.IsValidProfileImage(model.ProfileImage))
+                var checkUploadedImageFileResult = await fileService.InsertProfileImage(model.ProfileImage);
+
+                if (!checkUploadedImageFileResult.IsSuccess)
                 {
-                    return new ErrorApiResponse<User>(data: null, ResultMessage.InvalidProfileImage);
+                    return new ErrorApiResponse<User>(data: default, checkUploadedImageFileResult.ErrorMessage);
                 }
 
-                currentUser.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
+                currentUser.ProfileImageUrl = checkUploadedImageFileResult.RelativeFilePath;
             }
 
             currentUser.Name = model.Name;

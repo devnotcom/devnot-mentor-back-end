@@ -3,16 +3,15 @@ using DevnotMentor.Api.Aspects.Autofac.Exception;
 using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Configuration.Context;
 
 namespace DevnotMentor.Api.Services
 {
@@ -28,7 +27,6 @@ namespace DevnotMentor.Api.Services
         private IMentorApplicationsRepository mentorApplicationsRepository;
 
         public MenteeService(
-            IOptions<AppSettings> appSettings,
             IMapper mapper,
             IMenteeRepository menteeRepository,
             IMenteeLinksRepository menteeLinksRepository,
@@ -37,9 +35,10 @@ namespace DevnotMentor.Api.Services
             IUserRepository userRepository,
             IMentorRepository mentorRepository,
             IMentorApplicationsRepository mentorApplicationsRepository,
-            ILoggerRepository loggerRepository
+            ILoggerRepository loggerRepository,
+            IDevnotConfigurationContext devnotConfigurationContext
             )
-            : base(appSettings, mapper, loggerRepository)
+            : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.menteeRepository = menteeRepository;
             this.menteeLinksRepository = menteeLinksRepository;
