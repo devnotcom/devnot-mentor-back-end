@@ -7,15 +7,12 @@ using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DevnotMentor.Api.Middleware;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Utilities.Security.Token;
 using Autofac;
@@ -61,7 +58,6 @@ namespace DevnotMentor.Api
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
 
             services.AddControllers();
-            services.AddTokenAuthentication(appSettingsSection);
             services.AddAutoMapper(typeof(Startup));
 
             services.AddSingleton<TokenAuthentication>();
