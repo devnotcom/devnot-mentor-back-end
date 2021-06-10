@@ -22,6 +22,11 @@ namespace DevnotMentor.Api.Utilities.Interceptor.Autofac
             {
                 invocation.Proceed();
 
+                if (invocation.ReturnValue is Task returnValueTask)
+                {
+                    returnValueTask.GetAwaiter().GetResult();
+                }
+
                 if (invocation.ReturnValue is Task task && task.Exception != null)
                 {
                     throw task.Exception;
