@@ -8,6 +8,7 @@
         public static string Success => "messages.success.general.ok";
         public static string InvalidModel => "messages.error.general.invalidModel";
         public static string UnhandledException => "messages.error.general.unhandledException";
+        public static string UnAuthorized => "messages.error.general.unAuthorized";
 
 
         public static string TokenCanNotBeEmptyOrNull => "messages.error.token.tokenCanNotBeEmptyOrNull";
