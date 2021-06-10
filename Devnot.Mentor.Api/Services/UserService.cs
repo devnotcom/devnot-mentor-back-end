@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 using DevnotMentor.Api.Utilities.File;
 
 namespace DevnotMentor.Api.Services
@@ -45,23 +46,22 @@ namespace DevnotMentor.Api.Services
             this.fileService = fileService;
         }
 
-        public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
+        public async Task<ApiResponse> ChangePassword(UpdatePasswordRequest request)
         {
-            string hashedLastPassword = hashService.CreateHash(model.LastPassword);
+            string hashedLastPassword = hashService.CreateHash(request.LastPassword);
 
-            User currentUser = await userRepository.Get(model.UserId, hashedLastPassword);
+            var currentUser = await userRepository.Get(request.UserId, hashedLastPassword);
 
             if (currentUser == null)
             {
-                return new ErrorApiResponse<bool>(data: false, ResultMessage.NotFoundUser);
+                return new ErrorApiResponse(ResultMessage.NotFoundUser);
             }
 
-            string hashedNewPassword = hashService.CreateHash(model.NewPassword);
-            currentUser.Password = hashedNewPassword;
+            currentUser.Password = hashService.CreateHash(request.NewPassword);
 
             userRepository.Update(currentUser);
 
-            return new SuccessApiResponse<bool>(data: true, ResultMessage.Success);
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         public async Task<ApiResponse<User>> Login(LoginModel model)
@@ -89,19 +89,19 @@ namespace DevnotMentor.Api.Services
         }
 
         //[DevnotUnitOfWorkAspect]
-        public async Task<ApiResponse<User>> Register(UserModel model)
+        public async Task<ApiResponse<User>> Register(RegisterUserRequest request)
         {
-            var checkFileResult = await fileService.InsertProfileImage(model.ProfileImage);
+            var checkFileResult = await fileService.InsertProfileImage(request.ProfileImage);
 
             if (!checkFileResult.IsSuccess)
             {
                 return new ErrorApiResponse<User>(data: default, checkFileResult.ErrorMessage);
             }
 
-            model.ProfileImageUrl = checkFileResult.RelativeFilePath;
-            model.Password = hashService.CreateHash(model.Password);
+            request.ProfileImageUrl = checkFileResult.RelativeFilePath;
+            request.Password = hashService.CreateHash(request.Password);
 
-            var newUser = userRepository.Create(mapper.Map<User>(model));
+            var newUser = userRepository.Create(mapper.Map<User>(request));
 
             return new SuccessApiResponse<User>(data: newUser, ResultMessage.Success);
         }
@@ -127,7 +127,7 @@ namespace DevnotMentor.Api.Services
 
             await SendRemindPasswordMail(currentUser);
 
-            return new SuccessApiResponse();
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         // TODO: İlerleyen zamanlarda template olarak veri tabanı ya da dosyadan okunulacak.
@@ -141,13 +141,13 @@ namespace DevnotMentor.Api.Services
             await mailService.SendEmailAsync(to, subject, body);
         }
 
-        public async Task<ApiResponse<User>> Update(UserUpdateModel model)
+        public async Task<ApiResponse<User>> Update(UpdateUserRequest request)
         {
-            var currentUser = await userRepository.GetById(model.UserId);
+            var currentUser = await userRepository.GetById(request.UserId);
 
-            if (model.ProfileImage != null)
+            if (request.ProfileImage != null)
             {
-                var checkUploadedImageFileResult = await fileService.InsertProfileImage(model.ProfileImage);
+                var checkUploadedImageFileResult = await fileService.InsertProfileImage(request.ProfileImage);
 
                 if (!checkUploadedImageFileResult.IsSuccess)
                 {
@@ -157,17 +157,17 @@ namespace DevnotMentor.Api.Services
                 currentUser.ProfileImageUrl = checkUploadedImageFileResult.RelativeFilePath;
             }
 
-            currentUser.Name = model.Name;
-            currentUser.SurName = model.SurName;
+            currentUser.Name = request.Name;
+            currentUser.SurName = request.SurName;
 
             userRepository.Update(currentUser);
 
             return new SuccessApiResponse<User>(currentUser, ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model)
+        public async Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request)
         {
-            var currentUser = await userRepository.Get(model.SecurityKey);
+            var currentUser = await userRepository.Get(request.SecurityKey);
 
             if (currentUser == null)
             {
@@ -180,7 +180,7 @@ namespace DevnotMentor.Api.Services
             }
 
             currentUser.SecurityKey = null;
-            currentUser.Password = hashService.CreateHash(model.Password);
+            currentUser.Password = hashService.CreateHash(request.Password);
 
             userRepository.Update(currentUser);
 
