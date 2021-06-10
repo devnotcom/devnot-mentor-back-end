@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using DevnotMentor.Api.Utilities.Email;
@@ -12,7 +11,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.UserRequest;
+using DevnotMentor.Api.CustomEntities.Response.UserResponse;
 using DevnotMentor.Api.Utilities.File;
 
 namespace DevnotMentor.Api.Services
@@ -64,20 +65,20 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse<User>> Login(LoginModel model)
+        public async Task<ApiResponse<UserLoginResponse>> Login(UserLoginRequest request)
         {
-            var hashedPassword = hashService.CreateHash(model.Password);
+            var hashedPassword = hashService.CreateHash(request.Password);
 
-            var user = await userRepository.Get(model.UserName, hashedPassword);
+            var user = await userRepository.Get(request.UserName, hashedPassword);
 
             if (user == null)
             {
-                return new ErrorApiResponse<User>(data: null, ResultMessage.InvalidUserNameOrPassword);
+                return new ErrorApiResponse<UserLoginResponse>(data: null, ResultMessage.InvalidUserNameOrPassword);
             }
 
             if (!user.UserNameConfirmed.HasValue || !user.UserNameConfirmed.Value)
             {
-                return new ErrorApiResponse<User>(data: null, ResultMessage.UserNameIsNotValidated);
+                return new ErrorApiResponse<UserLoginResponse>(data: null, ResultMessage.UserNameIsNotValidated);
             }
 
             var tokenData = tokenService.CreateToken(user.Id, user.UserName);
@@ -85,11 +86,15 @@ namespace DevnotMentor.Api.Services
             user.Token = tokenData.Token;
             user.TokenExpireDate = tokenData.ExpiredDate;
 
-            return new SuccessApiResponse<User>(data: user, ResultMessage.Success);
+            var mappedUser = mapper.Map<User, UserDto>(user);
+
+            var loginResponse = new UserLoginResponse(mappedUser, user.Token, user.TokenExpireDate);
+
+            return new SuccessApiResponse<UserLoginResponse>(data: loginResponse, ResultMessage.Success);
         }
 
         //[DevnotUnitOfWorkAspect]
-        public async Task<ApiResponse<User>> Register(RegisterUserRequest request)
+        public async Task<ApiResponse> Register(RegisterUserRequest request)
         {
             var checkFileResult = await fileService.InsertProfileImage(request.ProfileImage);
 
@@ -101,9 +106,9 @@ namespace DevnotMentor.Api.Services
             request.ProfileImageUrl = checkFileResult.RelativeFilePath;
             request.Password = hashService.CreateHash(request.Password);
 
-            var newUser = userRepository.Create(mapper.Map<User>(request));
+            userRepository.Create(mapper.Map<User>(request));
 
-            return new SuccessApiResponse<User>(data: newUser, ResultMessage.Success);
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         public async Task<ApiResponse> RemindPassword(string email)
@@ -141,7 +146,7 @@ namespace DevnotMentor.Api.Services
             await mailService.SendEmailAsync(to, subject, body);
         }
 
-        public async Task<ApiResponse<User>> Update(UpdateUserRequest request)
+        public async Task<ApiResponse> Update(UpdateUserRequest request)
         {
             var currentUser = await userRepository.GetById(request.UserId);
 
@@ -162,7 +167,7 @@ namespace DevnotMentor.Api.Services
 
             userRepository.Update(currentUser);
 
-            return new SuccessApiResponse<User>(currentUser, ResultMessage.Success);
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         public async Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request)

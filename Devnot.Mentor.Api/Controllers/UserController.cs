@@ -2,7 +2,6 @@
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +21,9 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost]
         [Route("/users/login")]
-        public async Task<IActionResult> Login(LoginModel model)
+        public async Task<IActionResult> Login(UserLoginRequest request)
         {
-            var result = await userService.Login(model);
+            var result = await userService.Login(request);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
