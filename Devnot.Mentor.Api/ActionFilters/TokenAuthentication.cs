@@ -1,12 +1,10 @@
-﻿using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Utilities.Security.Token;
+﻿using DevnotMentor.Api.Utilities.Security.Token;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using DevnotMentor.Api.Common;
+using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.ActionFilters
 {
@@ -21,24 +19,36 @@ namespace DevnotMentor.Api.ActionFilters
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var token = context.HttpContext.Request.Headers["Authorization"].ToString();
+            var tokenWithBearerKeyword = context.HttpContext.Request.Headers["Authorization"].ToString();
 
-            if (String.IsNullOrEmpty(token))
+            if (String.IsNullOrEmpty(tokenWithBearerKeyword))
             {
-                context.Result = new UnauthorizedObjectResult(new ApiResponse
-                {
-                    Success = false,
-                    Message = "Yetkisiz işlem! Lütfen Header içerisinde token bilgisi gönderdiğinizden emin olunuz."
-                });
+                context.Result = new UnauthorizedObjectResult(new ErrorApiResponse(ResultMessage.TokenCanNotBeEmptyOrNull));
+                return;
+            }
 
+            if (!tokenWithBearerKeyword.StartsWith("Bearer "))
+            {
+                context.Result = new UnauthorizedObjectResult(new ErrorApiResponse(ResultMessage.TokenMustStartWithBearerKeyword));
                 return;
             }
 
             try
             {
-                var claims = _tokenService.ReadToken(token);
+                var tokenWithoutBearerKeyword = tokenWithBearerKeyword.Split("Bearer ")[1];
 
-                var claimsIdentity = new ClaimsIdentity(claims);
+                var resolveTokenResult = _tokenService.ResolveToken(tokenWithoutBearerKeyword);
+
+                if (!resolveTokenResult.IsValid)
+                {
+                    context.Result = new UnauthorizedObjectResult(new ApiResponse
+                    {
+                        Success = false,
+                        Message = resolveTokenResult.ErrorMessage
+                    });
+                }
+
+                var claimsIdentity = new ClaimsIdentity(resolveTokenResult.Claims);
 
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
@@ -46,11 +56,7 @@ namespace DevnotMentor.Api.ActionFilters
             }
             catch (Exception ex)
             {
-                context.Result = new UnauthorizedObjectResult(new ApiResponse
-                {
-                    Success = false,
-                    Message = "Yetkisiz işlem! Lütfen geçerli bir token bilgisi giriniz."
-                });
+                context.Result = new UnauthorizedObjectResult(new ErrorApiResponse(ResultMessage.InvalidToken));
             }
         }
     }

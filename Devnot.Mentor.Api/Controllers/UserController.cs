@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DevnotMentor.Api.ActionFilters;
-using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Helpers;
+using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using DevnotMentor.Api.Models;
-using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace DevnotMentor.Api.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
     public class UserController : BaseController
     {
@@ -29,121 +19,64 @@ namespace DevnotMentor.Api.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetLogs()
+        [HttpPost]
+        [Route("/users/login")]
+        public async Task<IActionResult> Login(UserLoginRequest request)
         {
-            try
-            {
-                var context = new MentorDBContext();
-                var logs = context.Log.OrderByDescending(l => l.InsertDate).Take(100).ToList();
-                var logList = new List<string>();
+            var result = await userService.Login(request);
 
-                foreach (var log in logs)
-                {
-                    logList.Add(log.InsertDate.ToString() + " - " + log.Message);
-                }
-
-                return Success(logList);
-            }
-            catch (Exception ex)
-            {
-                var message = ex.Message;
-                if (ex.InnerException != null)
-                    message += "\nInnerException: " + ex.InnerException.Message;
-
-                return Success("Veritabanına bağlantı kurulamadı. Hata mesajı: " + message);
-            }
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Login(LoginModel model)
+        [Route("/users/register")]
+        public async Task<IActionResult> Register([FromForm] RegisterUserRequest request)
         {
-            var result = await userService.Login(model);
+            var result = await userService.Register(request);
 
-            if (!result.Success)
-            {
-                return Unauthorized(result);
-            }
-
-            return Success(result);
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> Register([FromForm] UserModel model)
-        {
-            var result = await userService.Register(model);
-
-            if (result.Success)
-            {
-                return Success(result);
-            }
-            else
-            {
-                return Error(result);
-            }
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
         [Route("/users/{userId}/change-password")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> ChangePassword([FromBody] PasswordUpdateModel model)
+        public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordRequest request)
         {
-            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            var checkResult = await userService.ChangePassword(model);
+            var result = await userService.ChangePassword(request);
 
-            if (checkResult.Success)
-            {
-                return Success<bool>(checkResult);
-            }
-
-            return Error<bool>(checkResult);
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost]
-        [Route("/users/{userId}/update-profile")]
+        [HttpPatch]
+        [Route("/users/{userId}")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> UpdateUser([FromForm] UserUpdateModel model)
+        public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest request)
         {
-            model.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            var checkResult = await userService.Update(model);
+            var result = await userService.Update(request);
 
-            if (checkResult.Success)
-            {
-                return Success(checkResult);
-            }
-            return Error(checkResult);
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [Route("/user/remind-password")]
-        public async Task<IActionResult> RemindPassword(string email)
+        [Route("/users/{email}/remind-password")]
+        [HttpGet]
+        public async Task<IActionResult> RemindPassword([FromRoute] string email)
         {
             var result = await userService.RemindPassword(email);
 
-            if (result.Success)
-            {
-                return Success<string>("Mail başarıyla gönderildi..");
-            }
-            return Error<bool>(result.Message, false);
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("/user/remind-password-complete")]
-        public async Task<IActionResult> RemindPasswordCompleteAsync(RemindPasswordCompleteModel model)
+        [Route("/users/me/remind-password-complete")]
+        public async Task<IActionResult> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request)
         {
-            var result = await userService.RemindPasswordComplete(model);
+            var result = await userService.RemindPasswordComplete(request);
 
-            if (result.Success)
-            {
-                return Success<string>(result.Message);
-            }
-
-            return Error<string>(result.Message, null);
+            return result.Success ? Success(result) : BadRequest(result);
         }
     }
 }

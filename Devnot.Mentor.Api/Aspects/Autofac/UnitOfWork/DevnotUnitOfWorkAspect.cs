@@ -15,6 +15,11 @@ namespace DevnotMentor.Api.Aspects.Autofac.UnitOfWork
                 {
                     invocation.Proceed();
 
+                    if (invocation.ReturnValue is Task returnValueTask)
+                    {
+                        returnValueTask.GetAwaiter().GetResult();
+                    }
+
                     if (invocation.ReturnValue is Task task && task.Exception != null)
                     {
                         throw task.Exception;

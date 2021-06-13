@@ -1,52 +1,81 @@
-﻿using DevnotMentor.Api.Helpers;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+using DevnotMentor.Api.Configuration.Context;
+using Microsoft.IdentityModel.Tokens;
 
-namespace DevnotMentor.Api.Utilities.Security.Token
+namespace DevnotMentor.Api.Utilities.Security.Token.Jwt
 {
     public class JwtTokenService : ITokenService
     {
-        public AppSettings AppSettings { get; set; }
+        private readonly IDevnotConfigurationContext devnotConfigurationContext;
 
-        public JwtTokenService(IOptions<AppSettings> appSettings)
+        public JwtTokenService(IDevnotConfigurationContext devnotConfigurationContext)
         {
-            AppSettings = appSettings.Value;
+            this.devnotConfigurationContext = devnotConfigurationContext;
         }
 
         public TokenInfo CreateToken(int userId, string userName)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(AppSettings.Secret);
+
+            var key = Encoding.ASCII.GetBytes(devnotConfigurationContext.JwtSecret);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[] {
                     new Claim(ClaimTypes.Email, userName),
                     new Claim("UserId",userId.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(AppSettings.SecretExpirationInMinutes),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddMinutes(devnotConfigurationContext.JwtSecretExpirationInMinutes),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = devnotConfigurationContext.JwtValidIssuer,
+                Audience = devnotConfigurationContext.JwtValidAudience
             };
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             tokenHandler.WriteToken(token);
 
-            var tokenInfo = new TokenInfo();
-            tokenInfo.Token = tokenHandler.WriteToken(token);
-            tokenInfo.ExpiredDate = DateTime.Now.AddMinutes(AppSettings.SecretExpirationInMinutes);
-
-            return tokenInfo;
+            return new TokenInfo
+            {
+                Token = tokenHandler.WriteToken(token),
+                ExpiredDate = DateTime.Now.AddMinutes(devnotConfigurationContext.JwtSecretExpirationInMinutes)
+            };
         }
 
-        public IEnumerable<Claim> ReadToken(string token)
+        public ResolveTokenResult ResolveToken(string token)
         {
-            var securityToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            return securityToken.Claims;
+            var resolveTokenResult = new ResolveTokenResult();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(devnotConfigurationContext.JwtSecret);
+            var securityKey = new SymmetricSecurityKey(key);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = devnotConfigurationContext.JwtValidAudience,
+                    ValidIssuer = devnotConfigurationContext.JwtValidIssuer,
+                    IssuerSigningKey = securityKey
+                }, out SecurityToken validatedToken);
+
+                resolveTokenResult.ExpiryDate = validatedToken.ValidTo;
+                resolveTokenResult.IsValid = true;
+                resolveTokenResult.Claims = tokenHandler.ReadJwtToken(token).Claims;
+            }
+
+            catch (Exception ex)
+            {
+                resolveTokenResult.IsValid = false;
+                resolveTokenResult.ErrorMessage = ex.Message;
+            }
+
+            return resolveTokenResult;
         }
     }
 }

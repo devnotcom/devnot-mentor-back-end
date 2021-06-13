@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
+using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
+using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 
 namespace DevnotMentor.Api.Helpers
 {
@@ -12,25 +11,22 @@ namespace DevnotMentor.Api.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<UserModel, User>().ReverseMap();
-            CreateMap<MentorProfileModel, Mentor>()
+            CreateMap<Mentee, MenteeDto>();
+            CreateMap<Mentor, MentorDto>();
+            CreateMap<User, UserDto>();
+
+            CreateMap<CreateMentorProfileRequest, Mentor>()
                 .ForMember(dest => dest.MentorTags, opt => opt.Ignore())
                 .ForMember(dest => dest.MentorLinks, opt => opt.Ignore())
                 .ReverseMap();
-            CreateMap<MenteeProfileModel, Mentee>()
+
+            CreateMap<CreateMenteeProfileRequest, Mentee>()
                 .ForMember(dest => dest.MenteeTags, opt => opt.Ignore())
                 .ForMember(dest => dest.MenteeLinks, opt => opt.Ignore())
                 .ReverseMap();
+
+
+            CreateMap<RegisterUserRequest, User>();
         }
     }
-
-    // CreateMap<string, MentorLinks>().ConvertUsing<MentorLinksConvertor>();
-    //public class MentorLinksConvertor : ITypeConverter<string, MentorLinks>
-    //{
-    //    public MentorLinks Convert(string source, MentorLinks destination, ResolutionContext context)
-    //    {
-    //        return new MentorLinks { Link = source };
-    //    }
-    //}
-
 }

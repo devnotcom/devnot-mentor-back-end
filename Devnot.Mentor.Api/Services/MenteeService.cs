@@ -1,26 +1,22 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Aspects.Autofac.Exception;
 using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
-using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Controllers;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Helpers.Extensions;
-using DevnotMentor.Api.Models;
-using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
+using DevnotMentor.Api.Common;
+using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 
 namespace DevnotMentor.Api.Services
 {
-    [ExceptionHandlingAspect]
+    //[ExceptionHandlingAspect]
     public class MenteeService : BaseService, IMenteeService
     {
         private IMenteeRepository menteeRepository;
@@ -32,8 +28,6 @@ namespace DevnotMentor.Api.Services
         private IMentorApplicationsRepository mentorApplicationsRepository;
 
         public MenteeService(
-            IOptions<AppSettings> appSettings,
-            IOptions<ResponseMessages> responseMessages,
             IMapper mapper,
             IMenteeRepository menteeRepository,
             IMenteeLinksRepository menteeLinksRepository,
@@ -42,9 +36,10 @@ namespace DevnotMentor.Api.Services
             IUserRepository userRepository,
             IMentorRepository mentorRepository,
             IMentorApplicationsRepository mentorApplicationsRepository,
-            ILoggerRepository loggerRepository
+            ILoggerRepository loggerRepository,
+            IDevnotConfigurationContext devnotConfigurationContext
             )
-            : base(appSettings, responseMessages, mapper, loggerRepository)
+            : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.menteeRepository = menteeRepository;
             this.menteeLinksRepository = menteeLinksRepository;
@@ -55,101 +50,90 @@ namespace DevnotMentor.Api.Services
             this.mentorApplicationsRepository = mentorApplicationsRepository;
         }
 
-        public async Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName)
+        public async Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName)
         {
-            var response = new ApiResponse<MenteeProfileModel>();
-
             var user = await userRepository.GetByUserName(userName);
 
-            if (user != null)
+            if (user == null)
             {
-                var mentee = await menteeRepository.GetByUserId(user.Id);
-
-                if (mentee != null)
-                {
-                    response.Data = mapper.Map<MenteeProfileModel>(mentee);
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Message = responseMessages.Values["MenteeNotFound"];
-                }
-            }
-            else
-            {
-                response.Message = responseMessages.Values["UserNotFound"];
+                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
             }
 
-            return response;
+            var mentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
+            return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
 
         //[DevnotUnitOfWorkAspect]
-        public async Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model)
+        public async Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request)
         {
-            var response = new ApiResponse<MenteeProfileModel>();
+            var user = await userRepository.GetById(request.UserId);
 
-            var user = await userRepository.GetByUserName(model.UserName);
-
-            if (user != null)
+            if (user == null)
             {
-                var registeredMentee = await menteeRepository.GetByUserId(user.Id);
-
-                if (registeredMentee == null)
-                {
-                    var mentee = await CreateNewMentee(model, user);
-
-                    if (mentee != null)
-                    {
-                        response.Data = mapper.Map<MenteeProfileModel>(mentee);
-                        response.Success = true;
-                    }
-                    else
-                    {
-                        response.Message = responseMessages.Values["UnhandledException"];
-                    }
-                }
-                else
-                {
-                    response.Message = responseMessages.Values["AlreadyRegisteredMentee"];
-                }
-            }
-            else
-            {
-                response.Message = responseMessages.Values["UserNotFound"];
+                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
             }
 
-            return response;
+            var registeredMentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (registeredMentee != null)
+            {
+                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.MenteeAlreadyRegistered);
+            }
+
+            var mentee = await CreateNewMentee(request, user);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MenteeDto>(data: default, ResultMessage.FailedToAddMentee);
+            }
+
+            var mappedMentee = mapper.Map<MenteeDto>(mentee);
+            return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
 
-        [DevnotUnitOfWorkAspect]
-        private async Task<Mentee> CreateNewMentee(MenteeProfileModel model, User user)
+        private async Task<Mentee> CreateNewMentee(CreateMenteeProfileRequest request, User user)
         {
             Mentee mentee = null;
 
-            var newMentee = mapper.Map<Mentee>(model);
+            var newMentee = mapper.Map<Mentee>(request);
             newMentee.UserId = user.Id;
 
             mentee = menteeRepository.Create(newMentee);
 
-            if (mentee != null)
+            if (mentee == null)
             {
-                menteeLinksRepository.Create(mentee.Id, model.MenteeLinks);
+                return null;
+            }
 
-                foreach (var menteeTag in model.MenteeTags)
+            menteeLinksRepository.Create(mentee.Id, request.MenteeLinks);
+
+            foreach (var menteeTag in request.MenteeTags)
+            {
+                if (String.IsNullOrWhiteSpace(menteeTag))
                 {
-                    var tag = tagRepository.Get(menteeTag);
+                    continue;
+                }
 
-                    if (tag != null)
+                var tag = tagRepository.Get(menteeTag);
+
+                if (tag != null)
+                {
+                    menteeTagsRepository.Create(new MenteeTags { TagId = tag.Id, MenteeId = mentee.Id });
+                }
+                else
+                {
+                    var newTag = tagRepository.Create(new Tag { Name = menteeTag });
+
+                    if (newTag != null)
                     {
-                        menteeTagsRepository.Create(new MenteeTags { TagId = tag.Id, MenteeId = mentee.Id });
-                    }
-                    else
-                    {
-                        var newTag = tagRepository.Create(new Tag { Name = menteeTag });
-                        if (newTag != null)
-                        {
-                            menteeTagsRepository.Create(new MenteeTags { TagId = newTag.Id, MenteeId = mentee.Id });
-                        }
+                        menteeTagsRepository.Create(new MenteeTags { TagId = newTag.Id, MenteeId = mentee.Id });
                     }
                 }
             }
@@ -157,51 +141,44 @@ namespace DevnotMentor.Api.Services
             return mentee;
         }
 
-        public async Task<ApiResponse> ApplyToMentor(ApplyMentorModel model)
+        public async Task<ApiResponse> ApplyToMentor(ApplyToMentorRequest request)
         {
-            var apiResponse = new ApiResponse();
-
-            if (model.MenteeUserId == model.MentorUserId)
+            if (request.MenteeUserId == request.MentorUserId)
             {
-                apiResponse.Message = responseMessages.Values["MenteeCanNotBeSelfMentor"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
             }
 
-            int menteeId = await menteeRepository.GetIdByUserId(model.MenteeUserId);
+            int menteeId = await menteeRepository.GetIdByUserId(request.MenteeUserId);
 
             if (menteeId == default)
             {
-                apiResponse.Message = responseMessages.Values["MenteeNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
             }
 
-            int mentorId = await mentorRepository.GetIdByUserId(model.MentorUserId);
+            int mentorId = await mentorRepository.GetIdByUserId(request.MentorUserId);
 
             if (mentorId == default)
             {
-                apiResponse.Message = responseMessages.Values["MentorNotFound"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(model.MentorUserId, model.MenteeUserId);
+            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(request.MentorUserId, request.MenteeUserId);
 
             if (checkAreThereExistsMenteeAndMentorPair)
             {
-                apiResponse.Message = responseMessages.Values["MentorMenteePairAlreadyExists"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }
 
             mentorApplicationsRepository.Create(new MentorApplications
             {
-                ApllicationNotes = model.ApplicationNotes,
+                ApllicationNotes = request.ApplicationNotes,
                 ApplyDate = DateTime.Now,
                 MenteeId = menteeId,
                 MentorId = mentorId,
-                Status = MentorMenteePairStatus.Waiting.ToInt()
+                Status = MentorApplicationStatus.Waiting.ToInt()
             });
 
-            apiResponse.Success = true;
-            return apiResponse;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
     }
 }

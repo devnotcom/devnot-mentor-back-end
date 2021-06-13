@@ -1,20 +1,17 @@
-﻿using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.CustomEntities.Request.UserRequest;
+using DevnotMentor.Api.CustomEntities.Response.UserResponse;
 
 namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<ApiResponse<User>> Login(LoginModel model);
-        Task<ApiResponse<User>> Register(UserModel model);
-        Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model);
-        Task<ApiResponse<User>> Update(UserUpdateModel model);
+        Task<ApiResponse<UserLoginResponse>> Login(UserLoginRequest request);
+        Task<ApiResponse> Register(RegisterUserRequest request);
+        Task<ApiResponse> ChangePassword(UpdatePasswordRequest request);
+        Task<ApiResponse> Update(UpdateUserRequest request);
         Task<ApiResponse> RemindPassword(string email);
-        Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model);
+        Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request);
     }
 }

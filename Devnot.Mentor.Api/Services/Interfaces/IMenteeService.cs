@@ -1,20 +1,16 @@
-﻿using DevnotMentor.Api.Common;
-using DevnotMentor.Api.Controllers;
-using DevnotMentor.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 
 namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IMenteeService
     {
-        Task<ApiResponse<MenteeProfileModel>> GetMenteeProfile(string userName);
+        Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName);
 
-        Task<ApiResponse<MenteeProfileModel>> CreateMenteeProfile(MenteeProfileModel model);
+        Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request);
 
-        //void UpdateMenteeProfile(MenteeProfileModel model);
-        Task<ApiResponse> ApplyToMentor(ApplyMentorModel model);
+        Task<ApiResponse> ApplyToMentor(ApplyToMentorRequest request);
     }
 }

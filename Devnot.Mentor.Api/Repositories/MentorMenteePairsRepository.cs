@@ -2,10 +2,7 @@
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
@@ -15,14 +12,14 @@ namespace DevnotMentor.Api.Repositories
         {
         }
 
-        public int GetCountForContinuesStatusByMenteeUserId(int menteeUserId)
+        public int GetCountForContinuesStatusByMenteeId(int menteeId)
         {
-            return DbContext.MentorMenteePairs.Where(i => i.Mentee.UserId == menteeUserId && i.State == MentorMenteePairStatus.Continues.ToInt()).Count();
+            return DbContext.MentorMenteePairs.Count(i => i.MenteeId == menteeId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
 
-        public int GetCountForContinuesStatusByMentorUserId(int mentorUserId)
+        public int GetCountForContinuesStatusByMentorId(int mentorId)
         {
-            return DbContext.MentorMenteePairs.Where(i => i.Mentor.UserId == mentorUserId && i.State == MentorMenteePairStatus.Continues.ToInt()).Count();
+            return DbContext.MentorMenteePairs.Count(i => i.MentorId == mentorId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
     }
 }

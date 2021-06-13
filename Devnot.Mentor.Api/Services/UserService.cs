@@ -1,33 +1,26 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Helpers;
-using DevnotMentor.Api.Models;
-using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Token;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
+using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Request.UserRequest;
+using DevnotMentor.Api.CustomEntities.Response.UserResponse;
+using DevnotMentor.Api.Utilities.File;
 
 namespace DevnotMentor.Api.Services
 {
     //TODO: Aynı username ile kayıt yapılabiliyor
 
-    [ExceptionHandlingAspect]
+    //[ExceptionHandlingAspect]
     public class UserService : BaseService, IUserService
     {
         private IUserRepository userRepository;
@@ -35,128 +28,111 @@ namespace DevnotMentor.Api.Services
         private ITokenService tokenService;
         private IMailService mailService;
 
+        private IFileService fileService;
+
         public UserService(
-            IOptions<AppSettings> appSettings,
-            IOptions<ResponseMessages> responseMessages,
             IMapper mapper,
             ITokenService tokenService,
             IHashService hashService,
             IMailService mailService,
             IUserRepository userRepository,
-            ILoggerRepository loggerRepository
-            ) : base(appSettings, responseMessages, mapper, loggerRepository)
+            ILoggerRepository loggerRepository,
+            IFileService fileService,
+            IDevnotConfigurationContext devnotConfigurationContext) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.tokenService = tokenService;
             this.hashService = hashService;
             this.mailService = mailService;
             this.userRepository = userRepository;
+            this.fileService = fileService;
         }
 
-        public async Task<ApiResponse<bool>> ChangePassword(PasswordUpdateModel model)
+        public async Task<ApiResponse> ChangePassword(UpdatePasswordRequest request)
         {
-            var response = new ApiResponse<bool>();
+            string hashedLastPassword = hashService.CreateHash(request.LastPassword);
 
-            string hashedLastPassword = hashService.CreateHash(model.LastPassword);
-
-            User currentUser = await userRepository.Get(model.UserId, hashedLastPassword);
+            var currentUser = await userRepository.Get(request.UserId, hashedLastPassword);
 
             if (currentUser == null)
             {
-                response.Message = responseMessages.Values["UserNotFound"];
-                return response;
+                return new ErrorApiResponse(ResultMessage.NotFoundUser);
             }
 
-            string hashedNewPassword = hashService.CreateHash(model.NewPassword);
-            currentUser.Password = hashedNewPassword;
+            currentUser.Password = hashService.CreateHash(request.NewPassword);
 
             userRepository.Update(currentUser);
 
-            response.Message = responseMessages.Values["Success"];
-            response.Success = true;
-            response.Data = true;
-
-            return response;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse<User>> Login(LoginModel model)
+        public async Task<ApiResponse<UserLoginResponse>> Login(UserLoginRequest request)
         {
-            var response = new ApiResponse<User>();
+            var hashedPassword = hashService.CreateHash(request.Password);
 
-            string hashedPassword = hashService.CreateHash(model.Password);
-
-            var user = await userRepository.Get(model.UserName, hashedPassword);
+            var user = await userRepository.Get(request.UserName, hashedPassword);
 
             if (user == null)
             {
-                response.Message = responseMessages.Values["InvalidUserNameOrPassword"];
+                return new ErrorApiResponse<UserLoginResponse>(data: null, ResultMessage.InvalidUserNameOrPassword);
             }
-            else if (!user.UserNameConfirmed.HasValue || !user.UserNameConfirmed.Value)
+
+            if (!user.UserNameConfirmed.HasValue || !user.UserNameConfirmed.Value)
             {
-                response.Message = responseMessages.Values["UserNameNotValidated"];
-            }
-            else
-            {
-                var tokenData = tokenService.CreateToken(user.Id, user.UserName);
-
-                user.Token = tokenData.Token;
-                user.TokenExpireDate = tokenData.ExpiredDate;
-
-                response.Success = true;
-                response.Data = user;
+                return new ErrorApiResponse<UserLoginResponse>(data: null, ResultMessage.UserNameIsNotValidated);
             }
 
-            return response;
+            var tokenData = tokenService.CreateToken(user.Id, user.UserName);
+
+            user.Token = tokenData.Token;
+            user.TokenExpireDate = tokenData.ExpiredDate;
+
+            var mappedUser = mapper.Map<User, UserDto>(user);
+
+            var loginResponse = new UserLoginResponse(mappedUser, user.Token, user.TokenExpireDate);
+
+            return new SuccessApiResponse<UserLoginResponse>(data: loginResponse, ResultMessage.Success);
         }
 
-        [DevnotUnitOfWorkAspect]
-        public async Task<ApiResponse<User>> Register(UserModel model)
+        //[DevnotUnitOfWorkAspect]
+        public async Task<ApiResponse> Register(RegisterUserRequest request)
         {
-            var response = new ApiResponse<User>();
+            var checkFileResult = await fileService.InsertProfileImage(request.ProfileImage);
 
-            if (!FileHelper.IsValidProfileImage(model.ProfileImage))
+            if (!checkFileResult.IsSuccess)
             {
-                response.Message = responseMessages.Values["InvalidProfileImage"];
-                return response;
+                return new ErrorApiResponse<User>(data: default, checkFileResult.ErrorMessage);
             }
 
-            model.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
-            model.Password = hashService.CreateHash(model.Password);
+            request.ProfileImageUrl = checkFileResult.RelativeFilePath;
+            request.Password = hashService.CreateHash(request.Password);
 
-            var newUser = userRepository.Create(mapper.Map<User>(model));
+            userRepository.Create(mapper.Map<User>(request));
 
-            response.Data = newUser;
-            response.Success = true;
-
-            return response;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         public async Task<ApiResponse> RemindPassword(string email)
         {
-            var response = new ApiResponse();
-
             if (String.IsNullOrWhiteSpace(email))
             {
-                response.Message = responseMessages.Values["InvalidModel"];
-                return response;
+                return new ErrorApiResponse(ResultMessage.InvalidModel);
             }
 
             var currentUser = await userRepository.GetByEmail(email);
 
             if (currentUser == null)
             {
-                response.Message = responseMessages.Values["UserNotFound"];
-                return response;
+                return new ErrorApiResponse(ResultMessage.NotFoundUser);
             }
 
             currentUser.SecurityKey = Guid.NewGuid();
-            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(appSettings.SecurityKeyExpiryFromHours);
+            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(devnotConfigurationContext.SecurityKeyExpiryFromHours);
 
             userRepository.Update(currentUser);
 
             await SendRemindPasswordMail(currentUser);
 
-            response.Success = true;
-            return response;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
         // TODO: İlerleyen zamanlarda template olarak veri tabanı ya da dosyadan okunulacak.
@@ -164,68 +140,56 @@ namespace DevnotMentor.Api.Services
         {
             var to = new List<string> { user.Email };
             string subject = "Devnot Mentor Programı | Parola Sıfırlama İsteği";
-            string remindPasswordUrl = $"{appSettings.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
+            string remindPasswordUrl = $"{devnotConfigurationContext.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
             string body = $"Merhaba {user.Name} {user.SurName}, <a href='{remindPasswordUrl}' target='_blank'>buradan</a> parolanızı sıfırlayabilirsiniz.";
 
             await mailService.SendEmailAsync(to, subject, body);
         }
 
-        public async Task<ApiResponse<User>> Update(UserUpdateModel model)
+        public async Task<ApiResponse> Update(UpdateUserRequest request)
         {
-            var response = new ApiResponse<User>();
+            var currentUser = await userRepository.GetById(request.UserId);
 
-            var currentUser = await userRepository.GetById(model.UserId);
-
-            if (model.ProfileImage != null)
+            if (request.ProfileImage != null)
             {
-                if (!FileHelper.IsValidProfileImage(model.ProfileImage))
+                var checkUploadedImageFileResult = await fileService.InsertProfileImage(request.ProfileImage);
+
+                if (!checkUploadedImageFileResult.IsSuccess)
                 {
-                    response.Message = responseMessages.Values["InvalidProfileImage"];
-                    return response;
+                    return new ErrorApiResponse<User>(data: default, checkUploadedImageFileResult.ErrorMessage);
                 }
 
-                currentUser.ProfileImageUrl = await FileHelper.UploadProfileImage(model.ProfileImage, appSettings);
+                currentUser.ProfileImageUrl = checkUploadedImageFileResult.RelativeFilePath;
             }
 
-            currentUser.Name = model.Name;
-            currentUser.SurName = model.SurName;
+            currentUser.Name = request.Name;
+            currentUser.SurName = request.SurName;
 
             userRepository.Update(currentUser);
 
-            response.Data = currentUser;
-            response.Message = responseMessages.Values["Success"];
-            response.Success = true;
-
-            return response;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RemindPasswordComplete(RemindPasswordCompleteModel model)
+        public async Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request)
         {
-            var apiResponse = new ApiResponse();
-
-            var currentUser = await userRepository.Get(model.SecurityKey);
+            var currentUser = await userRepository.Get(request.SecurityKey);
 
             if (currentUser == null)
             {
-                apiResponse.Message = responseMessages.Values["InvalidSecurityKey"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.InvalidSecurityKey);
             }
 
             if (currentUser.SecurityKeyExpiryDate < DateTime.Now)
             {
-                apiResponse.Message = responseMessages.Values["SecurityKeyExpiryDateAlreadyExpired"];
-                return apiResponse;
+                return new ErrorApiResponse(ResultMessage.SecurityKeyExpiryDateAlreadyExpired);
             }
 
             currentUser.SecurityKey = null;
-            currentUser.Password = hashService.CreateHash(model.Password);
+            currentUser.Password = hashService.CreateHash(request.Password);
 
             userRepository.Update(currentUser);
 
-            apiResponse.Success = true;
-            apiResponse.Message = responseMessages.Values["Success"];
-
-            return apiResponse;
+            return new SuccessApiResponse(ResultMessage.Success);
         }
     }
 }

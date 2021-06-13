@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace DevnotMentor.Api.Models
+namespace DevnotMentor.Api.CustomEntities.Request.UserRequest
 {
-    public class UserModel
+    public class RegisterUserRequest
     {
         [Required]
         public string UserName { get; set; }
+
+        [Required]
+        public string Email { get; set; }
 
         [Required]
         public string Password { get; set; }

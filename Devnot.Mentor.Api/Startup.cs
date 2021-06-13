@@ -1,31 +1,28 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AutoMapper;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using DevnotMentor.Api.Middleware;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Utilities.Security.Token;
 using Autofac;
+using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.Configuration.Environment;
 using DevnotMentor.Api.Utilities.Interceptor;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Hash.Sha256;
 using DevnotMentor.Api.Utilities.Email;
-using DevnotMentor.Api.Utilities.Email.Gmail;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
+using DevnotMentor.Api.Utilities.Email.SmtpMail;
+using DevnotMentor.Api.Utilities.Security.Token.Jwt;
 
 namespace DevnotMentor.Api
 {
@@ -51,14 +48,9 @@ namespace DevnotMentor.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-
-            services.Configure<AppSettings>(appSettingsSection);
-            services.Configure<ResponseMessages>(Configuration.GetSection("ResponseMessages"));
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
 
             services.AddControllers();
-            services.AddTokenAuthentication(appSettingsSection);
             services.AddAutoMapper(typeof(Startup));
 
             services.AddSingleton<TokenAuthentication>();
@@ -67,9 +59,13 @@ namespace DevnotMentor.Api
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
 
-            services.AddScoped<IMailService, GmailService>();
+            services.AddScoped<IMailService, SmtpMailService>();
             services.AddSingleton<ITokenService, JwtTokenService>();
             services.AddSingleton<IHashService, Sha256HashService>();
+
+            services.AddSingleton<IDevnotConfigurationContext, DevnotConfigurationContext>();
+            services.AddSingleton<IEnvironmentService, EnvironmentService>();
+
 
             #region Repositories
 

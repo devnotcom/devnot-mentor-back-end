@@ -1,82 +1,69 @@
 ﻿using DevnotMentor.Api.ActionFilters;
-using DevnotMentor.Api.Models;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
+using DevnotMentor.Api.Helpers.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
-    [Route("[controller]")]
     [ApiController]
     public class MentorController : BaseController
     {
         IMentorService mentorService;
+        private IHttpContextAccessor httpContextAccessor;
 
-        public MentorController(IMentorService service)
+        public MentorController(IMentorService service, IHttpContextAccessor httpContextAccessor)
         {
             mentorService = service;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync(string userName)
+        [Route("/mentors/{userName}")]
+        public async Task<IActionResult> GetAsync([FromRoute] string userName)
         {
             var result = await mentorService.GetMentorProfile(userName);
 
-            if (result.Success)
-            {
-                return Success(result);
-            }
-            else
-            {
-                return Error(result);
-            }
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] MentorProfileModel model)
+        [Route("/mentors")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
         {
-            var result = await mentorService.CreateMentorProfile(model);
+            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            if (result.Success)
-            {
-                return Success(result);
-            }
-            else
-            {
-                return Error(result);
-            }
+            var result = await mentorService.CreateMentorProfile(request);
+
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("/mentors/{mentorUserId}/mentees/{menteeUserId}/accept")]
-        public async Task<IActionResult> AcceptMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
+        [Route("/mentors/{mentorId}/mentees/{menteeId}/accept")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var result = await mentorService.AcceptMentee(mentorUserId, menteeUserId);
+            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            if (result.Success)
-            {
-                return Success(result);
-            }
+            var result = await mentorService.AcceptMentee(mentorUserId, mentorId, menteeId);
 
-            return Error<object>(result.Message, null);
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("/mentors/{mentorUserId}/mentees/{menteeUserId}/reject")]
-        public async Task<IActionResult> RejectMentee([FromRoute] int mentorUserId, [FromRoute] int menteeUserId)
+        [Route("/mentors/{mentorId}/mentees/{menteeId}/reject")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var result = await mentorService.RejectMentee(mentorUserId, menteeUserId);
+            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
 
-            if (result.Success)
-            {
-                return Success(result);
-            }
+            var result = await mentorService.RejectMentee(mentorUserId, mentorId, menteeId);
 
-            return Error<object>(result.Message, null);
+            return result.Success ? Success(result) : BadRequest(result);
         }
     }
 }
