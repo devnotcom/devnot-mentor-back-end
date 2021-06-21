@@ -34,6 +34,10 @@ ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
 
 
+---
+
+
+
 ### Klasör Yapısı
 
 📁 ActionFilters - Controller altındaki ilgili action tetiklenmeden önce çalışacak işlemlerin yer aldığı klasör.
@@ -59,6 +63,10 @@ ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 📁 Services - Servis sınıflarının, iş kurallarının yapıldığı yerdir, bu işlemleri gerçekleştiren sınıfları içeren klasör.
 
 📁 Utilities - Email, JWT, Hash, Interceptor, dosya yazma gibi işlemlere ait sınıfların bulunduğu klasör.
+
+
+
+---
 
 
 
