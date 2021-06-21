@@ -26,11 +26,39 @@ Publish alma işlemleri için.
 $ dotnet publish
 ```
 
-publish alma işleminden sonra uygun profili seçmek için ENV. değerinin karşılığı `Developemen`, `Test` ya da `Production` olmalıdır.
+publish alma işleminden sonra uygun profili seçmek için ENV. değerinin karşılığı `Development`, `Test` ya da `Production` olmalıdır.
 
 ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
 Örnek bir ENV. ataması: ***DEVNOT_MENTOR_ENVIRONMENT = production***
+
+
+
+### Klasör Yapısı
+
+📁 ActionFilters - Controller altındaki ilgili action tetiklenmeden önce çalışacak işlemlerin yer aldığı klasör.
+
+📁 Aspects - İlgili cross-cutting-concern'lerin (Transaction, Exception) yer aldığı klasör. 
+
+📁 Common - Hata mesajlarını ve servis sınıflarının geriye döndüğü durumları temsil eden sınıfların yer aldığı klasör.
+
+📁 Configuration - Environment bilgilerinin ve bu bilgilere ait JSON dosyalarının tutulduğu klasör.
+
+📁 Controllers - API için kullanılan Controller listesini içeren klasör.
+
+📁 CustomEntities - DTO, Request ve Response için oluşturulan sınıfların yer aldığı klasör.
+
+📁 Enums - Sabit değerler için oluşturulan Enum'ların bulunduğu klasör.
+
+📁 Helpers - Extension metotlarını ve Mapper Profillerini içeren sınıfların bulunduğu klasör.
+
+📁 images - Kullanıcılara ait profil fotoğraflarının bulunduğu klasör.
+
+📁 Repositories - Repository sınıflarını içeren klasör.
+
+📁 Services - Servis sınıflarının, iş kurallarının yapıldığı yerdir, bu işlemleri gerçekleştiren sınıfları içeren klasör.
+
+📁 Utilities - Email, JWT, Hash, Interceptor, dosya yazma gibi işlemlere ait sınıfların bulunduğu klasör.
 
 
 
