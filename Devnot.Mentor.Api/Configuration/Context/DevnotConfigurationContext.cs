@@ -30,6 +30,7 @@ namespace DevnotMentor.Api.Configuration.Context
 
 
             ProfileImagePath = environmentService.Configuration["General:ProfileImagePath"];
+            ProfileImageMaxFileLength = int.Parse(environmentService.Configuration["General:ProfileImageMaxFileLength"]);
 
             MaxMentorCountOfMentee = int.Parse(environmentService.Configuration["General:MaxMentorCountOfMentee"]);
 
@@ -47,6 +48,7 @@ namespace DevnotMentor.Api.Configuration.Context
         public string JwtValidIssuer { get; }
         public string JwtValidAudience { get; }
         public string ProfileImagePath { get; }
+        public int ProfileImageMaxFileLength { get; }
         public int MaxMentorCountOfMentee { get; }
         public int MaxMenteeCountOfMentor { get; }
         public string UpdatePasswordWebPageUrl { get; }
@@ -55,5 +57,6 @@ namespace DevnotMentor.Api.Configuration.Context
         public string SmtpEmail { get; }
         public string SmtpPassword { get; }
         public int SmtpPort { get; }
+
     }
 }

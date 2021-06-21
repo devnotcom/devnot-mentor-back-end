@@ -34,6 +34,11 @@
         public string ProfileImagePath { get; }
 
         /// <summary>
+        /// Profile image maximum file length in bytes.
+        /// </summary>
+        public int ProfileImageMaxFileLength { get; }
+
+        /// <summary>
         /// Max mentor count of mentee.
         /// </summary>
         public int MaxMentorCountOfMentee { get; }
