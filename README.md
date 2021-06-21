@@ -46,7 +46,7 @@ publish alma işleminden sonra uygun profili seçmek için ENV. değerinin karş
 
 ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
-Örnek bir ENV. ataması: ***DEVNOT_MENTOR_ENVIRONMENT = production***
+Örnek bir ENV. ataması: ***DEVNOT_MENTOR_ENVIRONMENT = Production***
 
 ---
 
