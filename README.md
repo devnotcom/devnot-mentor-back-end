@@ -2,6 +2,22 @@
 <img height="300" src="https://user-images.githubusercontent.com/43035417/122687424-17337700-d21f-11eb-9d6b-26000d720291.jpg">
 </p>
 
+# Devnot Nedir?
+
+Blog yazıları yayınlayan, yazılım konferansları, buluşmalar ve kamplar düzenleyen yazılım geliştirici topluluğudur.
+
+
+
+# Projenin Amacı Nedir?
+
+Yazılımcı adaylarının ve yazılım geliştiricilerin yetkinliklerini arttırmak adına Devnot Mentor projesini hayata geçiriyoruz.
+
+
+
+Yazılımcı olmayı veya mesleğinde daha iyi noktalara gelmeyi hedefleyen kişileri(öğrenci) bu program kapsamında bir mentorle eşleştirerek düzenli görüşmeler yapmalarını amaçlamaktayız. Bu görüşmelerde öğrenciler mentorlerine sorular sorabilecek, çözmekte zorlandıkları konularda yardım isteyebilecek, gelişimleri için uygun kaynak önerilerini dinleyebilecekler.
+
+
+
 # Başlarken
 
 devnot-mentor-back-end projesini çalıştırabilmek için bilgisayarınıza [.NET Core](https://dotnet.microsoft.com/download) yüklemelisiniz.
@@ -32,11 +48,7 @@ ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
 Örnek bir ENV. ataması: ***DEVNOT_MENTOR_ENVIRONMENT = production***
 
-
-
 ---
-
-
 
 ### Klasör Yapısı
 
@@ -64,11 +76,7 @@ ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
 📁 Utilities - Email, JWT, Hash, Interceptor, dosya yazma gibi işlemlere ait sınıfların bulunduğu klasör.
 
-
-
 ---
-
-
 
 ### API Projesi Ağaç Yapısı
 
