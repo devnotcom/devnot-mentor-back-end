@@ -10,7 +10,7 @@ Güncel yazılım konularıyla ilgili yazılar yayınlayan, yazılım konferansl
 
 # Devnot Mentor Projesi Nedir?
 
-Yazılım alanında kendini geliştirmek isteyen öğrencilerin(mentilerin) kendilerinden daha tecrübeli yazılımcılar(mentorlar) bulmalarını, onlarla tanışmalarını ve düzenli görüşmeler yapmalarını sağlayacak açık kaynaklı bir topluluk projesidir.
+Yazılım alanında kendini geliştirmek isteyen öğrencilerin(mentilerin) kendilerinden daha tecrübeli yazılımcılar(mentorlar) bulmalarını, onlarla tanışmalarını ve düzenli görüşmeler yapmalarını sağlayacak açık kaynak kod bir topluluk projesidir.
 
 
 
