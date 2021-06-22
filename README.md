@@ -8,9 +8,9 @@ Güncel yazılım konularıyla ilgili yazılar yayınlayan, yazılım konferansl
 
 
 
-# Projenin Amacı Nedir?
+# Devnot Mentor Projesi Nedir?
 
-Yazılımcı adaylarının ve yazılım geliştiricilerin yetkinliklerini arttırmak adına Devnot Mentor projesini hayata geçiriyoruz.
+Yazılım alanında kendini geliştirmek isteyen öğrencilerin(mentilerin) kendilerinden daha tecrübeli yazılımcılar(mentorlar) bulmalarını, onlarla tanışmalarını ve düzenli görüşmeler yapmalarını sağlayacak açık kaynaklı bir topluluk projesidir.
 
 
 
