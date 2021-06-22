@@ -28,7 +28,11 @@ namespace DevnotMentor.Api.Utilities.File.Local
                 return new FileResult(isSuccess: false, errorMessage: ResultMessage.ProfileImageCanNotBeNullOrEmpty, newFileName: default, relativeFilePath: default);
             }
 
-            // TODO: I am going to check max file length.
+            //Check image max file length.
+            if (profileImageFile.Length > this.devnotConfigurationContext.ProfileImageMaxFileLength)
+            {
+                return new FileResult(isSuccess: false, errorMessage: ResultMessage.InvalidProfileImageSize, newFileName: default, relativeFilePath: default);
+            }
 
             // Check image has valid extension?
             if (validImageMimeTypes.Contains(profileImageFile.ContentType.ToLower()) == false)
