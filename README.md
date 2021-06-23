@@ -54,7 +54,7 @@ Linux Terminal: `export DEVNOT_MENTOR_ENVIRONMENT='Development'`
 
 ## Database Migration
 
-Migration işlemini gerçekleştirmeden önce SQL Server'a bağlanmak için connection string bilgisini sizlerin kullandığı makinaya göre ayarlamanız gerekmektedir. Bunun için **DevnotMentor.Api.Configuration** namespace altındaki appsettings.development.json dosyasındaki bağlantı düzeltilmelidir.
+Migration işlemini gerçekleştirmeden önce SQL Server'a bağlanmak için connection string bilgisini sizlerin kullandığı makinaya göre ayarlamanız gerekmektedir. Bunun için **DevnotMentor.Api.Configuration** namespace altındaki **appsettings.development.json** dosyasındaki bağlantı düzeltilmelidir.
 
 
 
