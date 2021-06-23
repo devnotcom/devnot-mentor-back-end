@@ -7,17 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20200522211011_may22-2.cs" />
-    <Compile Remove="Migrations\20200522211011_may22-2.Designer.cs" />
-    <Compile Remove="Migrations\20200522211120_may22-2.cs" />
-    <Compile Remove="Migrations\20200522211120_may22-2.Designer.cs" />
-    <Compile Remove="Migrations\20200523215715_Id-Identity.cs" />
-    <Compile Remove="Migrations\20200523215715_Id-Identity.Designer.cs" />
-    <Compile Remove="Migrations\20200523215901_Id-Identity-2.cs" />
-    <Compile Remove="Migrations\20200523215901_Id-Identity-2.Designer.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="5.0.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
@@ -41,7 +30,6 @@
     <Folder Include="CustomEntities\Request\" />
     <Folder Include="CustomEntities\Response\" />
     <Folder Include="images\profile-images\" />
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
