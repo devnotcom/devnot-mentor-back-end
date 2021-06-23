@@ -48,7 +48,8 @@ namespace DevnotMentor.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
+            var connectionString = EnvironmentService.StaticConfiguration["ConnectionStrings:SQLServerConnectionString"];
+            services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
