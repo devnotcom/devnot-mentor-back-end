@@ -60,7 +60,9 @@ Migration işleminin gerçekleştirmeden önce SQL Server'a bağlanmak için con
 
 Bu işlemden sonra Package Manager Console üzerinden aşağıdaki adımların takip edilmesi gerekmektedir.
 
-```shell
+
+
+```sh
 $  $env:DEVNOT_MENTOR_ENVIRONMENT='Development'
 $  add-migration MentorDB_Initialization
 $  Update-Database
