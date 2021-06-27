@@ -6,17 +6,11 @@
 
 Güncel yazılım konularıyla ilgili yazılar yayınlayan, yazılım konferansları, buluşmalar ve kamplar düzenleyen yazılım geliştirici topluluğudur.
 
-
-
 # Devnot Mentor Projesi Nedir?
 
 Yazılım alanında kendini geliştirmek isteyen öğrencilerin(mentilerin) kendilerinden daha tecrübeli yazılımcılar(mentorlar) bulmalarını, onlarla tanışmalarını ve düzenli görüşmeler yapmalarını sağlayacak açık kaynak kod bir topluluk projesidir.
 
-
-
 Yazılımcı olmayı veya mesleğinde daha iyi noktalara gelmeyi hedefleyen kişileri(öğrenci) bu program kapsamında bir mentorle eşleştirerek düzenli görüşmeler yapmalarını amaçlamaktayız. Bu görüşmelerde öğrenciler mentorlerine sorular sorabilecek, çözmekte zorlandıkları konularda yardım isteyebilecek, gelişimleri için uygun kaynak önerilerini dinleyebilecekler.
-
-
 
 # Başlarken
 
@@ -42,11 +36,39 @@ Publish alma işlemleri için.
 $ dotnet publish
 ```
 
-publish alma işleminden sonra uygun profili seçmek için ENV. değerinin karşılığı `Development`, `Test` ya da `Production` olmalıdır.
+publish alma, migration gibi işlemlerde uygun profili seçmek için ENV. değerinin karşılığı `Development`, `Test` ya da `Production` olmalıdır.
+
+
 
 ENV. Key: DEVNOT_MENTOR_ENVIRONMENT
 
-Örnek bir ENV. ataması: ***DEVNOT_MENTOR_ENVIRONMENT = Production***
+
+
+Örnek bir ENV. ataması: 
+
+Powershell:  `$env:DEVNOT_MENTOR_ENVIRONMENT='Development'`
+
+Linux Terminal: `export DEVNOT_MENTOR_ENVIRONMENT='Development'`
+
+
+
+## Database Migration
+
+Migration işlemini gerçekleştirmeden önce SQL Server'a bağlanmak için connection string bilgisini sizlerin kullandığı makinaya göre ayarlamanız gerekmektedir. Bunun için **DevnotMentor.Api.Configuration** namespace altındaki **appsettings.development.json** dosyasındaki bağlantı düzeltilmelidir.
+
+
+
+Bu işlemden sonra Package Manager Console üzerinden aşağıdaki adımların takip edilmesi gerekmektedir.
+
+
+
+```sh
+$  $env:DEVNOT_MENTOR_ENVIRONMENT='Development'
+$  add-migration MentorDB_Initialization
+$  Update-Database
+```
+
+
 
 ---
 

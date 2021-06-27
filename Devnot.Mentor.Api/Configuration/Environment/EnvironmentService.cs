@@ -17,7 +17,7 @@ namespace DevnotMentor.Api.Configuration.Environment
             SetConfiguration();
         }
 
-        private void SetConfiguration()
+        private static void SetConfiguration()
         {
             if (_configuration == null)
             {
@@ -31,7 +31,7 @@ namespace DevnotMentor.Api.Configuration.Environment
             }
         }
 
-        private void SetEnvironmentValue()
+        private static void SetEnvironmentValue()
         {
             _environmentVariableValue = System.Environment.GetEnvironmentVariable(_environmentVariableKey, EnvironmentVariableTarget.Process);
 
@@ -42,6 +42,23 @@ namespace DevnotMentor.Api.Configuration.Environment
         }
 
         public IConfiguration Configuration => _configuration;
+
+        /// <summary>
+        /// Static configuration instance. You can use this property without `new` keyword.
+        /// </summary>
+        public static IConfiguration StaticConfiguration
+        {
+            get
+            {
+                if (_configuration == null)
+                {
+                    SetEnvironmentValue();
+                    SetConfiguration();
+                }
+
+                return _configuration;
+            }
+        }
 
         public bool IsDevelopment => _environmentVariableValue.ToLower() == "development";
         public bool IsTest => _environmentVariableValue.ToLower() == "test";
