@@ -13,6 +13,7 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
+using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Services
 {
@@ -20,12 +21,12 @@ namespace DevnotMentor.Api.Services
     public class MenteeService : BaseService, IMenteeService
     {
         private readonly IMenteeRepository menteeRepository;
-        private readonly  IMenteeLinksRepository menteeLinksRepository;
-        private readonly  IMenteeTagsRepository menteeTagsRepository;
-        private readonly  ITagRepository tagRepository;
-        private readonly  IUserRepository userRepository;
-        private readonly  IMentorRepository mentorRepository;
-        private readonly  IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMenteeLinksRepository menteeLinksRepository;
+        private readonly IMenteeTagsRepository menteeTagsRepository;
+        private readonly ITagRepository tagRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMentorRepository mentorRepository;
+        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -68,6 +69,26 @@ namespace DevnotMentor.Api.Services
 
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
+        }
+        public async Task<ApiResponse> GetMentors(string userName)
+        {
+            var user = await userRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
+            }
+
+            var mentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var mappedData = mapper.Map<List<MentorDto>>(await menteeRepository.GetMentors(x => x.Mentee.Id == mentee.Id));
+
+            return new SuccessApiResponse<List<MentorDto>>(mappedData);
         }
 
         //[DevnotUnitOfWorkAspect]

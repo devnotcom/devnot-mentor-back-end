@@ -12,5 +12,7 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request);
 
         Task<ApiResponse> ApplyToMentor(ApplyToMentorRequest request);
+        
+        Task<ApiResponse> GetMentors(string userName);
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories.Interfaces
@@ -11,5 +12,7 @@ namespace DevnotMentor.Api.Repositories.Interfaces
         Task<Mentee> GetByUserId(int userId);
         Task<int> GetIdByUserId(int userId);
         Task<bool> IsExistsByUserId(int userId);
+
+        Task<IEnumerable<Mentor>> GetMentors(Expression<Func<MentorMenteePairs, bool>> predicate);
     }
 }
