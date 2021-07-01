@@ -11,8 +11,8 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private IUserService userService;
-        private IHttpContextAccessor httpContextAccessor;
+        private readonly IUserService userService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             this.userService = userService;

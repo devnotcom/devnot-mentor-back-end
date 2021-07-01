@@ -12,8 +12,8 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MentorController : BaseController
     {
-        IMentorService mentorService;
-        private IHttpContextAccessor httpContextAccessor;
+        private readonly IMentorService mentorService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public MentorController(IMentorService service, IHttpContextAccessor httpContextAccessor)
         {

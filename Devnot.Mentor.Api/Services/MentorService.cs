@@ -19,14 +19,14 @@ namespace DevnotMentor.Api.Services
     //[ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
-        private IMentorRepository mentorRepository;
-        private IMenteeRepository menteeRepository;
-        private IMentorLinksRepository mentorLinksRepository;
-        private IMentorTagsRepository mentorTagsRepository;
-        private ITagRepository tagRepository;
-        private IUserRepository userRepository;
-        private IMentorApplicationsRepository mentorApplicationsRepository;
-        private IMentorMenteePairsRepository mentorMenteePairsRepository;
+        private readonly  IMentorRepository mentorRepository;
+        private readonly  IMenteeRepository menteeRepository;
+        private readonly  IMentorLinksRepository mentorLinksRepository;
+        private readonly  IMentorTagsRepository mentorTagsRepository;
+        private readonly  ITagRepository tagRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMentorMenteePairsRepository mentorMenteePairsRepository;
 
         public MentorService(
             IMapper mapper,

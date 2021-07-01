@@ -3,7 +3,7 @@
     /// <summary>
     /// It provides global result message keys.
     /// </summary>
-    public class ResultMessage
+    public static class ResultMessage
     {
         public static string Success => "messages.success.general.ok";
         public static string InvalidModel => "messages.error.general.invalidModel";
