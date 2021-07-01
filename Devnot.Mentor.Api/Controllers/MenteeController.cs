@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Api.Controllers
 {
@@ -13,12 +12,9 @@ namespace DevnotMentor.Api.Controllers
     public class MenteeController : BaseController
     {
         private IMenteeService menteeService;
-        private IHttpContextAccessor httpContextAccessor;
-
-        public MenteeController(IMenteeService menteeService, IHttpContextAccessor httpContextAccessor)
+        public MenteeController(IMenteeService menteeService)
         {
             this.menteeService = menteeService;
-            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -35,7 +31,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMenteeProfileRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await menteeService.CreateMenteeProfile(request);
 
@@ -47,7 +43,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ApplyToMentor(ApplyToMentorRequest request)
         {
-            request.MenteeUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.MenteeUserId = User.Claims.GetUserId();
 
             var result = await menteeService.ApplyToMentor(request);
 

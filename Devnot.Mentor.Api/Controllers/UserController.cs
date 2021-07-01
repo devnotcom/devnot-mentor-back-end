@@ -3,7 +3,6 @@ using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.Api.Controllers
@@ -12,11 +11,9 @@ namespace DevnotMentor.Api.Controllers
     public class UserController : BaseController
     {
         private IUserService userService;
-        private IHttpContextAccessor httpContextAccessor;
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
+        public UserController(IUserService userService)
         {
             this.userService = userService;
-            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
@@ -38,11 +35,11 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost]
-        [Route("/users/{userId}/change-password")]
+        [Route("/users/change-password")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await userService.ChangePassword(request);
 
@@ -50,11 +47,11 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPatch]
-        [Route("/users/{userId}")]
+        [Route("/users")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await userService.Update(request);
 
