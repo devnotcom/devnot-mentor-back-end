@@ -53,14 +53,7 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
-            }
-
-            var mentee = await menteeRepository.GetByUserId(user.Id);
+            var mentee = await menteeRepository.GetByUserName(userName);
 
             if (mentee == null)
             {
@@ -74,14 +67,7 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse> GetMentors(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
-            }
-
-            var mentee = await menteeRepository.GetByUserId(user.Id);
+            var mentee = await menteeRepository.GetByUserName(userName);
 
             if (mentee == null)
             {
@@ -95,14 +81,7 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
-            }
-
-            var mentee = await menteeRepository.GetByUserId(user.Id);
+            var mentee = await menteeRepository.GetByUserName(userName);
 
             if (mentee == null)
             {

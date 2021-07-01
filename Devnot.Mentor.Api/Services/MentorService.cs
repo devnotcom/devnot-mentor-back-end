@@ -19,11 +19,11 @@ namespace DevnotMentor.Api.Services
     //[ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
-        private readonly  IMentorRepository mentorRepository;
-        private readonly  IMenteeRepository menteeRepository;
-        private readonly  IMentorLinksRepository mentorLinksRepository;
-        private readonly  IMentorTagsRepository mentorTagsRepository;
-        private readonly  ITagRepository tagRepository;
+        private readonly IMentorRepository mentorRepository;
+        private readonly IMenteeRepository menteeRepository;
+        private readonly IMentorLinksRepository mentorLinksRepository;
+        private readonly IMentorTagsRepository mentorTagsRepository;
+        private readonly ITagRepository tagRepository;
         private readonly IUserRepository userRepository;
         private readonly IMentorApplicationsRepository mentorApplicationsRepository;
         private readonly IMentorMenteePairsRepository mentorMenteePairsRepository;
@@ -54,14 +54,7 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse<MentorDto>> GetMentorProfile(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundUser);
-            }
-
-            var mentor = await mentorRepository.GetByUserId(user.Id);
+            var mentor = await mentorRepository.GetByUserName(userName);
 
             if (mentor == null)
             {
@@ -70,6 +63,19 @@ namespace DevnotMentor.Api.Services
 
             var mappedMentor = mapper.Map<MentorDto>(mentor);
             return new SuccessApiResponse<MentorDto>(mappedMentor);
+        }
+
+        public async Task<ApiResponse> GetMentees(string userName)
+        {
+            var mentor = await mentorRepository.GetByUserName(userName);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
+            }
+
+            var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
+            return new SuccessApiResponse<List<MenteeDto>>(mappedData);
         }
 
         public async Task<ApiResponse<MentorDto>> CreateMentorProfile(CreateMentorProfileRequest request)
@@ -226,27 +232,7 @@ namespace DevnotMentor.Api.Services
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
-        
-        public async Task<ApiResponse> GetMentees(string userName)
-        {
-            var user = await userRepository.GetByUserName(userName);
 
-            if (user == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundUser);
-            }
-
-            var mentor = await mentorRepository.GetByUserId(user.Id);
-
-            if (mentor == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
-            }
-            
-            var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
-            return new SuccessApiResponse<List<MenteeDto>>(mappedData);
-        }
-        
         /// <summary>
         /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
         /// </summary>
