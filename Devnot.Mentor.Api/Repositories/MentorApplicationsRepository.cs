@@ -31,15 +31,15 @@ namespace DevnotMentor.Api.Repositories
                 .Where(i => i.MentorId == mentorId && i.MenteeId == menteeId)
                 .FirstOrDefaultAsync();
         }
-        
+
         public async Task<IEnumerable<MentorApplications>> GetForMentees(Expression<Func<MentorApplications, bool>> predicate)
         {
-            return await DbContext.MentorApplications.Where(predicate).Include(x => x.Mentor).ToListAsync();
+            return await DbContext.MentorApplications.Where(predicate).Include(x => x.Mentor).ThenInclude(x => x.User).ToListAsync();
         }
 
         public async Task<IEnumerable<MentorApplications>> GetForMentors(Expression<Func<MentorApplications, bool>> predicate)
         {
-            return await DbContext.MentorApplications.Where(predicate).Include(x => x.Mentee).ToListAsync();
+            return await DbContext.MentorApplications.Where(predicate).Include(x => x.Mentee).ThenInclude(x => x.User).ToListAsync();
         }
     }
 }

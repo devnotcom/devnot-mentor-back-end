@@ -38,7 +38,16 @@ namespace DevnotMentor.Api.Controllers
 
             return result.Success ? Success(result) : BadRequest(result);
         }
-        
+
+        [HttpGet]
+        [Route("/mentors/{userName}/applications")]
+        public async Task<IActionResult> GetApplications([FromRoute] string userName)
+        {
+            var result = await mentorService.GetApplicationsNotIncludeApproveds(userName);
+
+            return result.Success ? Success(result) : BadRequest(result);
+        }
+
         [HttpPost]
         [Route("/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]

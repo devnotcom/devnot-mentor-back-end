@@ -75,7 +75,28 @@ namespace DevnotMentor.Api.Services
             }
 
             var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
+
+            //todo: null check for mappedData
+
             return new SuccessApiResponse<List<MenteeDto>>(mappedData);
+        }
+
+        public async Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName)
+        {
+            var mentor = await mentorRepository.GetByUserName(userName);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentor);
+            }
+
+            var mappedData = mapper.Map<List<MentorApplicationsDTO>>(
+                await mentorApplicationsRepository.GetForMentors(x => x.MenteeId == mentor.Id && x.Status != MentorApplicationStatus.Approved.ToInt())
+            );
+
+            //todo: null check for mappedData
+
+            return new SuccessApiResponse<List<MentorApplicationsDTO>>(mappedData);
         }
 
         public async Task<ApiResponse<MentorDto>> CreateMentorProfile(CreateMentorProfileRequest request)

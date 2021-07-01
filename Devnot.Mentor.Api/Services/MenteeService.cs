@@ -76,6 +76,8 @@ namespace DevnotMentor.Api.Services
 
             var mappedData = mapper.Map<List<MentorDto>>(await menteeRepository.GetMentors(x => x.Mentee.Id == mentee.Id));
 
+            //todo: null check for mappedData
+            
             return new SuccessApiResponse<List<MentorDto>>(mappedData);
         }
 
@@ -92,6 +94,8 @@ namespace DevnotMentor.Api.Services
                 await mentorApplicationsRepository.GetForMentees(x => x.MenteeId == mentee.Id && x.Status != MentorApplicationStatus.Approved.ToInt())
             );
 
+            //todo: null check for mappedData
+            
             return new SuccessApiResponse<List<MentorApplicationsDTO>>(mappedData);
 
         }

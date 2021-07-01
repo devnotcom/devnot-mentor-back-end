@@ -11,5 +11,7 @@ namespace DevnotMentor.Api.Repositories.Interfaces
         Task<bool> IsExistsByUserId(int mentorId, int menteeId);
         Task<MentorApplications> Get(int mentorId, int menteeId);
         Task<IEnumerable<MentorApplications>> GetForMentees(Expression<Func<MentorApplications, bool>> predicate);
+        Task<IEnumerable<MentorApplications>> GetForMentors(Expression<Func<MentorApplications, bool>> predicate);
+
     }
 }
