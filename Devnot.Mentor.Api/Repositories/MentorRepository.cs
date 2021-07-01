@@ -32,7 +32,7 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<IEnumerable<Mentee>> GetMentees(Expression<Func<MentorMenteePairs, bool>> predicate)
         {
-            return await DbContext.MentorMenteePairs.Where(predicate).Select(x => x.Mentee).ToListAsync();;
+            return await DbContext.MentorMenteePairs.Where(predicate).Include(x => x.Mentee).ThenInclude(x => x.User).Select(x => x.Mentee).ToListAsync(); ;
         }
     }
 }
