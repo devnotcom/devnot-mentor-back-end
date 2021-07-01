@@ -10,9 +10,9 @@ namespace DevnotMentor.Api.Repositories.Interfaces
     public interface IMenteeRepository : IRepository<Mentee>
     {
         Task<Mentee> GetByUserId(int userId);
+        Task<Mentee> GetByUserName(string userName);
         Task<int> GetIdByUserId(int userId);
         Task<bool> IsExistsByUserId(int userId);
-
         Task<IEnumerable<Mentor>> GetMentors(Expression<Func<MentorMenteePairs, bool>> predicate);
     }
 }

@@ -23,6 +23,11 @@ namespace DevnotMentor.Api.Repositories
             return await DbContext.Mentee.Where(i => i.UserId == userId).FirstOrDefaultAsync();
         }
 
+        public async Task<Mentee> GetByUserName(string userName)
+        {
+            return await DbContext.Mentee.Include(x => x.User).Where(i => i.User.UserName == userName).FirstOrDefaultAsync();
+        }
+
         public async Task<int> GetIdByUserId(int userId)
         {
             return await DbContext.Mentee.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
