@@ -93,7 +93,7 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorDto>>(mappedData);
         }
 
-        public async Task<ApiResponse> GetApplications(string userName)
+        public async Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName)
         {
             var user = await userRepository.GetByUserName(userName);
 

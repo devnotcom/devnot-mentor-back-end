@@ -226,7 +226,7 @@ namespace DevnotMentor.Api.Services
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
-
+        
         public async Task<ApiResponse> GetMentees(string userName)
         {
             var user = await userRepository.GetByUserName(userName);
@@ -246,6 +246,7 @@ namespace DevnotMentor.Api.Services
             var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
             return new SuccessApiResponse<List<MenteeDto>>(mappedData);
         }
+        
         /// <summary>
         /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
         /// </summary>

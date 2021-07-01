@@ -43,7 +43,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("/mentees/{userName}/applications")]
         public async Task<IActionResult> GetApplications([FromRoute] string userName)
         {
-            var result = await menteeService.GetApplications(userName);
+            var result = await menteeService.GetApplicationsNotIncludeApproveds(userName);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
