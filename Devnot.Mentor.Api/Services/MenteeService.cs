@@ -70,6 +70,8 @@ namespace DevnotMentor.Api.Services
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
+
+
         public async Task<ApiResponse> GetMentors(string userName)
         {
             var user = await userRepository.GetByUserName(userName);
@@ -89,6 +91,30 @@ namespace DevnotMentor.Api.Services
             var mappedData = mapper.Map<List<MentorDto>>(await menteeRepository.GetMentors(x => x.Mentee.Id == mentee.Id));
 
             return new SuccessApiResponse<List<MentorDto>>(mappedData);
+        }
+
+        public async Task<ApiResponse> GetApplications(string userName)
+        {
+            var user = await userRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
+            }
+
+            var mentee = await menteeRepository.GetByUserId(user.Id);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var mappedData = mapper.Map<List<MentorApplicationsDTO>>(
+                await mentorApplicationsRepository.GetForMentees(x => x.MenteeId == mentee.Id && x.Status != MentorApplicationStatus.Approved.ToInt())
+            );
+
+            return new SuccessApiResponse<List<MentorApplicationsDTO>>(mappedData);
+
         }
 
         //[DevnotUnitOfWorkAspect]

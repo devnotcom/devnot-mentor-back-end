@@ -9,10 +9,12 @@ namespace DevnotMentor.Api.Services.Interfaces
     {
         Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName);
 
+        Task<ApiResponse> GetMentors(string userName);
+
+        Task<ApiResponse> GetApplications(string userName);
+
         Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request);
 
         Task<ApiResponse> ApplyToMentor(ApplyToMentorRequest request);
-        
-        Task<ApiResponse> GetMentors(string userName);
     }
 }

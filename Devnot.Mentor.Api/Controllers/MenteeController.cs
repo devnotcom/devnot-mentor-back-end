@@ -12,8 +12,8 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MenteeController : BaseController
     {
-        private readonly  IMenteeService menteeService;
-        private readonly  IHttpContextAccessor httpContextAccessor;
+        private readonly IMenteeService menteeService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public MenteeController(IMenteeService menteeService, IHttpContextAccessor httpContextAccessor)
         {
@@ -39,6 +39,15 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
         
+        [HttpGet]
+        [Route("/mentees/{userName}/applications")]
+        public async Task<IActionResult> GetApplications([FromRoute] string userName)
+        {
+            var result = await menteeService.GetApplications(userName);
+
+            return result.Success ? Success(result) : BadRequest(result);
+        }
+
         [HttpPost]
         [Route("/mentees")]
         [ServiceFilter(typeof(TokenAuthentication))]
