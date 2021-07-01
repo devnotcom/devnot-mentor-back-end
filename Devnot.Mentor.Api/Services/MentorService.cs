@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
@@ -13,6 +11,8 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Services
 {
@@ -227,6 +227,25 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
+        public async Task<ApiResponse> GetMentees(string userName)
+        {
+            var user = await userRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundUser);
+            }
+
+            var mentor = await mentorRepository.GetByUserId(user.Id);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
+            }
+            
+            var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
+            return new SuccessApiResponse<List<MenteeDto>>(mappedData);
+        }
         /// <summary>
         /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
         /// </summary>
