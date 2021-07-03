@@ -13,12 +13,10 @@ namespace DevnotMentor.Api.Controllers
     public class MentorController : BaseController
     {
         IMentorService mentorService;
-        private IHttpContextAccessor httpContextAccessor;
 
-        public MentorController(IMentorService service, IHttpContextAccessor httpContextAccessor)
+        public MentorController(IMentorService service)
         {
             mentorService = service;
-            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -35,7 +33,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await mentorService.CreateMentorProfile(request);
 
@@ -47,7 +45,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            var mentorUserId = User.Claims.GetUserId();
 
             var result = await mentorService.AcceptMentee(mentorUserId, mentorId, menteeId);
 
@@ -59,7 +57,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            var mentorUserId = User.Claims.GetUserId();
 
             var result = await mentorService.RejectMentee(mentorUserId, mentorId, menteeId);
 
