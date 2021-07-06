@@ -2,7 +2,7 @@ using System;
 
 namespace DevnotMentor.Api.CustomEntities.Dto
 {
-    public class MentorApplicationsDTO
+    public class MentorApplicationsDto
     {
         public DateTime? ApplyDate { get; set; }
         public DateTime? CompleteDate { get; set; }

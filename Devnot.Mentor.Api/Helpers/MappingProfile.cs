@@ -14,7 +14,7 @@ namespace DevnotMentor.Api.Helpers
             CreateMap<Mentee, MenteeDto>();
             CreateMap<Mentor, MentorDto>();
             CreateMap<User, UserDto>();
-            CreateMap<MentorApplications, MentorApplicationsDTO>();
+            CreateMap<MentorApplications, MentorApplicationsDto>();
 
 
             CreateMap<CreateMentorProfileRequest, Mentor>()
