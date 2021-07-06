@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Api.Controllers
 {
@@ -13,8 +12,7 @@ namespace DevnotMentor.Api.Controllers
     [Route("/mentees/")]
     public class MenteeController : BaseController
     {
-        private IMenteeService menteeService;
-        
+        private readonly IMenteeService menteeService;
         public MenteeController(IMenteeService menteeService)
         {
             this.menteeService = menteeService;

@@ -13,8 +13,7 @@ namespace DevnotMentor.Api.Controllers
     [Route("/mentors")]
     public class MentorController : BaseController
     {
-        IMentorService mentorService;
-        
+        private readonly IMentorService mentorService;
         public MentorController(IMentorService mentorService)
         {
             this.mentorService = mentorService;
