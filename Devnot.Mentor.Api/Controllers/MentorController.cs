@@ -13,13 +13,11 @@ namespace DevnotMentor.Api.Controllers
     [Route("/mentors")]
     public class MentorController : BaseController
     {
-        private readonly IMentorService mentorService;
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        public MentorController(IMentorService service, IHttpContextAccessor httpContextAccessor)
+        IMentorService mentorService;
+        
+        public MentorController(IMentorService mentorService)
         {
-            mentorService = service;
-            this.httpContextAccessor = httpContextAccessor;
+            this.mentorService = mentorService;
         }
 
         [HttpGet("{userName}")]
@@ -54,7 +52,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await mentorService.CreateMentorProfile(request);
 
@@ -65,7 +63,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            var mentorUserId = User.Claims.GetUserId();
 
             var result = await mentorService.AcceptMentee(mentorUserId, mentorId, menteeId);
 
@@ -76,7 +74,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
-            var mentorUserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            var mentorUserId = User.Claims.GetUserId();
 
             var result = await mentorService.RejectMentee(mentorUserId, mentorId, menteeId);
 

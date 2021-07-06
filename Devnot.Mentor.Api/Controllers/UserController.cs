@@ -12,11 +12,10 @@ namespace DevnotMentor.Api.Controllers
     public class UserController : BaseController
     {
         private readonly IUserService userService;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor)
+
+        public UserController(IUserService userService)
         {
             this.userService = userService;
-            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
@@ -42,7 +41,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await userService.ChangePassword(request);
 
@@ -54,7 +53,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest request)
         {
-            request.UserId = httpContextAccessor.HttpContext.User.Claims.GetUserId();
+            request.UserId = User.Claims.GetUserId();
 
             var result = await userService.Update(request);
 
