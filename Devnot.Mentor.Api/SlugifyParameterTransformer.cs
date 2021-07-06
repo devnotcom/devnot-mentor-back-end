@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Routing;
 
 public class SlugifyParameterTransformer : IOutboundParameterTransformer
     {
-        //Controller isimlerini, Route attribute icinde gelen bilesik isimleri "-" ile ayirir, ornek [ regularExpression => regular-expression ]
+        //Controller isimlerini, Route attribute icindeki(camel-case) isimleri "-" ile ayırır, örnek [ regularExpression => regular-expression ]
         public string TransformOutbound(object value)
         {
             if (value == null) { return null; }
