@@ -11,7 +11,6 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Services
@@ -51,7 +50,7 @@ namespace DevnotMentor.Api.Services
             this.mentorApplicationsRepository = mentorApplicationsRepository;
             this.mentorMenteePairsRepository = mentorMenteePairsRepository;
         }
-
+        // todo: fix duplications: get mentor and null check
         public async Task<ApiResponse<MentorDto>> GetMentorProfile(string userName)
         {
             var mentor = await mentorRepository.GetByUserName(userName);
@@ -65,38 +64,42 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MentorDto>(mappedMentor);
         }
 
-        public async Task<ApiResponse> GetMentees(string userName)
+        public async Task<ApiResponse> GetPairedMenteesByUserId(int userId)
         {
-            var mentor = await mentorRepository.GetByUserName(userName);
+            var mentor = await mentorRepository.GetByUserId(userId);
 
             if (mentor == null)
             {
                 return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
             }
 
-            var mappedData = mapper.Map<List<MenteeDto>>(await mentorRepository.GetMentees(x => x.Mentor.Id == mentor.Id));
+            var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorId(mentor.Id));
 
-            //todo: null check for mappedData
+            if (pairedMentees == null || pairedMentees.Count < 1)
+            {
+                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentorMenteePair);
+            }
 
-            return new SuccessApiResponse<List<MenteeDto>>(mappedData);
+            return new SuccessApiResponse<List<MenteeDto>>(pairedMentees);
         }
 
-        public async Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName)
+        public async Task<ApiResponse> GetApplicationsByUserId(int userId)
         {
-            var mentor = await mentorRepository.GetByUserName(userName);
+            var mentor = await mentorRepository.GetByUserId(userId);
 
             if (mentor == null)
             {
                 return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentor);
             }
 
-            var mappedData = mapper.Map<List<MentorApplicationsDTO>>(
-                await mentorApplicationsRepository.GetForMentors(x => x.MenteeId == mentor.Id && x.Status != MentorApplicationStatus.Approved.ToInt())
-            );
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
 
-            //todo: null check for mappedData
+            if (applications == null || applications.Count < 1)
+            {
+                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentorApplications);
+            }
 
-            return new SuccessApiResponse<List<MentorApplicationsDTO>>(mappedData);
+            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
         public async Task<ApiResponse<MentorDto>> CreateMentorProfile(CreateMentorProfileRequest request)

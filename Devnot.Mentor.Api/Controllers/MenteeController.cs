@@ -10,6 +10,7 @@ namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
     [ApiController]
+    [Route("/mentees/")]
     public class MenteeController : BaseController
     {
         private readonly IMenteeService menteeService;
@@ -21,8 +22,7 @@ namespace DevnotMentor.Api.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpGet]
-        [Route("/mentees/{userName}")]
+        [HttpGet("{userName}")]
         public async Task<IActionResult> Get([FromRoute] string userName)
         {
             var result = await menteeService.GetMenteeProfile(userName);
@@ -30,26 +30,28 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet]
-        [Route("/mentees/{userName}/mentors")]
-        public async Task<IActionResult> GetMentors([FromRoute] string userName)
+        
+        [HttpGet("me/mentors")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetPairedMentors()
         {
-            var result = await menteeService.GetMentors(userName);
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await menteeService.GetPairedMentorsByUserId(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
         
-        [HttpGet]
-        [Route("/mentees/{userName}/applications")]
-        public async Task<IActionResult> GetApplications([FromRoute] string userName)
+        [HttpGet("me/applications")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetApplications()
         {
-            var result = await menteeService.GetApplicationsNotIncludeApproveds(userName);
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await menteeService.GetApplicationsByUserId(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("/mentees")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMenteeProfileRequest request)
         {
@@ -60,8 +62,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost]
-        [Route("/mentees/{menteeId}/mentors")]
+        [HttpPost("{menteeId}/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ApplyToMentor(ApplyToMentorRequest request)
         {

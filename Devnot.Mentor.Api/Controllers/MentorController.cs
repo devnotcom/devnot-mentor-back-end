@@ -10,6 +10,7 @@ namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
     [ApiController]
+    [Route("/mentors")]
     public class MentorController : BaseController
     {
         private readonly IMentorService mentorService;
@@ -21,8 +22,7 @@ namespace DevnotMentor.Api.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        [HttpGet]
-        [Route("/mentors/{userName}")]
+        [HttpGet("{userName}")]
         public async Task<IActionResult> GetAsync([FromRoute] string userName)
         {
             var result = await mentorService.GetMentorProfile(userName);
@@ -30,26 +30,27 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet]
-        [Route("/mentors/{userName}/mentees")]
-        public async Task<IActionResult> GetMentees([FromRoute] string userName)
+        [HttpGet("me/mentees")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetPairedMentees()
         {
-            var result = await mentorService.GetMentees(userName);
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await mentorService.GetPairedMenteesByUserId(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet]
-        [Route("/mentors/{userName}/applications")]
-        public async Task<IActionResult> GetApplications([FromRoute] string userName)
+        [HttpGet("me/applications")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetApplications()
         {
-            var result = await mentorService.GetApplicationsNotIncludeApproveds(userName);
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await mentorService.GetApplicationsByUserId(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpPost]
-        [Route("/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
         {
@@ -60,8 +61,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost]
-        [Route("/mentors/{mentorId}/mentees/{menteeId}/accept")]
+        [HttpPost("{mentorId}/mentees/{menteeId}/accept")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
@@ -72,8 +72,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost]
-        [Route("/mentors/{mentorId}/mentees/{menteeId}/reject")]
+        [HttpPost("{mentorId}/mentees/{menteeId}/reject")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {

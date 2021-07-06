@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
@@ -50,7 +48,7 @@ namespace DevnotMentor.Api.Services
             this.mentorRepository = mentorRepository;
             this.mentorApplicationsRepository = mentorApplicationsRepository;
         }
-
+        // todo: fix duplications: get mentee and null check
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName)
         {
             var mentee = await menteeRepository.GetByUserName(userName);
@@ -64,39 +62,42 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
 
-
-        public async Task<ApiResponse> GetMentors(string userName)
+        public async Task<ApiResponse> GetPairedMentorsByUserId(int userId)
         {
-            var mentee = await menteeRepository.GetByUserName(userName);
+            var mentee = await menteeRepository.GetByUserId(userId);
 
             if (mentee == null)
             {
                 return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var mappedData = mapper.Map<List<MentorDto>>(await menteeRepository.GetMentors(x => x.Mentee.Id == mentee.Id));
+            var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeId(mentee.Id));
 
-            //todo: null check for mappedData
-            
-            return new SuccessApiResponse<List<MentorDto>>(mappedData);
+            if (pairedMentors == null || pairedMentors.Count < 1)
+            {
+                return new ErrorApiResponse<List<MentorDto>>(data: default, ResultMessage.NotFoundMentorMenteePair);
+            }
+
+            return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
         }
 
-        public async Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName)
+        public async Task<ApiResponse> GetApplicationsByUserId(int userId)
         {
-            var mentee = await menteeRepository.GetByUserName(userName);
+            var mentee = await menteeRepository.GetByUserId(userId);
 
             if (mentee == null)
             {
                 return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var mappedData = mapper.Map<List<MentorApplicationsDTO>>(
-                await mentorApplicationsRepository.GetForMentees(x => x.MenteeId == mentee.Id && x.Status != MentorApplicationStatus.Approved.ToInt())
-            );
-
-            //todo: null check for mappedData
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
             
-            return new SuccessApiResponse<List<MentorApplicationsDTO>>(mappedData);
+            if (applications == null || applications.Count < 1)
+            {
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMenteeApplications);
+            }
+
+            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
 
         }
 

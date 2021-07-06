@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
@@ -35,9 +33,13 @@ namespace DevnotMentor.Api.Repositories
             return await DbContext.Mentor.AnyAsync(i => i.UserId == userId);
         }
 
-        public async Task<IEnumerable<Mentee>> GetMentees(Expression<Func<MentorMenteePairs, bool>> predicate)
+        public async Task<IEnumerable<Mentee>> GetPairedMenteesByMentorId(int mentorId)
         {
-            return await DbContext.MentorMenteePairs.Where(predicate).Include(x => x.Mentee).ThenInclude(x => x.User).Select(x => x.Mentee).ToListAsync();
+            return await DbContext.MentorMenteePairs.Where(x => x.MentorId == mentorId)
+                .Include(x => x.Mentee)
+                .ThenInclude(x => x.User)
+                .Select(x => x.Mentee)
+                .ToListAsync();
         }
     }
 }

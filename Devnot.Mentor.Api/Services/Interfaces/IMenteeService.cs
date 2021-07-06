@@ -10,18 +10,18 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName);
 
         /// <summary>
-        /// This method returns mentors who are paired with mentee.
+        /// Returns mentors who are paired with mentee.
         /// </summary>
-        /// <param name="userName">Mentee UserName</param>
-        /// <returns>List of MentorDTO inside the ApiResponse</returns>
-        Task<ApiResponse> GetMentors(string userName);
+        /// <param name="userId">Mentee UserId</param>
+        /// <returns>List of <see cref="MentorDto"/> inside the <see cref="ApiResponse"/></returns>
+        Task<ApiResponse> GetPairedMentorsByUserId(int userId);
 
         /// <summary>
-        /// This method returns non approved mentoring applications with mentor informations.
+        /// Returns mentoring applications with mentor informations.
         /// </summary>
-        /// <param name="userName">Mentee UserName</param>
-        /// <returns>List of MentorAplicationsDTO inside the ApiResponse</returns>
-        Task<ApiResponse> GetApplicationsNotIncludeApproveds(string userName);
+        /// <param name="userId">Mentee UserId</param>
+        /// <returns>List of <see cref="MentorApplicationsDto"/> inside the <see cref="ApiResponse"/></returns>
+        Task<ApiResponse> GetApplicationsByUserId(int userId);
 
         Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request);
 
