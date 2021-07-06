@@ -23,6 +23,7 @@ using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace DevnotMentor.Api
 {
@@ -51,7 +52,10 @@ namespace DevnotMentor.Api
             var connectionString = EnvironmentService.StaticConfiguration["ConnectionStrings:SQLServerConnectionString"];
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
 
-            services.AddControllers();
+            services.AddControllers(options=>{
+                options.Conventions.Add(new RouteTokenTransformerConvention(
+                    new SlugifyParameterTransformer()));
+            });
             services.AddAutoMapper(typeof(Startup));
 
             services.AddSingleton<TokenAuthentication>();
