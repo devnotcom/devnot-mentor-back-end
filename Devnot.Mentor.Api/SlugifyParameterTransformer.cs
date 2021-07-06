@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Routing;
 
 public class SlugifyParameterTransformer : IOutboundParameterTransformer
     {
-        //transforming controller name into a separated form in router, Route("customerRelations")=>customer-relations
+        //Controller isimlerini, Route attribute icinde gelen bilesik isimleri "-" ile ayirir, ornek [ regularExpression => regular-expression ]
         public string TransformOutbound(object value)
         {
             if (value == null) { return null; }
