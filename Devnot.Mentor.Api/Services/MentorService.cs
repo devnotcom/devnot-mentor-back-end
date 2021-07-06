@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
