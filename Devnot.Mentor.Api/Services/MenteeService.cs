@@ -12,6 +12,7 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
@@ -62,43 +63,32 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
 
-        public async Task<ApiResponse> GetPairedMentorsByUserId(int userId)
+        public async Task<ApiResponse<List<MentorDto>>> GetPairedMentorsByUserId(int userId)
         {
             var mentee = await menteeRepository.GetByUserId(userId);
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorDto>>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeId(mentee.Id));
 
-            if (pairedMentors == null || pairedMentors.Count < 1)
-            {
-                return new ErrorApiResponse<List<MentorDto>>(data: default, ResultMessage.NotFoundMentorMenteePair);
-            }
-
             return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
         }
 
-        public async Task<ApiResponse> GetApplicationsByUserId(int userId)
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
         {
             var mentee = await menteeRepository.GetByUserId(userId);
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
-            
-            if (applications == null || applications.Count < 1)
-            {
-                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMenteeApplications);
-            }
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
-
         }
 
         //[DevnotUnitOfWorkAspect]

@@ -50,7 +50,6 @@ namespace DevnotMentor.Api.Services
             this.mentorApplicationsRepository = mentorApplicationsRepository;
             this.mentorMenteePairsRepository = mentorMenteePairsRepository;
         }
-        // todo: fix duplications: get mentor and null check
         public async Task<ApiResponse<MentorDto>> GetMentorProfile(string userName)
         {
             var mentor = await mentorRepository.GetByUserName(userName);
@@ -64,40 +63,30 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MentorDto>(mappedMentor);
         }
 
-        public async Task<ApiResponse> GetPairedMenteesByUserId(int userId)
+        public async Task<ApiResponse<List<MenteeDto>>> GetPairedMenteesByUserId(int userId)
         {
             var mentor = await mentorRepository.GetByUserId(userId);
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentor);
             }
 
             var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorId(mentor.Id));
 
-            if (pairedMentees == null || pairedMentees.Count < 1)
-            {
-                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentorMenteePair);
-            }
-
             return new SuccessApiResponse<List<MenteeDto>>(pairedMentees);
         }
 
-        public async Task<ApiResponse> GetApplicationsByUserId(int userId)
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
         {
             var mentor = await mentorRepository.GetByUserId(userId);
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentor);
             }
 
             var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
-
-            if (applications == null || applications.Count < 1)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundMentorApplications);
-            }
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }

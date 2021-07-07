@@ -4,13 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
     [ApiController]
-    [Route("/mentors")]
+    [Route("/mentors/")]
     public class MentorController : BaseController
     {
         private readonly IMentorService mentorService;
@@ -27,7 +26,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet("me/mentees")]
+        [HttpGet("me/paireds/mentees")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetPairedMentees()
         {

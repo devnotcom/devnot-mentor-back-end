@@ -26,8 +26,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        
-        [HttpGet("me/mentors")]
+        [HttpGet("me/paireds/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetPairedMentors()
         {
