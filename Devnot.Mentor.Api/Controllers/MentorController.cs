@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Helpers.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Api.Controllers
 {

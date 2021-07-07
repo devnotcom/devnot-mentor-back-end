@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
@@ -15,7 +14,6 @@ using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 
 namespace DevnotMentor.Api.Services
 {
-    //[ExceptionHandlingAspect]
     public class MenteeService : BaseService, IMenteeService
     {
         private IMenteeRepository menteeRepository;
@@ -69,7 +67,6 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
         }
 
-        //[DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request)
         {
             var user = await userRepository.GetById(request.UserId);

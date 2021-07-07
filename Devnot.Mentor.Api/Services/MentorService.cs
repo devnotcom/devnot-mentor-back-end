@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
@@ -15,7 +14,6 @@ using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 
 namespace DevnotMentor.Api.Services
 {
-    //[ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
         private IMentorRepository mentorRepository;

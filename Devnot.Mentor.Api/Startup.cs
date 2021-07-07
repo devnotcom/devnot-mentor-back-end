@@ -14,6 +14,7 @@ using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Utilities.Security.Token;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.Configuration.Environment;
+using DevnotMentor.Api.Middlewares;
 using DevnotMentor.Api.Utilities.Security.Hash;
 using DevnotMentor.Api.Utilities.Security.Hash.Sha256;
 using DevnotMentor.Api.Utilities.Email;
@@ -34,17 +35,6 @@ namespace DevnotMentor.Api
         }
 
         public IConfiguration Configuration { get; }
-
-        //public void ConfigureContainer(ContainerBuilder builder)
-        //{
-        //    // Add any Autofac modules or registrations.
-        //    // This is called AFTER ConfigureServices so things you
-        //    // register here OVERRIDE things registered in ConfigureServices.
-        //    //
-        //    // You must have the call to `UseServiceProviderFactory(new AutofacServiceProviderFactory())`
-        //    // when building the host or this won't be called.
-        //    builder.RegisterModule(new AutofacInterceptorModule());
-        //}
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -69,7 +59,6 @@ namespace DevnotMentor.Api
             services.AddSingleton<IDevnotConfigurationContext, DevnotConfigurationContext>();
             services.AddSingleton<IEnvironmentService, EnvironmentService>();
 
-
             #region Repositories
 
             services.AddScoped<ILoggerRepository, LoggerRepository>();
@@ -85,8 +74,6 @@ namespace DevnotMentor.Api
             services.AddScoped<IUserRepository, UserRepository>();
 
             #endregion
-
-            services.AddHttpContextAccessor();
 
             services.AddCors(options =>
             {
@@ -111,7 +98,6 @@ namespace DevnotMentor.Api
             });
 
             services.AddCustomSwagger();
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -122,6 +108,7 @@ namespace DevnotMentor.Api
             }
 
             app.UseRouting();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseCors("AllowMyOrigin");
             app.UseCustomSwagger();
@@ -129,7 +116,6 @@ namespace DevnotMentor.Api
             {
                 endpoints.MapControllers();
             });
-
         }
     }
 }
