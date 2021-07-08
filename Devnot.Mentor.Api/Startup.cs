@@ -24,6 +24,7 @@ using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
 
+[assembly:ApiController]
 namespace DevnotMentor.Api
 {
     public class Startup
