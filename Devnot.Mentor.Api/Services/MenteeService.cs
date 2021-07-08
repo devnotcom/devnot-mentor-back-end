@@ -183,9 +183,9 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(request.MentorUserId, request.MenteeUserId);
+            bool checkThereAreAnyPair = await mentorApplicationsRepository.IsExistsByUserId(mentorId, menteeId);
 
-            if (checkAreThereExistsMenteeAndMentorPair)
+            if (checkThereAreAnyPair)
             {
                 return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }
