@@ -10,7 +10,8 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private IUserService userService;
+        private readonly IUserService userService;
+
         public UserController(IUserService userService)
         {
             this.userService = userService;

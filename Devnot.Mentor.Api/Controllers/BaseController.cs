@@ -5,10 +5,6 @@ namespace DevnotMentor.Api.Controllers
 {
     public class BaseController : ControllerBase
     {
-        public BaseController()
-        {
-        }
-
         [NonAction]
         protected IActionResult Success(ApiResponse response)
         {

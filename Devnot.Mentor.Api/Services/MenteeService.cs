@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
@@ -13,19 +11,21 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
     //[ExceptionHandlingAspect]
     public class MenteeService : BaseService, IMenteeService
     {
-        private IMenteeRepository menteeRepository;
-        private IMenteeLinksRepository menteeLinksRepository;
-        private IMenteeTagsRepository menteeTagsRepository;
-        private ITagRepository tagRepository;
-        private IUserRepository userRepository;
-        private IMentorRepository mentorRepository;
-        private IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMenteeRepository menteeRepository;
+        private readonly IMenteeLinksRepository menteeLinksRepository;
+        private readonly IMenteeTagsRepository menteeTagsRepository;
+        private readonly ITagRepository tagRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMentorRepository mentorRepository;
+        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -49,17 +49,10 @@ namespace DevnotMentor.Api.Services
             this.mentorRepository = mentorRepository;
             this.mentorApplicationsRepository = mentorApplicationsRepository;
         }
-
+        // todo: fix duplications: get mentee and null check
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
-            }
-
-            var mentee = await menteeRepository.GetByUserId(user.Id);
+            var mentee = await menteeRepository.GetByUserName(userName);
 
             if (mentee == null)
             {
@@ -68,6 +61,34 @@ namespace DevnotMentor.Api.Services
 
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
             return new SuccessApiResponse<MenteeDto>(mappedMentee);
+        }
+
+        public async Task<ApiResponse<List<MentorDto>>> GetPairedMentorsByUserId(int userId)
+        {
+            var mentee = await menteeRepository.GetByUserId(userId);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<List<MentorDto>>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeId(mentee.Id));
+
+            return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
+        }
+
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
+        {
+            var mentee = await menteeRepository.GetByUserId(userId);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
+
+            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
         //[DevnotUnitOfWorkAspect]
@@ -162,9 +183,9 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkAreThereExistsMenteeAndMentorPair = await mentorApplicationsRepository.IsExistsByUserId(request.MentorUserId, request.MenteeUserId);
+            bool checkThereAreAnyPair = await mentorApplicationsRepository.IsExistsByUserId(mentorId, menteeId);
 
-            if (checkAreThereExistsMenteeAndMentorPair)
+            if (checkThereAreAnyPair)
             {
                 return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }

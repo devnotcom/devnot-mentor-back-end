@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Api.Aspects.Autofac.Exception;
-using DevnotMentor.Api.Aspects.Autofac.UnitOfWork;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
@@ -13,20 +11,21 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
+using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Services
 {
     //[ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
-        private IMentorRepository mentorRepository;
-        private IMenteeRepository menteeRepository;
-        private IMentorLinksRepository mentorLinksRepository;
-        private IMentorTagsRepository mentorTagsRepository;
-        private ITagRepository tagRepository;
-        private IUserRepository userRepository;
-        private IMentorApplicationsRepository mentorApplicationsRepository;
-        private IMentorMenteePairsRepository mentorMenteePairsRepository;
+        private readonly IMentorRepository mentorRepository;
+        private readonly IMenteeRepository menteeRepository;
+        private readonly IMentorLinksRepository mentorLinksRepository;
+        private readonly IMentorTagsRepository mentorTagsRepository;
+        private readonly ITagRepository tagRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMentorMenteePairsRepository mentorMenteePairsRepository;
 
         public MentorService(
             IMapper mapper,
@@ -51,17 +50,9 @@ namespace DevnotMentor.Api.Services
             this.mentorApplicationsRepository = mentorApplicationsRepository;
             this.mentorMenteePairsRepository = mentorMenteePairsRepository;
         }
-
         public async Task<ApiResponse<MentorDto>> GetMentorProfile(string userName)
         {
-            var user = await userRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundUser);
-            }
-
-            var mentor = await mentorRepository.GetByUserId(user.Id);
+            var mentor = await mentorRepository.GetByUserName(userName);
 
             if (mentor == null)
             {
@@ -70,6 +61,34 @@ namespace DevnotMentor.Api.Services
 
             var mappedMentor = mapper.Map<MentorDto>(mentor);
             return new SuccessApiResponse<MentorDto>(mappedMentor);
+        }
+
+        public async Task<ApiResponse<List<MenteeDto>>> GetPairedMenteesByUserId(int userId)
+        {
+            var mentor = await mentorRepository.GetByUserId(userId);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentor);
+            }
+
+            var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorId(mentor.Id));
+
+            return new SuccessApiResponse<List<MenteeDto>>(pairedMentees);
+        }
+
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
+        {
+            var mentor = await mentorRepository.GetByUserId(userId);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentor);
+            }
+
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
+
+            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
         public async Task<ApiResponse<MentorDto>> CreateMentorProfile(CreateMentorProfileRequest request)

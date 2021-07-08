@@ -23,12 +23,12 @@ namespace DevnotMentor.Api.Services
     //[ExceptionHandlingAspect]
     public class UserService : BaseService, IUserService
     {
-        private IUserRepository userRepository;
-        private IHashService hashService;
-        private ITokenService tokenService;
-        private IMailService mailService;
+        private readonly IUserRepository userRepository;
+        private readonly IHashService hashService;
+        private readonly ITokenService tokenService;
+        private readonly IMailService mailService;
 
-        private IFileService fileService;
+        private readonly IFileService fileService;
 
         public UserService(
             IMapper mapper,

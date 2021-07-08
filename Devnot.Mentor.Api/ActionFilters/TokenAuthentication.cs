@@ -10,7 +10,7 @@ namespace DevnotMentor.Api.ActionFilters
 {
     public class TokenAuthentication : ActionFilterAttribute
     {
-        private ITokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
         public TokenAuthentication(ITokenService tokenService)
         {
