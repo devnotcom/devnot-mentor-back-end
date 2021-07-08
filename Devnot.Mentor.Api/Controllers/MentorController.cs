@@ -57,7 +57,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("{mentorId}/mentees/{menteeId}/accept")]
+        [HttpPost("{mentorId}/applications/mentees/{menteeId}/accept")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {
@@ -68,7 +68,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("{mentorId}/mentees/{menteeId}/reject")]
+        [HttpPost("{mentorId}/applications/mentees/{menteeId}/reject")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
         {

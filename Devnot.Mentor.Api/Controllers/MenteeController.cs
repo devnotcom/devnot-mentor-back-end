@@ -57,7 +57,7 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("{menteeId}/mentors")]
+        [HttpPost("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ApplyToMentor(ApplyToMentorRequest request)
         {
