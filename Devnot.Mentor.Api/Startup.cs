@@ -108,10 +108,10 @@ namespace DevnotMentor.Api
             }
 
             app.UseRouting();
-            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseAuthentication();
             app.UseCors("AllowMyOrigin");
             app.UseCustomSwagger();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
