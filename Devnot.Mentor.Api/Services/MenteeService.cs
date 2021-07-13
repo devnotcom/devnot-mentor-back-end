@@ -16,7 +16,6 @@ using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
-    //[ExceptionHandlingAspect]
     public class MenteeService : BaseService, IMenteeService
     {
         private readonly IMenteeRepository menteeRepository;
@@ -91,7 +90,6 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
-        //[DevnotUnitOfWorkAspect]
         public async Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request)
         {
             var user = await userRepository.GetById(request.UserId);

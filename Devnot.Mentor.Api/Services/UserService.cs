@@ -20,7 +20,6 @@ namespace DevnotMentor.Api.Services
 {
     //TODO: Aynı username ile kayıt yapılabiliyor
 
-    //[ExceptionHandlingAspect]
     public class UserService : BaseService, IUserService
     {
         private readonly IUserRepository userRepository;
@@ -93,7 +92,6 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<UserLoginResponse>(data: loginResponse, ResultMessage.Success);
         }
 
-        //[DevnotUnitOfWorkAspect]
         public async Task<ApiResponse> Register(RegisterUserRequest request)
         {
             var checkFileResult = await fileService.InsertProfileImage(request.ProfileImage);

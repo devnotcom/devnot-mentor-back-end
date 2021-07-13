@@ -10,6 +10,7 @@
         public static string UnhandledException => "messages.error.general.unhandledException";
         public static string UnAuthorized => "messages.error.general.unAuthorized";
 
+        public static string InternalServerError => "messages.error.general.internalServerError";
 
         public static string TokenCanNotBeEmptyOrNull => "messages.error.token.tokenCanNotBeEmptyOrNull";
         public static string TokenMustStartWithBearerKeyword => "messages.error.token.tokenMustStartWithBearerKeyword";

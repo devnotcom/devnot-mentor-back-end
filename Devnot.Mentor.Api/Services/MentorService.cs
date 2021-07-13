@@ -15,7 +15,6 @@ using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Services
 {
-    //[ExceptionHandlingAspect]
     public class MentorService : BaseService, IMentorService
     {
         private readonly IMentorRepository mentorRepository;
