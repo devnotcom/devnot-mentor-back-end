@@ -12,7 +12,6 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
@@ -24,7 +23,8 @@ namespace DevnotMentor.Api.Services
         private readonly ITagRepository tagRepository;
         private readonly IUserRepository userRepository;
         private readonly IMentorRepository mentorRepository;
-        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMentorApplicationsRepository applicationsRepository;
+        private readonly IMentorMenteePairsRepository pairsRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -35,6 +35,7 @@ namespace DevnotMentor.Api.Services
             IUserRepository userRepository,
             IMentorRepository mentorRepository,
             IMentorApplicationsRepository mentorApplicationsRepository,
+            IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             )
@@ -46,9 +47,10 @@ namespace DevnotMentor.Api.Services
             this.tagRepository = tagRepository;
             this.userRepository = userRepository;
             this.mentorRepository = mentorRepository;
-            this.mentorApplicationsRepository = mentorApplicationsRepository;
+            this.applicationsRepository = mentorApplicationsRepository;
+            this.pairsRepository = mentorMenteePairsRepository;
         }
-        // todo: fix duplications: get mentee and null check
+
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName)
         {
             var mentee = await menteeRepository.GetByUserName(userName);
@@ -76,6 +78,20 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
         }
 
+        public async Task<ApiResponse<List<PairsDto>>> GetMentorshipsByUserId(int userId)
+        {
+            var mentee = await menteeRepository.GetByUserId(userId);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<List<PairsDto>>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var pairs = mapper.Map<List<PairsDto>>(await pairsRepository.GetByUserId(userId));
+
+            return new SuccessApiResponse<List<PairsDto>>(pairs);
+        }
+
         public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
         {
             var mentee = await menteeRepository.GetByUserId(userId);
@@ -85,10 +101,12 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserId(userId));
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
+
+
 
         public async Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request)
         {
@@ -181,14 +199,14 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkThereAreAnyPair = await mentorApplicationsRepository.IsExistsByUserId(mentorId, menteeId);
+            bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserId(mentorId, menteeId);
 
             if (checkThereAreAnyPair)
             {
                 return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }
 
-            mentorApplicationsRepository.Create(new MentorApplications
+            applicationsRepository.Create(new MentorApplications
             {
                 ApllicationNotes = request.ApplicationNotes,
                 ApplyDate = DateTime.Now,
@@ -199,5 +217,7 @@ namespace DevnotMentor.Api.Services
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
+
+
     }
 }

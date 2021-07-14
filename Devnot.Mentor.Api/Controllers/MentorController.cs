@@ -36,6 +36,16 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
+        [HttpGet("me/mentorships")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetMentorships()
+        {
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await mentorService.GetMentorshipsByUserId(authenticatedUserId);
+
+            return result.Success ? Success(result) : BadRequest(result);
+        }
+
         [HttpGet("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetApplications()

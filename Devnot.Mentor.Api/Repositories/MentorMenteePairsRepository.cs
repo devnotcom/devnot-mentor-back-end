@@ -15,21 +15,12 @@ namespace DevnotMentor.Api.Repositories
         {
         }
 
-        public async Task<IEnumerable<MentorMenteePairs>> GetByMenteeId(int menteeId)
+        public async Task<IEnumerable<MentorMenteePairs>> GetByUserId(int userId)
         {
             return await DbContext.MentorMenteePairs
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
                 .Include(x => x.Mentor).ThenInclude(x => x.User)
-                .Where(x => x.MenteeId == menteeId)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<MentorMenteePairs>> GetByMentorId(int mentorId)
-        {
-            return await DbContext.MentorMenteePairs
-                .Include(x => x.Mentee).ThenInclude(x => x.User)
-                .Include(x => x.Mentor).ThenInclude(x => x.User)
-                .Where(x => x.MentorId == mentorId)
+                .Where(x => x.Mentee.UserId == userId || x.Mentor.UserId == userId)
                 .ToListAsync();
         }
 
