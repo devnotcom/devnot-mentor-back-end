@@ -2,7 +2,10 @@
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
 {
@@ -10,6 +13,24 @@ namespace DevnotMentor.Api.Repositories
     {
         public MentorMenteePairsRepository(MentorDBContext context) : base(context)
         {
+        }
+
+        public async Task<IEnumerable<MentorMenteePairs>> GetByMenteeId(int menteeId)
+        {
+            return await DbContext.MentorMenteePairs
+                .Include(x => x.Mentee).ThenInclude(x => x.User)
+                .Include(x => x.Mentor).ThenInclude(x => x.User)
+                .Where(x => x.MenteeId == menteeId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<MentorMenteePairs>> GetByMentorId(int mentorId)
+        {
+            return await DbContext.MentorMenteePairs
+                .Include(x => x.Mentee).ThenInclude(x => x.User)
+                .Include(x => x.Mentor).ThenInclude(x => x.User)
+                .Where(x => x.MentorId == mentorId)
+                .ToListAsync();
         }
 
         public int GetCountForContinuesStatusByMenteeId(int menteeId)

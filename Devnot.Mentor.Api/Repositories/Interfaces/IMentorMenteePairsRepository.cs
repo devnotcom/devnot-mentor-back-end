@@ -1,4 +1,6 @@
-﻿using DevnotMentor.Api.Entities;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DevnotMentor.Api.Entities;
 
 namespace DevnotMentor.Api.Repositories.Interfaces
 {
@@ -6,5 +8,8 @@ namespace DevnotMentor.Api.Repositories.Interfaces
     {
         int GetCountForContinuesStatusByMenteeId(int menteeId);
         int GetCountForContinuesStatusByMentorId(int mentorId);
+
+        Task<IEnumerable<MentorMenteePairs>> GetByMentorId(int mentorId);
+        Task<IEnumerable<MentorMenteePairs>> GetByMenteeId(int menteeId);
     }
 }
