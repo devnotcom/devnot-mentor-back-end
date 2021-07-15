@@ -1,7 +1,5 @@
 using System;
-using AutoMapper;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Helpers;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +22,13 @@ using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.File;
 using DevnotMentor.Api.Utilities.File.Local;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 
 namespace DevnotMentor.Api
 {
@@ -40,11 +45,43 @@ namespace DevnotMentor.Api
         {
             var connectionString = EnvironmentService.StaticConfiguration["ConnectionStrings:SQLServerConnectionString"];
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
+            services.AddSingleton<TokenAuthentication>();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
+            
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie()
+            .AddGitHub(options =>
+            {
+                options.ClientId = EnvironmentService.StaticConfiguration["GitHub:Client:ID"];
+                options.ClientSecret = EnvironmentService.StaticConfiguration["GitHub:Client:Secret"];
+                options.CallbackPath = new PathString("/auth-github/");
+                options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
+                options.TokenEndpoint = "https://github.com/login/oauth/access_token";
+                options.UserInformationEndpoint = "https://api.github.com/user";
 
-            services.AddSingleton<TokenAuthentication>();
+                options.ClaimActions.MapJsonKey("github:id", "id");
+                options.ClaimActions.MapJsonKey("github:name", "name");
+                options.ClaimActions.MapJsonKey("github:login", "login");
+                options.ClaimActions.MapJsonKey("github:avatar", "avatar_url");
+
+                options.SaveTokens = true;
+
+                options.Events = new OAuthEvents
+                {
+                    OnCreatingTicket = async ctx =>
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
+                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
+                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
+                        response.EnsureSuccessStatusCode();
+
+                        var jsonDocumentFromResponse = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                        ctx.RunClaimActions(jsonDocumentFromResponse.RootElement);
+                    }
+                };
+            });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
@@ -106,7 +143,10 @@ namespace DevnotMentor.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCookiePolicy(new CookiePolicyOptions()
+            {
+                MinimumSameSitePolicy = SameSiteMode.Lax
+            });
             app.UseRouting();
             app.UseAuthentication();
             app.UseCors("AllowMyOrigin");
