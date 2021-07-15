@@ -3,7 +3,6 @@ using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.CustomEntities.Request.UserRequest;
 
 namespace DevnotMentor.Api.Helpers
 {
@@ -26,9 +25,6 @@ namespace DevnotMentor.Api.Helpers
                 .ForMember(dest => dest.MenteeTags, opt => opt.Ignore())
                 .ForMember(dest => dest.MenteeLinks, opt => opt.Ignore())
                 .ReverseMap();
-
-
-            CreateMap<RegisterUserRequest, User>();
         }
     }
 }

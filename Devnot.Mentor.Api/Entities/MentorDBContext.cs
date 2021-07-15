@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DevnotMentor.Api.Entities
 {
@@ -292,23 +291,23 @@ namespace DevnotMentor.Api.Entities
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.Name)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.HasKey(p => p.Id);
 
-                entity.Property(e => e.Password)
-                    .HasMaxLength(512)
-                    .IsUnicode(false);
+                entity.HasIndex(p=>p.UserName).HasDatabaseName("unique_username").IsUnique();
 
-                entity.Property(e => e.ProfileImageUrl)
-                    .HasMaxLength(500)
-                    .IsFixedLength();
+                entity.HasIndex(e => e.Email).HasDatabaseName("unique_email").IsUnique();
 
-                entity.Property(e => e.ProfileUrl)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
+                entity.Property(p=>p.Email)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .IsRequired(false);
+                
+                entity.Property(e => e.UserName)
+                    .HasMaxLength(39)
+                    .IsUnicode(false)
+                    .IsRequired(true);
 
-                entity.Property(e => e.SurName)
+                entity.Property(e => e.FullName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
@@ -317,10 +316,6 @@ namespace DevnotMentor.Api.Entities
                     .IsUnicode(false);
 
                 entity.Property(e => e.TokenExpireDate).HasColumnType("datetime");
-
-                entity.Property(e => e.UserName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
