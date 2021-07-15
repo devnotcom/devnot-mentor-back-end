@@ -8,9 +8,9 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface ILoggerRepository : IRepository<Log>
     {
-        Task WriteInfo(string message);
-        Task WriteError(string message);
-        Task WriteError(Exception ex);
-        Task WriteLog(string message, string stackTrace, string level);
+        Task WriteInfoAsync(string message);
+        Task WriteErrorAsync(string message);
+        Task WriteErrorAsync(Exception ex);
+        Task WriteLogAsync(string message, string stackTrace, string level);
     }
 }

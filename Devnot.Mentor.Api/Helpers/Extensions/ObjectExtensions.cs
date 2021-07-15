@@ -23,7 +23,7 @@ namespace System
         //    }
         //}
 
-        public static async Task RunInTry(this object o, Func<Task> action, Func<Exception, Task> exception)
+        public static async Task RunInTryAsync(this object o, Func<Task> action, Func<Exception, Task> exception)
         {
             try
             {

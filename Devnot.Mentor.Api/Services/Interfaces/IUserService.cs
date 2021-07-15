@@ -7,11 +7,11 @@ namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<ApiResponse<UserLoginResponse>> Login(UserLoginRequest request);
-        Task<ApiResponse> Register(RegisterUserRequest request);
-        Task<ApiResponse> ChangePassword(UpdatePasswordRequest request);
-        Task<ApiResponse> Update(UpdateUserRequest request);
-        Task<ApiResponse> RemindPassword(string email);
-        Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request);
+        Task<ApiResponse<UserLoginResponse>> LoginAsync(UserLoginRequest request);
+        Task<ApiResponse> RegisterAsync(RegisterUserRequest request);
+        Task<ApiResponse> ChangePasswordAsync(UpdatePasswordRequest request);
+        Task<ApiResponse> UpdateAsync(UpdateUserRequest request);
+        Task<ApiResponse> RemindPasswordAsync(string email);
+        Task<ApiResponse> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request);
     }
 }

@@ -21,7 +21,7 @@ namespace DevnotMentor.Api.Utilities.File.Local
             this.devnotConfigurationContext = devnotConfigurationContext;
         }
 
-        public async Task<FileResult> InsertProfileImage(IFormFile profileImageFile)
+        public async Task<FileResult> InsertProfileImageAsync(IFormFile profileImageFile)
         {
             if (profileImageFile == null || profileImageFile.Length == 0)
             {
