@@ -1,4 +1,5 @@
 using System;
+using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.Configuration.Environment;
 using DevnotMentor.Api.Repositories;
@@ -17,9 +18,8 @@ namespace DevnotMentor.Api.Helpers.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDefaultServices(this IServiceCollection services)
+        public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(Startup));
             
             services.AddSingleton<TokenAuthentication>();
 

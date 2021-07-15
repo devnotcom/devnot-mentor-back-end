@@ -30,7 +30,7 @@ namespace DevnotMentor.Api.Services
         }
 
         public async Task<ApiResponse<UserLoginResponse>> GitHubAuth(string githubId, string name, string login, string avatar)
-        {
+        { //todo: seperate jobs(creating new user - creating token for user)
             var user = await userRepository.GetByGitHubIdOrEmail(githubId);
             if (user == null)
             {
