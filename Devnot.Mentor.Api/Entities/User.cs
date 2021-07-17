@@ -16,10 +16,7 @@ namespace DevnotMentor.Api.Entities
         public string UserName { get; set; }
         public string Email { get; set; }
         public string FullName { get; set; }
-        public int? UserState { get; set; }
         public string ProfilePictureUrl { get; set; }
-        public string Token { get; set; }
-        public DateTime? TokenExpireDate { get; set; }
 
         public virtual ICollection<Mentee> Mentee { get; set; }
         public virtual ICollection<Mentor> Mentor { get; set; }

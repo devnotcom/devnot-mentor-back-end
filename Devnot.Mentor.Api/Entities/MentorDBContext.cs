@@ -310,12 +310,6 @@ namespace DevnotMentor.Api.Entities
                 entity.Property(e => e.FullName)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.Token)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.TokenExpireDate).HasColumnType("datetime");
             });
 
             OnModelCreatingPartial(modelBuilder);

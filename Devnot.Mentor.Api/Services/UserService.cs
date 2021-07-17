@@ -41,19 +41,15 @@ namespace DevnotMentor.Api.Services
                     UserName = login,
                     ProfilePictureUrl = avatar
                 };
-                
+
                 user = userRepository.Create(user);
             }
 
             var tokenInfo = tokenService.CreateToken(user.Id, user.UserName);
-            user.Token = tokenInfo.Token;
-            user.TokenExpireDate = tokenInfo.ExpiredDate;
+
             var mappedUser = mapper.Map<User, UserDto>(user);
 
-            return new SuccessApiResponse<UserLoginResponse>(data: new UserLoginResponse(
-            mappedUser,
-            user.Token,
-            user.TokenExpireDate), ResultMessage.Success);
+            return new SuccessApiResponse<UserLoginResponse>(data: new UserLoginResponse(mappedUser, tokenInfo.Token, tokenInfo.ExpiredDate), ResultMessage.Success);
         }
     }
 }
