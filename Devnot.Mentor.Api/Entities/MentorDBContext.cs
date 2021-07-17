@@ -293,15 +293,25 @@ namespace DevnotMentor.Api.Entities
             {
                 entity.HasKey(p => p.Id);
 
-                entity.HasIndex(p=>p.UserName).HasDatabaseName("unique_username").IsUnique();
+                entity.HasIndex(p => p.UserName).HasDatabaseName("unique_username").IsUnique();
 
                 entity.HasIndex(e => e.Email).HasDatabaseName("unique_email").IsUnique();
 
-                entity.Property(p=>p.Email)
-                    .HasMaxLength(100)
+                entity.Property(p => p.GitHubId)
+                    .HasMaxLength(1000) // todo: learn max length from github api
+                    .IsUnicode(false)
+                    .IsRequired(false);
+
+                entity.Property(p => p.GoogleId)
+                    .HasMaxLength(1000) // todo: learn max length from google api
                     .IsUnicode(false)
                     .IsRequired(false);
                 
+                entity.Property(p => p.Email)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .IsRequired(false);
+
                 entity.Property(e => e.UserName)
                     .HasMaxLength(39)
                     .IsUnicode(false)
