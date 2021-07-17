@@ -19,5 +19,11 @@ namespace DevnotMentor.Api.Controllers
         {
             return Challenge(new AuthenticationProperties() { RedirectUri = "/" }, "GitHub");
         }
+        [Route("/auth/google")]
+        [HttpGet]
+        public IActionResult GoogleChallenge()
+        {
+            return Challenge(new AuthenticationProperties() { RedirectUri = "/" }, "Google");
+        }
     }
 }
