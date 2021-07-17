@@ -111,6 +111,7 @@ namespace DevnotMentor.Api.Helpers.Extensions
                     IdentifierProperty = googleResponse.email,
                     FullName = googleResponse.name,
                     ProfilePictureUrl = googleResponse.picture,
+                    Type = oAuthType,
                 };
             }
 
@@ -121,6 +122,7 @@ namespace DevnotMentor.Api.Helpers.Extensions
                 IdentifierProperty = gitHubResponse.login,
                 FullName = gitHubResponse.name,
                 ProfilePictureUrl = gitHubResponse.avatar_url,
+                Type = oAuthType,
             };
         }
 

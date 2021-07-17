@@ -36,6 +36,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
+                user = new User();
                 switch (oAuthUser.Type)
                 {
                     case OAuthType.Google:
@@ -43,9 +44,13 @@ namespace DevnotMentor.Api.Services
                         user.Email = oAuthUser.IdentifierProperty;
                         user.UserName = oAuthUser.IdentifierProperty;
                         break;
+                    
                     case OAuthType.GitHub:
                         user.GitHubId = oAuthUser.Id;
                         user.UserName = oAuthUser.IdentifierProperty;
+                        break;
+                    
+                    default:
                         break;
                 }
 
