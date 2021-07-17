@@ -13,6 +13,6 @@ namespace DevnotMentor.Api.Utilities.File
         /// </summary>
         /// <param name="profileImageFile">Profile image file</param>
         /// <returns></returns>
-        Task<FileResult> InsertProfileImage(IFormFile profileImageFile);
+        Task<FileResult> InsertProfileImageAsync(IFormFile profileImageFile);
     }
 }

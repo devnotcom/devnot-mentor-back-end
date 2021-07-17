@@ -6,10 +6,10 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IMentorRepository : IRepository<Mentor>
     {
-        Task<int> GetIdByUserId(int userId);
-        Task<Mentor> GetByUserName(string userName);
-        Task<Mentor> GetByUserId(int userId);
-        Task<bool> IsExistsByUserId(int userId);
-        Task<IEnumerable<Mentee>> GetPairedMenteesByMentorId(int mentorId);
+        Task<int> GetIdByUserIdAsync(int userId);
+        Task<Mentor> GetByUserNameAsync(string userName);
+        Task<Mentor> GetByUserIdAsync(int userId);
+        Task<bool> IsExistsByUserIdAsync(int userId);
+        Task<IEnumerable<Mentee>> GetPairedMenteesByMentorIdAsync(int mentorId);
     }
 }

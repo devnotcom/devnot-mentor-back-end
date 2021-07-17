@@ -7,12 +7,12 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IMenteeRepository : IRepository<Mentee>
     {
-        Task<Mentee> GetByUserId(int userId);
-        Task<Mentee> GetByUserName(string userName);
-        Task<int> GetIdByUserId(int userId);
-        Task<bool> IsExistsByUserId(int userId);
+        Task<Mentee> GetByUserIdAsync(int userId);
+        Task<Mentee> GetByUserNameAsync(string userName);
+        Task<int> GetIdByUserIdAsync(int userId);
+        Task<bool> IsExistsByUserIdAsync(int userId);
 
-        Task<IEnumerable<Mentor>> GetPairedMentorsByMenteeId(int menteeId);
+        Task<IEnumerable<Mentor>> GetPairedMentorsByMenteeIdAsync(int menteeId);
 
     }
 }

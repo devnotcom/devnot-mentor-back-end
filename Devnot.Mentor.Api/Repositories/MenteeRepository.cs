@@ -15,27 +15,27 @@ namespace DevnotMentor.Api.Repositories
 
         }
 
-        public async Task<Mentee> GetByUserId(int userId)
+        public async Task<Mentee> GetByUserIdAsync(int userId)
         {
             return await DbContext.Mentee.Where(i => i.UserId == userId).FirstOrDefaultAsync();
         }
 
-        public async Task<Mentee> GetByUserName(string userName)
+        public async Task<Mentee> GetByUserNameAsync(string userName)
         {
             return await DbContext.Mentee.Include(x => x.User).Where(i => i.User.UserName == userName).FirstOrDefaultAsync();
         }
 
-        public async Task<int> GetIdByUserId(int userId)
+        public async Task<int> GetIdByUserIdAsync(int userId)
         {
             return await DbContext.Mentee.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
         }
 
-        public async Task<bool> IsExistsByUserId(int userId)
+        public async Task<bool> IsExistsByUserIdAsync(int userId)
         {
             return await DbContext.Mentee.AnyAsync(i => i.UserId == userId);
         }
 
-        public async Task<IEnumerable<Mentor>> GetPairedMentorsByMenteeId(int menteeId)
+        public async Task<IEnumerable<Mentor>> GetPairedMentorsByMenteeIdAsync(int menteeId)
         {
             return await DbContext.MentorMenteePairs.Where(x => x.MenteeId == menteeId)
                 .Include(x => x.Mentor)
