@@ -32,7 +32,7 @@ namespace DevnotMentor.Api.Repositories
             return await DbContext.User.Where(u => u.UserName == userName).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetByGitHubIdOrEmail(object identifier)
+        public async Task<User> GetByUserNameOrEmailAsync(object identifier)
         {
             return await DbContext.User.Where(u => u.GitHubId == identifier.ToString() || u.Email == identifier.ToString()).FirstOrDefaultAsync();
         }
