@@ -9,6 +9,7 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Response.UserResponse;
 using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Auth;
 
 namespace DevnotMentor.Api.Services
 {
@@ -29,21 +30,36 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
         }
 
-        public async Task<ApiResponse<UserLoginResponse>> GitHubAuth(string githubId, string name, string login, string avatar)
-        { //todo: seperate jobs(creating new user - creating token for user)
-            var user = await userRepository.GetByGitHubIdOrEmail(githubId);
+        private async Task<User> GetOrCreateForOAuthUserAsync(OAuthUser oAuthUser)
+        {
+            var user = await userRepository.GetByUserNameOrEmailAsync(oAuthUser.IdentifierProperty);
+
             if (user == null)
             {
-                user = new User()
+                switch (oAuthUser.Type)
                 {
-                    GitHubId = githubId,
-                    FullName = name,
-                    UserName = login,
-                    ProfilePictureUrl = avatar
-                };
+                    case OAuthType.Google:
+                        user.GoogleId = oAuthUser.Id;
+                        user.Email = oAuthUser.IdentifierProperty;
+                        user.UserName = oAuthUser.IdentifierProperty;
+                        break;
+                    case OAuthType.GitHub:
+                        user.GitHubId = oAuthUser.Id;
+                        user.UserName = oAuthUser.IdentifierProperty;
+                        break;
+                }
 
-                user = userRepository.Create(user);
+                user.FullName = oAuthUser.FullName;
+                user.ProfilePictureUrl = oAuthUser.ProfilePictureUrl;
+                return userRepository.Create(user);
             }
+
+            return user;
+        }
+
+        public async Task<ApiResponse<UserLoginResponse>> SignInAsync(OAuthUser oAuthUser)
+        {
+            User user = await GetOrCreateForOAuthUserAsync(oAuthUser);
 
             var tokenInfo = tokenService.CreateToken(user.Id, user.UserName);
 
