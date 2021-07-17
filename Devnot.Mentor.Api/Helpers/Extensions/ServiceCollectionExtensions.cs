@@ -15,10 +15,7 @@ using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using Newtonsoft.Json;
+using DevnotMentor.Api.Utilities;
 
 namespace DevnotMentor.Api.Helpers.Extensions
 {
@@ -74,7 +71,11 @@ namespace DevnotMentor.Api.Helpers.Extensions
 
                 options.Events = new OAuthEvents
                 {
-                    OnCreatingTicket = async ctx => { var oAuthUser = await GetOAuthUser(OAuthType.GitHub, ctx); await SignIn(oAuthUser, ctx.HttpContext); }
+                    OnCreatingTicket = async ctx =>
+                    {
+                        var oAuthUser = await OAuthService.GetOAuthUserAsync(OAuthType.GitHub, ctx);
+                        await OAuthService.SignInAsync(oAuthUser, ctx.HttpContext);
+                    }
                 };
             })
             .AddGoogle(options =>
@@ -85,60 +86,15 @@ namespace DevnotMentor.Api.Helpers.Extensions
 
                 options.Events = new OAuthEvents
                 {
-                    OnCreatingTicket = async ctx => { var oAuthUser = await GetOAuthUser(OAuthType.Google, ctx); await SignIn(oAuthUser, ctx.HttpContext); }
+                    OnCreatingTicket = async ctx =>
+                    {
+                        var oAuthUser = await OAuthService.GetOAuthUserAsync(OAuthType.Google, ctx);
+                        await OAuthService.SignInAsync(oAuthUser, ctx.HttpContext);
+                    }
                 };
             });
 
             return services;
-        }
-
-        private static async Task<OAuthUser> GetOAuthUser(OAuthType oAuthType, OAuthCreatingTicketContext ctx)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
-            response.EnsureSuccessStatusCode();
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-
-            if (oAuthType == OAuthType.Google)
-            {
-                var googleResponse = JsonConvert.DeserializeObject<GoogleResponse>(responseContent);
-                return new OAuthUser
-                {
-                    Id = googleResponse.id,
-                    IdentifierProperty = googleResponse.email,
-                    FullName = googleResponse.name,
-                    ProfilePictureUrl = googleResponse.picture,
-                    Type = oAuthType,
-                };
-            }
-
-            var gitHubResponse = JsonConvert.DeserializeObject<GitHubResponse>(responseContent);
-            return new OAuthUser
-            {
-                Id = gitHubResponse.id,
-                IdentifierProperty = gitHubResponse.login,
-                FullName = gitHubResponse.name,
-                ProfilePictureUrl = gitHubResponse.avatar_url,
-                Type = oAuthType,
-            };
-        }
-
-        private static async Task SignIn(OAuthUser oAuthUser, HttpContext httpContext)
-        {
-            var userService = httpContext.RequestServices.GetService<IUserService>();
-            var signInResponse = await userService.SignInAsync(oAuthUser);
-            if (signInResponse.Success)
-            {
-                httpContext.Response.Headers.Add("auth-token", signInResponse.Data.Token);
-                httpContext.Response.Headers.Add("auth-token-expiry-date", signInResponse.Data.TokenExpiryDate.ToString());
-            }
-            else
-            {
-                httpContext.Response.StatusCode = 500;
-            }
         }
     }
 }
