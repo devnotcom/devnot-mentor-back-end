@@ -5,11 +5,11 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IUserRepository : IRepository<User>
     {
-        Task<User> GetById(int id);
-        Task<User> GetByGitHubId(object identifier);
-        Task<User> GetByGoogleId(object identifier);
-        Task<User> GetByUserName(string userName);
-        Task<User> GetByEmail(string email);
-        Task<bool> IsExists(int id);
+        Task<User> GetByGitHubIdAsync(object identifier);
+        Task<User> GetByGoogleIdAsync(object identifier);
+        Task<User> GetByIdAsync(int id);
+        Task<User> GetByUserNameAsync(string userName);
+        Task<User> GetByEmailAsync(string email);
+        Task<bool> IsExistsAsync(int id);
     }
 }

@@ -49,9 +49,9 @@ namespace DevnotMentor.Api.Services
             this.mentorApplicationsRepository = mentorApplicationsRepository;
             this.mentorMenteePairsRepository = mentorMenteePairsRepository;
         }
-        public async Task<ApiResponse<MentorDto>> GetMentorProfile(string userName)
+        public async Task<ApiResponse<MentorDto>> GetMentorProfileAsync(string userName)
         {
-            var mentor = await mentorRepository.GetByUserName(userName);
+            var mentor = await mentorRepository.GetByUserNameAsync(userName);
 
             if (mentor == null)
             {
@@ -62,44 +62,44 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<MentorDto>(mappedMentor);
         }
 
-        public async Task<ApiResponse<List<MenteeDto>>> GetPairedMenteesByUserId(int userId)
+        public async Task<ApiResponse<List<MenteeDto>>> GetPairedMenteesByUserIdAsync(int userId)
         {
-            var mentor = await mentorRepository.GetByUserId(userId);
+            var mentor = await mentorRepository.GetByUserIdAsync(userId);
 
             if (mentor == null)
             {
                 return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentor);
             }
 
-            var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorId(mentor.Id));
+            var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
 
             return new SuccessApiResponse<List<MenteeDto>>(pairedMentees);
         }
 
-        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId)
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId)
         {
-            var mentor = await mentorRepository.GetByUserId(userId);
+            var mentor = await mentorRepository.GetByUserIdAsync(userId);
 
             if (mentor == null)
             {
                 return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentor);
             }
 
-            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserId(userId));
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserIdAsync(userId));
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
-        public async Task<ApiResponse<MentorDto>> CreateMentorProfile(CreateMentorProfileRequest request)
+        public async Task<ApiResponse<MentorDto>> CreateMentorProfileAsync(CreateMentorProfileRequest request)
         {
-            var user = await userRepository.GetById(request.UserId);
+            var user = await userRepository.GetByIdAsync(request.UserId);
 
             if (user == null)
             {
                 return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var registeredMentor = await mentorRepository.GetByUserId(user.Id);
+            var registeredMentor = await mentorRepository.GetByUserIdAsync(user.Id);
 
             if (registeredMentor != null)
             {
@@ -161,16 +161,16 @@ namespace DevnotMentor.Api.Services
             return mentor;
         }
 
-        public async Task<ApiResponse> AcceptMentee(int mentorUserId, int mentorId, int menteeId)
+        public async Task<ApiResponse> AcceptMenteeAsync(int mentorUserId, int mentorId, int menteeId)
         {
-            var mentor = await mentorRepository.GetByUserId(mentorUserId);
+            var mentor = await mentorRepository.GetByUserIdAsync(mentorUserId);
 
             if (mentor == null || mentor.Id != mentorId)
             {
                 return new ErrorApiResponse(ResultMessage.UnAuthorized);
             }
 
-            var mentorApplication = await mentorApplicationsRepository.Get(mentorId, menteeId);
+            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorId, menteeId);
 
             if (mentorApplication == null)
             {
@@ -216,16 +216,16 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RejectMentee(int mentorUserId, int mentorId, int menteeId)
+        public async Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId)
         {
-            var mentor = await mentorRepository.GetByUserId(mentorUserId);
+            var mentor = await mentorRepository.GetByUserIdAsync(mentorUserId);
 
             if (mentor == null || mentor.Id != mentorId)
             {
                 return new ErrorApiResponse(ResultMessage.UnAuthorized);
             }
 
-            var mentorApplication = await mentorApplicationsRepository.Get(mentorId, menteeId);
+            var mentorApplication = await mentorApplicationsRepository.GetAsync(mentorId, menteeId);
 
             if (mentorApplication == null)
             {

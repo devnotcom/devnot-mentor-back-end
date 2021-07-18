@@ -14,7 +14,7 @@ namespace DevnotMentor.Api.Repositories
 
         }
 
-        public async Task<bool> IsExistsByUserId(int mentorId, int menteeId)
+        public async Task<bool> IsExistsByUserIdAsync(int mentorId, int menteeId)
         {
             return await DbContext
                 .MentorApplications
@@ -22,7 +22,7 @@ namespace DevnotMentor.Api.Repositories
                 .AnyAsync();
         }
 
-        public async Task<MentorApplications> Get(int mentorId, int menteeId)
+        public async Task<MentorApplications> GetAsync(int mentorId, int menteeId)
         {
             return await DbContext
                 .MentorApplications
@@ -30,7 +30,7 @@ namespace DevnotMentor.Api.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<MentorApplications>> GetByUserId(int userId)
+        public async Task<IEnumerable<MentorApplications>> GetByUserIdAsync(int userId)
         {
             return await DbContext.MentorApplications
                 .Include(x => x.Mentee).ThenInclude(x => x.User)

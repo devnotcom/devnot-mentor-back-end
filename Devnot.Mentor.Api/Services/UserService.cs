@@ -35,6 +35,7 @@ namespace DevnotMentor.Api.Services
             var user = new User();
             
             switch (oAuthUser.Type)
+
             {
                 case OAuthType.Google:
                     user.GoogleId = oAuthUser.Id;
@@ -55,8 +56,8 @@ namespace DevnotMentor.Api.Services
         {
             var user = oAuthUser.Type switch
             {
-                OAuthType.GitHub => await userRepository.GetByGitHubId(oAuthUser.Id),
-                OAuthType.Google => await userRepository.GetByGoogleId(oAuthUser.Id),
+                OAuthType.GitHub => await userRepository.GetByGitHubIdAsync(oAuthUser.Id),
+                OAuthType.Google => await userRepository.GetByGoogleIdAsync(oAuthUser.Id),
             };
 
             if (user == null)
