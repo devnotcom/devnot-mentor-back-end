@@ -37,13 +37,13 @@ namespace DevnotMentor.Api.Services
             {
                 case OAuthType.Google:
                     user.GoogleId = oAuthUser.Id;
-                    user.Email = oAuthUser.IdentifierProperty;
-                    user.UserName = oAuthUser.IdentifierProperty; // todo: after registration, user must select a UserName
+                    user.Email = oAuthUser.UniqueByProvider;
+                    user.UserName = oAuthUser.UniqueByProvider; // todo: after registration, user must select a UserName
                     break;
 
                 case OAuthType.GitHub:
                     user.GitHubId = oAuthUser.Id;
-                    user.UserName = oAuthUser.IdentifierProperty;
+                    user.UserName = oAuthUser.UniqueByProvider;
                     //user.Email = ""; // todo: after registration, user must select a Email
                     break;
 
