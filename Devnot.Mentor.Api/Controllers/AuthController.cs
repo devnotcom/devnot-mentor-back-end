@@ -6,6 +6,7 @@ namespace DevnotMentor.Api.Controllers
     public class AuthController : BaseController
     {
         [Route("/auth/okay")]
+        [HttpGet]
         public IActionResult OK()
         {
             return Ok("OAuth: okay");
