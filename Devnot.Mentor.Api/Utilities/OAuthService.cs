@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
-using DevnotMentor.Api.CustomEntities.Auth;
+using DevnotMentor.Api.CustomEntities.OAuth;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using DevnotMentor.Api.Services.Interfaces;
@@ -20,16 +20,9 @@ namespace DevnotMentor.Api.Utilities
             var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
             response.EnsureSuccessStatusCode();
 
-            var responseContent = await response.Content.ReadAsStringAsync();
+            var oauthResponse = JsonConvert.DeserializeObject<OAuthResponse>(await response.Content.ReadAsStringAsync());
 
-            if (oAuthType == OAuthType.Google)
-            {
-                var googleResponse = JsonConvert.DeserializeObject<GoogleResponse>(responseContent);
-                return new OAuthUser(googleResponse.id, googleResponse.email, googleResponse.name, googleResponse.picture, oAuthType);
-            }
-
-            var gitHubResponse = JsonConvert.DeserializeObject<GitHubResponse>(responseContent);
-            return new OAuthUser(gitHubResponse.id, gitHubResponse.login, gitHubResponse.name, gitHubResponse.avatar_url, oAuthType);
+            return new OAuthUser(oauthResponse, oAuthType);
         }
 
         public static async Task SignInAsync(OAuthUser oAuthUser, HttpContext httpContext)

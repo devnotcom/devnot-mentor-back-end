@@ -9,7 +9,7 @@ using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Response.UserResponse;
 using DevnotMentor.Api.CustomEntities.Dto;
-using DevnotMentor.Api.CustomEntities.Auth;
+using DevnotMentor.Api.CustomEntities.OAuth;
 
 namespace DevnotMentor.Api.Services
 {
@@ -33,24 +33,19 @@ namespace DevnotMentor.Api.Services
         private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
         {
             var user = new User();
+            
             switch (oAuthUser.Type)
             {
                 case OAuthType.Google:
                     user.GoogleId = oAuthUser.Id;
-                    user.Email = oAuthUser.UniqueByProvider;
-                    user.UserName = oAuthUser.UniqueByProvider; // todo: after registration, user must select a UserName
                     break;
-
                 case OAuthType.GitHub:
                     user.GitHubId = oAuthUser.Id;
-                    user.UserName = oAuthUser.UniqueByProvider;
-                    //user.Email = ""; // todo: after registration, user must select a Email
-                    break;
-
-                default:
                     break;
             }
 
+            user.Email = oAuthUser.Email;       // todo: if it's github oauth, it can be null. after the registration user must pass a email.
+            user.UserName = oAuthUser.UserName; // todo: if it's google oauth, it takes random value
             user.FullName = oAuthUser.FullName;
             user.ProfilePictureUrl = oAuthUser.ProfilePictureUrl;
             return userRepository.Create(user);
