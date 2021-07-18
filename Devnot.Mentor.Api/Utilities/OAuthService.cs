@@ -19,31 +19,17 @@ namespace DevnotMentor.Api.Utilities
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
             response.EnsureSuccessStatusCode();
-            
+
             var responseContent = await response.Content.ReadAsStringAsync();
 
             if (oAuthType == OAuthType.Google)
             {
                 var googleResponse = JsonConvert.DeserializeObject<GoogleResponse>(responseContent);
-                return new OAuthUser
-                {
-                    Id = googleResponse.id,
-                    IdentifierProperty = googleResponse.email,
-                    FullName = googleResponse.name,
-                    ProfilePictureUrl = googleResponse.picture,
-                    Type = oAuthType,
-                };
+                return new OAuthUser(googleResponse.id, googleResponse.email, googleResponse.name, googleResponse.picture, oAuthType);
             }
 
             var gitHubResponse = JsonConvert.DeserializeObject<GitHubResponse>(responseContent);
-            return new OAuthUser
-            {
-                Id = gitHubResponse.id,
-                IdentifierProperty = gitHubResponse.login,
-                FullName = gitHubResponse.name,
-                ProfilePictureUrl = gitHubResponse.avatar_url,
-                Type = oAuthType,
-            };
+            return new OAuthUser(gitHubResponse.id, gitHubResponse.login, gitHubResponse.name, gitHubResponse.avatar_url, oAuthType);
         }
 
         public static async Task SignInAsync(OAuthUser oAuthUser, HttpContext httpContext)

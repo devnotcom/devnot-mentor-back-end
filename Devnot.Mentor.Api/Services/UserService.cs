@@ -30,42 +30,44 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
         }
 
-        private async Task<User> GetOrCreateForOAuthUserAsync(OAuthUser oAuthUser)
+        private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
         {
-            var user = await userRepository.GetByUserNameOrEmailAsync(oAuthUser.IdentifierProperty);
-
-            if (user == null)
+            var user = new User();
+            switch (oAuthUser.Type)
             {
-                user = new User();
-                switch (oAuthUser.Type)
-                {
-                    case OAuthType.Google:
-                        user.GoogleId = oAuthUser.Id;
-                        user.Email = oAuthUser.IdentifierProperty;
-                        user.UserName = oAuthUser.IdentifierProperty; // todo: after registration, user must select a UserName
-                        break;
-                    
-                    case OAuthType.GitHub:
-                        user.GitHubId = oAuthUser.Id;
-                        user.UserName = oAuthUser.IdentifierProperty;
-                        //user.Email = ""; // todo: after registration, user must select a Email
-                        break;
-                    
-                    default:
-                        break;
-                }
+                case OAuthType.Google:
+                    user.GoogleId = oAuthUser.Id;
+                    user.Email = oAuthUser.IdentifierProperty;
+                    user.UserName = oAuthUser.IdentifierProperty; // todo: after registration, user must select a UserName
+                    break;
 
-                user.FullName = oAuthUser.FullName;
-                user.ProfilePictureUrl = oAuthUser.ProfilePictureUrl;
-                return userRepository.Create(user);
+                case OAuthType.GitHub:
+                    user.GitHubId = oAuthUser.Id;
+                    user.UserName = oAuthUser.IdentifierProperty;
+                    //user.Email = ""; // todo: after registration, user must select a Email
+                    break;
+
+                default:
+                    break;
             }
 
-            return user;
+            user.FullName = oAuthUser.FullName;
+            user.ProfilePictureUrl = oAuthUser.ProfilePictureUrl;
+            return userRepository.Create(user);
         }
 
         public async Task<ApiResponse<UserLoginResponse>> SignInAsync(OAuthUser oAuthUser)
         {
-            User user = await GetOrCreateForOAuthUserAsync(oAuthUser);
+            var user = oAuthUser.Type switch
+            {
+                OAuthType.GitHub => await userRepository.GetByGitHubId(oAuthUser.Id),
+                OAuthType.Google => await userRepository.GetByGoogleId(oAuthUser.Id),
+            };
+
+            if (user == null)
+            {
+                user = await CreateUserForOAuthUserAsync(oAuthUser);
+            }
 
             var tokenInfo = tokenService.CreateToken(user.Id, user.UserName);
 
