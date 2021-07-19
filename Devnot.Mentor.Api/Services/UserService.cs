@@ -7,13 +7,10 @@ using DevnotMentor.Api.Utilities.Security.Token;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
-using DevnotMentor.Api.CustomEntities.Response.UserResponse;
-using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.OAuth;
 
 namespace DevnotMentor.Api.Services
 {
-
     public class UserService : BaseService, IUserService
     {
         private readonly IUserRepository userRepository;
@@ -32,10 +29,9 @@ namespace DevnotMentor.Api.Services
 
         private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
         {
-            var user = new User();
-            
-            switch (oAuthUser.Type)
+            var user = mapper.Map<User>(oAuthUser);
 
+            switch (oAuthUser.Type)
             {
                 case OAuthType.Google:
                     user.GoogleId = oAuthUser.Id;
@@ -44,15 +40,14 @@ namespace DevnotMentor.Api.Services
                     user.GitHubId = oAuthUser.Id;
                     break;
             }
+            /*  todo: 
+                if it's github oauth, it can be null. after the registration user must pass a email.
+                if it's google oauth, it takes random value */
 
-            user.Email = oAuthUser.Email;       // todo: if it's github oauth, it can be null. after the registration user must pass a email.
-            user.UserName = oAuthUser.UserName; // todo: if it's google oauth, it takes random value
-            user.FullName = oAuthUser.FullName;
-            user.ProfilePictureUrl = oAuthUser.ProfilePictureUrl;
             return userRepository.Create(user);
         }
 
-        public async Task<ApiResponse<UserLoginResponse>> SignInAsync(OAuthUser oAuthUser)
+        public async Task<ApiResponse<TokenInfo>> SignInAsync(OAuthUser oAuthUser)
         {
             var user = oAuthUser.Type switch
             {
@@ -65,11 +60,7 @@ namespace DevnotMentor.Api.Services
                 user = await CreateUserForOAuthUserAsync(oAuthUser);
             }
 
-            var tokenInfo = tokenService.CreateToken(user.Id, user.UserName);
-
-            var mappedUser = mapper.Map<User, UserDto>(user);
-
-            return new SuccessApiResponse<UserLoginResponse>(data: new UserLoginResponse(mappedUser, tokenInfo.Token, tokenInfo.ExpiredDate), ResultMessage.Success);
+            return new SuccessApiResponse<TokenInfo>(data: tokenService.CreateToken(user.Id, user.UserName), ResultMessage.Success);
         }
     }
 }

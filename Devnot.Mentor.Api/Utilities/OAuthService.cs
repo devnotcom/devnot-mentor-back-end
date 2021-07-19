@@ -32,7 +32,7 @@ namespace DevnotMentor.Api.Utilities
             if (signInResponse.Success)
             {
                 httpContext.Response.Headers.Add("auth-token", signInResponse.Data.Token);
-                httpContext.Response.Headers.Add("auth-token-expiry-date", signInResponse.Data.TokenExpiryDate.ToString());
+                httpContext.Response.Headers.Add("auth-token-expiry-date", signInResponse.Data.ExpiryDate.ToString());
             }
             else
             {

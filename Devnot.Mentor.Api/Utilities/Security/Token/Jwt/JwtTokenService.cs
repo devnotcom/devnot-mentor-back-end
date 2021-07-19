@@ -40,7 +40,7 @@ namespace DevnotMentor.Api.Utilities.Security.Token.Jwt
             return new TokenInfo
             {
                 Token = tokenHandler.WriteToken(token),
-                ExpiredDate = DateTime.Now.AddMinutes(devnotConfigurationContext.JwtSecretExpirationInMinutes)
+                ExpiryDate = DateTime.Now.AddMinutes(devnotConfigurationContext.JwtSecretExpirationInMinutes)
             };
         }
 
