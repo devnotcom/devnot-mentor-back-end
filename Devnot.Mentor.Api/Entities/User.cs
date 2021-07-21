@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Entities
 {
@@ -17,6 +18,8 @@ namespace DevnotMentor.Api.Entities
         public string Email { get; set; }
         public string FullName { get; set; }
         public string ProfilePictureUrl { get; set; }
+        public bool EmailConfirmed { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual ICollection<Mentee> Mentee { get; set; }
         public virtual ICollection<Mentor> Mentor { get; set; }
