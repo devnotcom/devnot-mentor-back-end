@@ -298,19 +298,19 @@ namespace DevnotMentor.Api.Entities
                 entity.HasIndex(e => e.Email).HasDatabaseName("unique_email").IsUnique();
 
                 entity.Property(p => p.GitHubId)
-                    .HasMaxLength(1000) // todo: learn max length from github api
+                    .HasMaxLength(64)
                     .IsUnicode(false)
                     .IsRequired(false);
 
                 entity.Property(p => p.GoogleId)
-                    .HasMaxLength(1000) // todo: learn max length from google api
+                    .HasMaxLength(64)
                     .IsUnicode(false)
                     .IsRequired(false);
-                
+
                 entity.Property(p => p.Email)
-                    .HasMaxLength(100)
+                    .HasMaxLength(254)
                     .IsUnicode(false)
-                    .IsRequired(false);
+                    .IsRequired(true);
 
                 entity.Property(e => e.UserName)
                     .HasMaxLength(39)
