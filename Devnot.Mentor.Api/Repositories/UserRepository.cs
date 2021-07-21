@@ -16,6 +16,12 @@ namespace DevnotMentor.Api.Repositories
         {
             return await DbContext.User.Where(i => i.Id == id).FirstOrDefaultAsync();
         }
+        public async Task<User> GetByIdIncludeMenteeMentorAsync(int id)
+        {
+            return await DbContext.User
+            .Include(x=>x.Mentor).Include(x=>x.Mentee)
+            .Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
 
         public async Task<User> GetByEmailAsync(string email)
         {

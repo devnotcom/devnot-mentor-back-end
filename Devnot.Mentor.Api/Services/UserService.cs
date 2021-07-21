@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.OAuth;
+using DevnotMentor.Api.CustomEntities.Dto;
 
 namespace DevnotMentor.Api.Services
 {
@@ -27,7 +28,7 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
         }
 
-        private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
+        private User CreateUserForOAuthUser(OAuthUser oAuthUser)
         {
             var user = mapper.Map<User>(oAuthUser);
 
@@ -57,10 +58,16 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                user = await CreateUserForOAuthUserAsync(oAuthUser);
+                user = CreateUserForOAuthUser(oAuthUser);
             }
 
             return new SuccessApiResponse<TokenInfo>(data: tokenService.CreateToken(user.Id, user.UserName), ResultMessage.Success);
+        }
+
+        public async Task<ApiResponse<UserDto>> GetByUserIdAsync(int userId)
+        {
+            var user = await userRepository.GetByIdIncludeMenteeMentorAsync(userId);
+            return new SuccessApiResponse<UserDto>(data: mapper.Map<UserDto>(user), ResultMessage.Success);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace DevnotMentor.Api.Repositories.Interfaces
         Task<User> GetByGitHubIdAsync(object identifier);
         Task<User> GetByGoogleIdAsync(object identifier);
         Task<User> GetByIdAsync(int id);
+        Task<User> GetByIdIncludeMenteeMentorAsync(int id);
         Task<User> GetByUserNameAsync(string userName);
         Task<User> GetByEmailAsync(string email);
         Task<bool> IsExistsAsync(int id);
