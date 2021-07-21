@@ -31,16 +31,6 @@ namespace DevnotMentor.Api.Services
         private User CreateUserForOAuthUser(OAuthUser oAuthUser)
         {
             var user = mapper.Map<User>(oAuthUser);
-            switch (oAuthUser.Type)
-            {
-                case OAuthType.Google:
-                    user.GoogleId = oAuthUser.Id;
-                    break;
-                case OAuthType.GitHub:
-                    user.GitHubId = oAuthUser.Id;
-                    break;
-            }
-
         create:
             try
             {
@@ -78,8 +68,8 @@ namespace DevnotMentor.Api.Services
         {
             var user = oAuthUser.Type switch
             {
-                OAuthType.GitHub => await userRepository.GetByGitHubIdAsync(oAuthUser.Id),
-                OAuthType.Google => await userRepository.GetByGoogleIdAsync(oAuthUser.Id),
+                OAuthType.GitHub => await userRepository.GetByGitHubIdAsync(oAuthUser.GitHubId),
+                OAuthType.Google => await userRepository.GetByGoogleIdAsync(oAuthUser.GoogleId),
             };
 
             if (user == null)

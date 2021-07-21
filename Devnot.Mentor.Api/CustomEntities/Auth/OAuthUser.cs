@@ -6,16 +6,22 @@ namespace DevnotMentor.Api.CustomEntities.OAuth
     {
         public OAuthUser(OAuthResponse response, OAuthType type)
         {
-            Id = response.id;
+            Type = type;
+
             FullName = response.name;
             Email = response.email;
+            CreatedAt = DateTime.Now;
 
-            switch (type)
+            switch (Type)
             {
                 case OAuthType.GitHub:
+                    GoogleId = null;
+
+                    GitHubId = response.id;
                     UserName = response.login;
                     ProfilePictureUrl = response.avatar_url;
-                    if (Email != null)
+
+                    if (!string.IsNullOrEmpty(Email))
                     {
                         EmailConfirmed = true;
                     }
@@ -25,19 +31,20 @@ namespace DevnotMentor.Api.CustomEntities.OAuth
                     }
                     break;
                 case OAuthType.Google:
+                    GitHubId = null;
+
+                    GoogleId = response.id;
                     UserName = System.IO.Path.GetRandomFileName();
                     ProfilePictureUrl = response.picture;
                     EmailConfirmed = true;
                     break;
             }
-            
-            Type = type;
-            CreatedAt = DateTime.Now;
         }
 
-        public string Id { get; set; }
-
         public string UserName { get; set; }
+        public string GitHubId { get; set; }
+        public string GoogleId { get; set; }
+
         public string Email { get; set; }
 
         public string FullName { get; set; }
