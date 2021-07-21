@@ -31,7 +31,6 @@ namespace DevnotMentor.Api.Services
         private User CreateUserForOAuthUser(OAuthUser oAuthUser)
         {
             var user = mapper.Map<User>(oAuthUser);
-
             switch (oAuthUser.Type)
             {
                 case OAuthType.Google:
@@ -41,11 +40,38 @@ namespace DevnotMentor.Api.Services
                     user.GitHubId = oAuthUser.Id;
                     break;
             }
-            /*  todo: 
-                if it's github oauth, it can be null. after the registration user must pass a email.
-                if it's google oauth, it takes random value */
 
-            return userRepository.Create(user);
+        create:
+            try
+            {
+                user = userRepository.Create(user);
+            }
+            catch (System.Exception exception)
+            {
+                var innerExMessage = exception.InnerException.Message;
+                bool exceptionCatched = false;
+
+                if (innerExMessage.Contains("unique_username"))
+                {
+                    exceptionCatched = true;
+                    user.UserName = System.IO.Path.GetRandomFileName();
+                }
+                if (innerExMessage.Contains("unique_email"))
+                {
+                    exceptionCatched = true;
+                    user.Email = System.IO.Path.GetRandomFileName();
+                    user.EmailConfirmed = false;
+                }
+
+                if (exceptionCatched)
+                {
+                    goto create;
+                }
+
+                throw exception; // middleware will catch
+            }
+
+            return user;
         }
 
         public async Task<ApiResponse<TokenInfo>> SignInAsync(OAuthUser oAuthUser)
