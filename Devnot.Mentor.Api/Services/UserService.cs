@@ -41,12 +41,12 @@ namespace DevnotMentor.Api.Services
                 var innerExMessage = exception.InnerException.Message;
                 bool exceptionCatched = false;
 
-                if (innerExMessage.Contains("unique_username"))
+                if (innerExMessage.Contains(UniqueIndexName.UserName))
                 {
                     exceptionCatched = true;
                     user.UserName = System.IO.Path.GetRandomFileName();
                 }
-                if (innerExMessage.Contains("unique_email"))
+                if (innerExMessage.Contains(UniqueIndexName.Email))
                 {
                     exceptionCatched = true;
                     user.Email = System.IO.Path.GetRandomFileName();
