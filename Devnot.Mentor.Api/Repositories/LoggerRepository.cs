@@ -1,8 +1,6 @@
 ﻿using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DevnotMentor.Api.Repositories
@@ -13,17 +11,17 @@ namespace DevnotMentor.Api.Repositories
         {
         }
 
-        public async Task WriteInfo(string message)
+        public async Task WriteInfoAsync(string message)
         {
-            await WriteLog(message, null, "INFO");
+            await WriteLogAsync(message, null, "INFO");
         }
 
-        public async Task WriteError(string message)
+        public async Task WriteErrorAsync(string message)
         {
-            await WriteLog(message, null, "ERROR");
+            await WriteLogAsync(message, null, "ERROR");
         }
 
-        public async Task WriteError(Exception ex)
+        public async Task WriteErrorAsync(Exception ex)
         {
             var message = ex.Message;
             var stackTrace = ex.StackTrace;
@@ -33,10 +31,10 @@ namespace DevnotMentor.Api.Repositories
                 message += Environment.NewLine + "InnerException: " + ex.InnerException.Message;
                 stackTrace += Environment.NewLine + "InnerException: " + ex.InnerException.StackTrace;
             }
-            await WriteLog(message, stackTrace, "ERROR");
+            await WriteLogAsync(message, stackTrace, "ERROR");
         }
 
-        public async Task WriteLog(string message, string stackTrace, string level)
+        public async Task WriteLogAsync(string message, string stackTrace, string level)
         {
             var log = new Log()
             {

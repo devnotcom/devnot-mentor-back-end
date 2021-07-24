@@ -8,12 +8,12 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IUserRepository : IRepository<User>
     {
-        Task<User> GetById(int id);
-        Task<User> GetByUserName(string userName);
-        Task<User> Get(string userName, string hashedPassword);
-        Task<User> Get(int userId, string hashedPassword);
-        Task<User> GetByEmail(string email);
-        Task<User> Get(Guid securityKey);
-        Task<bool> IsExists(int id);
+        Task<User> GetByIdAsync(int id);
+        Task<User> GetByUserNameAsync(string userName);
+        Task<User> GetAsync(string userName, string hashedPassword);
+        Task<User> GetAsync(int userId, string hashedPassword);
+        Task<User> GetByEmailAsync(string email);
+        Task<User> GetAsync(Guid securityKey);
+        Task<bool> IsExistsAsync(int id);
     }
 }

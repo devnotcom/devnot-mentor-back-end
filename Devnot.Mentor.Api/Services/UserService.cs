@@ -46,11 +46,11 @@ namespace DevnotMentor.Api.Services
             this.fileService = fileService;
         }
 
-        public async Task<ApiResponse> ChangePassword(UpdatePasswordRequest request)
+        public async Task<ApiResponse> ChangePasswordAsync(UpdatePasswordRequest request)
         {
             string hashedLastPassword = hashService.CreateHash(request.LastPassword);
 
-            var currentUser = await userRepository.Get(request.UserId, hashedLastPassword);
+            var currentUser = await userRepository.GetAsync(request.UserId, hashedLastPassword);
 
             if (currentUser == null)
             {
@@ -64,11 +64,11 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse<UserLoginResponse>> Login(UserLoginRequest request)
+        public async Task<ApiResponse<UserLoginResponse>> LoginAsync(UserLoginRequest request)
         {
             var hashedPassword = hashService.CreateHash(request.Password);
 
-            var user = await userRepository.Get(request.UserName, hashedPassword);
+            var user = await userRepository.GetAsync(request.UserName, hashedPassword);
 
             if (user == null)
             {
@@ -92,9 +92,9 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<UserLoginResponse>(data: loginResponse, ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> Register(RegisterUserRequest request)
+        public async Task<ApiResponse> RegisterAsync(RegisterUserRequest request)
         {
-            var checkFileResult = await fileService.InsertProfileImage(request.ProfileImage);
+            var checkFileResult = await fileService.InsertProfileImageAsync(request.ProfileImage);
 
             if (!checkFileResult.IsSuccess)
             {
@@ -109,14 +109,14 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RemindPassword(string email)
+        public async Task<ApiResponse> RemindPasswordAsync(string email)
         {
             if (String.IsNullOrWhiteSpace(email))
             {
                 return new ErrorApiResponse(ResultMessage.InvalidModel);
             }
 
-            var currentUser = await userRepository.GetByEmail(email);
+            var currentUser = await userRepository.GetByEmailAsync(email);
 
             if (currentUser == null)
             {
@@ -128,13 +128,13 @@ namespace DevnotMentor.Api.Services
 
             userRepository.Update(currentUser);
 
-            await SendRemindPasswordMail(currentUser);
+            await SendRemindPasswordMailAsync(currentUser);
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
         // TODO: İlerleyen zamanlarda template olarak veri tabanı ya da dosyadan okunulacak.
-        private async Task SendRemindPasswordMail(User user)
+        private async Task SendRemindPasswordMailAsync(User user)
         {
             var to = new List<string> { user.Email };
             string subject = "Devnot Mentor Programı | Parola Sıfırlama İsteği";
@@ -144,13 +144,13 @@ namespace DevnotMentor.Api.Services
             await mailService.SendEmailAsync(to, subject, body);
         }
 
-        public async Task<ApiResponse> Update(UpdateUserRequest request)
+        public async Task<ApiResponse> UpdateAsync(UpdateUserRequest request)
         {
-            var currentUser = await userRepository.GetById(request.UserId);
+            var currentUser = await userRepository.GetByIdAsync(request.UserId);
 
             if (request.ProfileImage != null)
             {
-                var checkUploadedImageFileResult = await fileService.InsertProfileImage(request.ProfileImage);
+                var checkUploadedImageFileResult = await fileService.InsertProfileImageAsync(request.ProfileImage);
 
                 if (!checkUploadedImageFileResult.IsSuccess)
                 {
@@ -168,9 +168,9 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RemindPasswordComplete(CompleteRemindPasswordRequest request)
+        public async Task<ApiResponse> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request)
         {
-            var currentUser = await userRepository.Get(request.SecurityKey);
+            var currentUser = await userRepository.GetAsync(request.SecurityKey);
 
             if (currentUser == null)
             {

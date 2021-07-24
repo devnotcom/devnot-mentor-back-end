@@ -8,7 +8,7 @@ namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IMenteeService
     {
-        Task<ApiResponse<MenteeDto>> GetMenteeProfile(string userName);
+        Task<ApiResponse<MenteeDto>> GetMenteeProfileAsync(string userName);
 
         /// <summary>
         /// Returns mentorship processes.
@@ -22,17 +22,17 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// </summary>
         /// <param name="userId">Mentee UserId</param>
         /// <returns>List of <see cref="MentorDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorDto>>> GetPairedMentorsByUserId(int userId);
+        Task<ApiResponse<List<MentorDto>>> GetPairedMentorsByUserIdAsync(int userId);
 
         /// <summary>
         /// Returns mentoring applications with mentor informations.
         /// </summary>
         /// <param name="userId">Mentee UserId</param>
         /// <returns>List of <see cref="MentorApplicationsDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserId(int userId);
+        Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId);
 
-        Task<ApiResponse<MenteeDto>> CreateMenteeProfile(CreateMenteeProfileRequest request);
+        Task<ApiResponse<MenteeDto>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request);
 
-        Task<ApiResponse> ApplyToMentor(ApplyToMentorRequest request);
+        Task<ApiResponse> ApplyToMentorAsync(ApplyToMentorRequest request);
     }
 }

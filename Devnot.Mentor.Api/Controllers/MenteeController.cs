@@ -21,7 +21,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpGet("{userName}")]
         public async Task<IActionResult> Get([FromRoute] string userName)
         {
-            var result = await menteeService.GetMenteeProfile(userName);
+            var result = await menteeService.GetMenteeProfileAsync(userName);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -31,7 +31,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetPairedMentors()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await menteeService.GetPairedMentorsByUserId(authenticatedUserId);
+            var result = await menteeService.GetPairedMentorsByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -51,7 +51,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetApplications()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await menteeService.GetApplicationsByUserId(authenticatedUserId);
+            var result = await menteeService.GetApplicationsByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -62,7 +62,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.UserId = User.Claims.GetUserId();
 
-            var result = await menteeService.CreateMenteeProfile(request);
+            var result = await menteeService.CreateMenteeProfileAsync(request);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -73,7 +73,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.MenteeUserId = User.Claims.GetUserId();
 
-            var result = await menteeService.ApplyToMentor(request);
+            var result = await menteeService.ApplyToMentorAsync(request);
 
             return result.Success ? Success(result) : BadRequest(result);
         }

@@ -21,7 +21,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpGet("{userName}")]
         public async Task<IActionResult> GetAsync([FromRoute] string userName)
         {
-            var result = await mentorService.GetMentorProfile(userName);
+            var result = await mentorService.GetMentorProfileAsync(userName);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -31,7 +31,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetPairedMentees()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await mentorService.GetPairedMenteesByUserId(authenticatedUserId);
+            var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -41,7 +41,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetMentorships()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await mentorService.GetMentorshipsByUserId(authenticatedUserId);
+            var result = await mentorService.GetMentorshipsByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -51,7 +51,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetApplications()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await mentorService.GetApplicationsByUserId(authenticatedUserId);
+            var result = await mentorService.GetApplicationsByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -62,7 +62,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.UserId = User.Claims.GetUserId();
 
-            var result = await mentorService.CreateMentorProfile(request);
+            var result = await mentorService.CreateMentorProfileAsync(request);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -73,7 +73,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var mentorUserId = User.Claims.GetUserId();
 
-            var result = await mentorService.AcceptMentee(mentorUserId, mentorId, menteeId);
+            var result = await mentorService.AcceptMenteeAsync(mentorUserId, mentorId, menteeId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var mentorUserId = User.Claims.GetUserId();
 
-            var result = await mentorService.RejectMentee(mentorUserId, mentorId, menteeId);
+            var result = await mentorService.RejectMenteeAsync(mentorUserId, mentorId, menteeId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
