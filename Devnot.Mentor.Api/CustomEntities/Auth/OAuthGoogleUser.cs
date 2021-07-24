@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using DevnotMentor.Api.CustomEntities.OAuth;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
 

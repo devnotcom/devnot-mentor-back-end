@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
 
-namespace DevnotMentor.Api.CustomEntities.OAuth
+namespace DevnotMentor.Api.CustomEntities.Auth
 {
     public abstract class OAuthUser
     {

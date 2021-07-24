@@ -6,7 +6,6 @@ using DevnotMentor.Api.Configuration.Environment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using DevnotMentor.Api.CustomEntities.OAuth;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Token;

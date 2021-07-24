@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using DevnotMentor.Api.CustomEntities.Auth;
 using DevnotMentor.Api.CustomEntities.Auth.Response;
 using Newtonsoft.Json;
-using DevnotMentor.Api.CustomEntities.OAuth;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using DevnotMentor.Api.Services.Interfaces;

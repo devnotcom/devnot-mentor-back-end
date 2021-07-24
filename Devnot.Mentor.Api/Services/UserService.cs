@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
@@ -8,7 +7,7 @@ using DevnotMentor.Api.Utilities.Security.Token;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
-using DevnotMentor.Api.CustomEntities.OAuth;
+using DevnotMentor.Api.CustomEntities.Auth;
 using DevnotMentor.Api.CustomEntities.Dto;
 
 namespace DevnotMentor.Api.Services

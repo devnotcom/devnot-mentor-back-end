@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using DevnotMentor.Api.CustomEntities.Auth;
 using DevnotMentor.Api.CustomEntities.Dto;
-using DevnotMentor.Api.CustomEntities.OAuth;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Entities;

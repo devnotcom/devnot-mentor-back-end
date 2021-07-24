@@ -1,4 +1,4 @@
-namespace DevnotMentor.Api.CustomEntities.OAuth
+namespace DevnotMentor.Api.CustomEntities.Auth
 {
     public enum OAuthType : int
     {
