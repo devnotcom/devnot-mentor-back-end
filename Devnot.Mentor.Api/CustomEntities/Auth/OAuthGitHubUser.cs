@@ -11,7 +11,7 @@ namespace DevnotMentor.Api.CustomEntities.Auth
         {
         }
 
-        public override async Task<User> GetUserFromDatabase(IUserRepository repository)
+        public override async Task<User> GetUserFromDatabaseAsync(IUserRepository repository)
         {
             if (repository is null)
             {

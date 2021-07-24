@@ -12,9 +12,8 @@ namespace DevnotMentor.Api.CustomEntities.Auth
             OAuthProviderType = providerType;
         }
 
-
         /// <summary>
-        /// O an ki provider'a ait kullanýcý id deðeri.
+        /// Provider ID
         /// </summary>
         public string Id { get; set; }
         public string FullName { get; set; }
@@ -25,10 +24,10 @@ namespace DevnotMentor.Api.CustomEntities.Auth
         public OAuthType OAuthProviderType { get; private set; }
 
         /// <summary>
-        /// Provider kullanýcýsýnýn bilgilerine göre veri tabanýndan ilgili kullanýcýyý getirir.
+        /// Get User by Provider
         /// </summary>
         /// <returns></returns>
-        public abstract Task<User> GetUserFromDatabase(IUserRepository repository);
+        public abstract Task<User> GetUserFromDatabaseAsync(IUserRepository repository);
 
         public void SetRandomUsername()
         {

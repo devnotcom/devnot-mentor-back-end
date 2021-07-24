@@ -19,7 +19,7 @@ namespace DevnotMentor.Api.Entities
         public string FullName { get; set; }
         public string ProfilePictureUrl { get; set; }
         public bool EmailConfirmed { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; private set; } = DateTime.Now;
 
         public virtual ICollection<Mentee> Mentee { get; set; }
         public virtual ICollection<Mentor> Mentor { get; set; }

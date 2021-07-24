@@ -16,17 +16,17 @@ namespace DevnotMentor.Api.Helpers
 
             CreateMap<User, UserDto>();
             CreateMap<OAuthUser, User>()
-                .ForMember(user => user.GitHubId, opt =>
-                {
-                    opt.Condition(oAuthUser => oAuthUser.OAuthProviderType == OAuthType.GitHub);
-                    opt.MapFrom(oAuthUser => oAuthUser.Id);
-                })
-                .ForMember(user => user.GoogleId, opt =>
-                {
-                    opt.Condition(oAuthUser => oAuthUser.OAuthProviderType == OAuthType.Google);
-                    opt.MapFrom(oAuthUser => oAuthUser.Id);
-                })
-                .ForMember(user => user.Id, opt => opt.Ignore());
+            .ForMember(user => user.GitHubId, opt => // if OAuthUser type is GitHub, map Id to GitHubId
+            {
+                opt.Condition(oAuthUser => oAuthUser.OAuthProviderType == OAuthType.GitHub);
+                opt.MapFrom(oAuthUser => oAuthUser.Id);
+            })
+            .ForMember(user => user.GoogleId, opt => // if OAuthUser type is Google, map Id to GoogleId
+            {
+                opt.Condition(oAuthUser => oAuthUser.OAuthProviderType == OAuthType.Google);
+                opt.MapFrom(oAuthUser => oAuthUser.Id);
+            })
+            .ForMember(user => user.Id, opt => opt.Ignore());
 
             CreateMap<MentorApplications, MentorApplicationsDto>();
 

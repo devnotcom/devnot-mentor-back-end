@@ -294,17 +294,21 @@ namespace DevnotMentor.Api.Entities
             {
                 entity.HasKey(p => p.Id);
 
-                entity.HasIndex(p => p.UserName).HasDatabaseName(UniqueIndexName.UserName).IsUnique();
+                entity.HasIndex(p => p.UserName).IsUnique();
+                /*
+                    has filter null, it removes filters and allows null to be unique.
+                */
+                entity.HasIndex(p => p.Email).IsUnique().HasFilter(null);
+                entity.HasIndex(p => p.GitHubId).IsUnique().HasFilter(null);
+                entity.HasIndex(p => p.GoogleId).IsUnique().HasFilter(null);
 
                 entity.Property(p => p.GitHubId)
                     .HasMaxLength(64)
-                    .IsUnicode(false)
-                    .IsRequired(false);
+                    .IsUnicode(false);
 
                 entity.Property(p => p.GoogleId)
                     .HasMaxLength(64)
-                    .IsUnicode(false)
-                    .IsRequired(false);
+                    .IsUnicode(false);
 
                 entity.Property(p => p.Email)
                     .HasMaxLength(254)

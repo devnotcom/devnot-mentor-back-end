@@ -30,16 +30,16 @@ namespace DevnotMentor.Api.Services
 
         private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
         {
-            var checkIsThereAnySimilarUser = await userRepository.AnyByUserNameAsync(oAuthUser.UserName);
+            var anySimilarUser = await userRepository.AnyByUserNameAsync(oAuthUser.UserName);
 
-            if (checkIsThereAnySimilarUser)
+            if (anySimilarUser)
             {
                 oAuthUser.SetRandomUsername();
             }
 
-            checkIsThereAnySimilarUser = await userRepository.AnyByEmailAsync(oAuthUser.Email);
+            anySimilarUser = await userRepository.AnyByEmailAsync(oAuthUser.Email);
 
-            if (checkIsThereAnySimilarUser)
+            if (anySimilarUser)
             {
                 oAuthUser.Email = null;
                 oAuthUser.EmailConfirmed = false;
@@ -52,7 +52,7 @@ namespace DevnotMentor.Api.Services
 
         public async Task<ApiResponse<TokenInfo>> SignInAsync(OAuthUser oAuthUser)
         {
-            var user = await oAuthUser.GetUserFromDatabase(userRepository);
+            var user = await oAuthUser.GetUserFromDatabaseAsync(userRepository);
 
             if (user is null)
             {
