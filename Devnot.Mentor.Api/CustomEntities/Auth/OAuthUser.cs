@@ -1,56 +1,38 @@
 using System;
+using System.Threading.Tasks;
+using DevnotMentor.Api.Entities;
+using DevnotMentor.Api.Repositories.Interfaces;
 
 namespace DevnotMentor.Api.CustomEntities.OAuth
 {
-    public class OAuthUser
+    public abstract class OAuthUser
     {
-        public OAuthUser(OAuthResponse response, OAuthType type)
+        protected OAuthUser(OAuthType providerType)
         {
-            Type = type;
-
-            FullName = response.name;
-            Email = response.email;
-            CreatedAt = DateTime.Now;
-
-            switch (Type)
-            {
-                case OAuthType.GitHub:
-                    GoogleId = null;
-
-                    GitHubId = response.id;
-                    UserName = response.login;
-                    ProfilePictureUrl = response.avatar_url;
-
-                    if (!string.IsNullOrEmpty(Email))
-                    {
-                        EmailConfirmed = true;
-                    }
-                    else
-                    {
-                        Email = UserName;
-                    }
-                    break;
-                case OAuthType.Google:
-                    GitHubId = null;
-
-                    GoogleId = response.id;
-                    UserName = System.IO.Path.GetRandomFileName();
-                    ProfilePictureUrl = response.picture;
-                    EmailConfirmed = true;
-                    break;
-            }
+            OAuthProviderType = providerType;
         }
 
-        public string UserName { get; set; }
-        public string GitHubId { get; set; }
-        public string GoogleId { get; set; }
 
-        public string Email { get; set; }
-
+        /// <summary>
+        /// O an ki provider'a ait kullanýcý id deðeri.
+        /// </summary>
+        public string Id { get; set; }
         public string FullName { get; set; }
-        public string ProfilePictureUrl { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
         public bool EmailConfirmed { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public OAuthType Type { get; set; }
+        public string ProfilePictureUrl { get; set; }
+        public OAuthType OAuthProviderType { get; private set; }
+
+        /// <summary>
+        /// Provider kullanýcýsýnýn bilgilerine göre veri tabanýndan ilgili kullanýcýyý getirir.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Task<User> GetUserFromDatabase(IUserRepository repository);
+
+        public void SetRandomUsername()
+        {
+            this.UserName = Guid.NewGuid().ToString().Split('-')[0];
+        }
     }
 }

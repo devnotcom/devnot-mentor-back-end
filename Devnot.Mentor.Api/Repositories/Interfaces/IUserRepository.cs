@@ -10,6 +10,8 @@ namespace DevnotMentor.Api.Repositories.Interfaces
         Task<User> GetByIdAsync(int id);
         Task<User> GetByIdIncludeMenteeMentorAsync(int id);
         Task<User> GetByUserNameAsync(string userName);
+        Task<bool> AnyByUserNameAsync(string userName);
+        Task<bool> AnyByEmailAsync(string email);
         Task<User> GetByEmailAsync(string email);
         Task<bool> IsExistsAsync(int id);
     }

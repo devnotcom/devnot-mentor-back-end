@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using DevnotMentor.Api.CustomEntities.Auth;
+using DevnotMentor.Api.CustomEntities.Auth.Response;
 using Newtonsoft.Json;
 using DevnotMentor.Api.CustomEntities.OAuth;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -12,7 +14,19 @@ namespace DevnotMentor.Api.Utilities
 {
     public static class OAuthService
     {
-        public static async Task<OAuthUser> GetOAuthUserAsync(OAuthType oAuthType, OAuthCreatingTicketContext ctx)
+        public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext ctx)
+        {
+            var authGitHubResponse = await GetOAuthUserAsync<OAuthGitHubResponse>(ctx);
+            return authGitHubResponse.MapToOAuthGitHubUser();
+        }
+
+        public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext ctx)
+        {
+            var authGoogleResponse = await GetOAuthUserAsync<OAuthGoogleResponse>(ctx);
+            return authGoogleResponse.MapToOAuthGoogleUser();
+        }
+
+        public static async Task<TOAuthResponse> GetOAuthUserAsync<TOAuthResponse>(OAuthCreatingTicketContext ctx)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
@@ -20,9 +34,7 @@ namespace DevnotMentor.Api.Utilities
             var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
             response.EnsureSuccessStatusCode();
 
-            var oauthResponse = JsonConvert.DeserializeObject<OAuthResponse>(await response.Content.ReadAsStringAsync());
-
-            return new OAuthUser(oauthResponse, oAuthType);
+            return JsonConvert.DeserializeObject<TOAuthResponse>(await response.Content.ReadAsStringAsync());
         }
 
         public static async Task SignInAsync(OAuthUser oAuthUser, HttpContext httpContext)

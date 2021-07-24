@@ -19,8 +19,18 @@ namespace DevnotMentor.Api.Repositories
         public async Task<User> GetByIdIncludeMenteeMentorAsync(int id)
         {
             return await DbContext.User
-            .Include(x=>x.Mentor).Include(x=>x.Mentee)
+            .Include(x => x.Mentor).Include(x => x.Mentee)
             .Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> AnyByUserNameAsync(string userName)
+        {
+            return await DbContext.User.Where(i => i.UserName == userName).AnyAsync();
+        }
+
+        public async Task<bool> AnyByEmailAsync(string email)
+        {
+            return await DbContext.User.Where(i => i.Email == email).AnyAsync();
         }
 
         public async Task<User> GetByEmailAsync(string email)
@@ -42,7 +52,7 @@ namespace DevnotMentor.Api.Repositories
         {
             return await DbContext.User.Where(u => u.GitHubId == identifier.ToString()).FirstOrDefaultAsync();
         }
-        
+
         public async Task<User> GetByGoogleIdAsync(object identifier)
         {
             return await DbContext.User.Where(u => u.GoogleId == identifier.ToString()).FirstOrDefaultAsync();

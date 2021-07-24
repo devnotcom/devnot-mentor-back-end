@@ -73,8 +73,9 @@ namespace DevnotMentor.Api.Helpers.Extensions
                 {
                     OnCreatingTicket = async ctx =>
                     {
-                        var oAuthUser = await OAuthService.GetOAuthUserAsync(OAuthType.GitHub, ctx);
-                        await OAuthService.SignInAsync(oAuthUser, ctx.HttpContext);
+                        var oAuthGitHubUser = await OAuthService.GetOAuthGitHubUserAsync(ctx);
+
+                        await OAuthService.SignInAsync(oAuthGitHubUser, ctx.HttpContext);
                     }
                 };
             })
@@ -88,8 +89,8 @@ namespace DevnotMentor.Api.Helpers.Extensions
                 {
                     OnCreatingTicket = async ctx =>
                     {
-                        var oAuthUser = await OAuthService.GetOAuthUserAsync(OAuthType.Google, ctx);
-                        await OAuthService.SignInAsync(oAuthUser, ctx.HttpContext);
+                        var oAuthGoogleUser = await OAuthService.GetOAuthGoogleUserAsync(ctx);
+                        await OAuthService.SignInAsync(oAuthGoogleUser, ctx.HttpContext);
                     }
                 };
             });

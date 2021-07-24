@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
@@ -28,53 +29,35 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
         }
 
-        private User CreateUserForOAuthUser(OAuthUser oAuthUser)
+        private async Task<User> CreateUserForOAuthUserAsync(OAuthUser oAuthUser)
         {
+            var checkIsThereAnySimilarUser = await userRepository.AnyByUserNameAsync(oAuthUser.UserName);
+
+            if (checkIsThereAnySimilarUser)
+            {
+                oAuthUser.SetRandomUsername();
+            }
+
+            checkIsThereAnySimilarUser = await userRepository.AnyByEmailAsync(oAuthUser.Email);
+
+            if (checkIsThereAnySimilarUser)
+            {
+                oAuthUser.Email = null;
+                oAuthUser.EmailConfirmed = false;
+            }
+
             var user = mapper.Map<User>(oAuthUser);
-        create:
-            try
-            {
-                user = userRepository.Create(user);
-            }
-            catch (System.Exception exception)
-            {
-                var innerExMessage = exception.InnerException.Message;
-                bool exceptionCatched = false;
 
-                if (innerExMessage.Contains(UniqueIndexName.UserName))
-                {
-                    exceptionCatched = true;
-                    user.UserName = System.IO.Path.GetRandomFileName();
-                }
-                if (innerExMessage.Contains(UniqueIndexName.Email))
-                {
-                    exceptionCatched = true;
-                    user.Email = System.IO.Path.GetRandomFileName();
-                    user.EmailConfirmed = false;
-                }
-
-                if (exceptionCatched)
-                {
-                    goto create;
-                }
-
-                throw exception; // middleware will catch
-            }
-
-            return user;
+            return userRepository.Create(user);
         }
 
         public async Task<ApiResponse<TokenInfo>> SignInAsync(OAuthUser oAuthUser)
         {
-            var user = oAuthUser.Type switch
-            {
-                OAuthType.GitHub => await userRepository.GetByGitHubIdAsync(oAuthUser.GitHubId),
-                OAuthType.Google => await userRepository.GetByGoogleIdAsync(oAuthUser.GoogleId),
-            };
+            var user = await oAuthUser.GetUserFromDatabase(userRepository);
 
-            if (user == null)
+            if (user is null)
             {
-                user = CreateUserForOAuthUser(oAuthUser);
+                user = await CreateUserForOAuthUserAsync(oAuthUser);
             }
 
             return new SuccessApiResponse<TokenInfo>(data: tokenService.CreateToken(user.Id, user.UserName), ResultMessage.Success);
