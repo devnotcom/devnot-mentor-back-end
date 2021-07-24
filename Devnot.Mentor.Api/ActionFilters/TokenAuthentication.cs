@@ -54,7 +54,7 @@ namespace DevnotMentor.Api.ActionFilters
 
                 context.HttpContext.User = claimsPrincipal;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 context.Result = new UnauthorizedObjectResult(new ErrorApiResponse(ResultMessage.InvalidToken));
             }

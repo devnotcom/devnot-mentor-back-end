@@ -1,15 +1,9 @@
-﻿using System;
-using DevnotMentor.Api.Common;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace DevnotMentor.Api.Entities
 {
     public partial class MentorDBContext : DbContext
     {
-        public MentorDBContext()
-        {
-        }
-
         public MentorDBContext(DbContextOptions<MentorDBContext> options)
             : base(options)
         {
@@ -30,15 +24,6 @@ namespace DevnotMentor.Api.Entities
         public virtual DbSet<QuestionType> QuestionType { get; set; }
         public virtual DbSet<Tag> Tag { get; set; }
         public virtual DbSet<User> User { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-8TSS65S;Database=MentorDB;Trusted_Connection=True;MultipleActiveResultSets=true");
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -295,12 +280,9 @@ namespace DevnotMentor.Api.Entities
                 entity.HasKey(p => p.Id);
 
                 entity.HasIndex(p => p.UserName).IsUnique();
-                /*
-                    has filter null, it removes filters and allows null to be unique.
-                */
-                entity.HasIndex(p => p.Email).IsUnique().HasFilter(null);
-                entity.HasIndex(p => p.GitHubId).IsUnique().HasFilter(null);
-                entity.HasIndex(p => p.GoogleId).IsUnique().HasFilter(null);
+                entity.HasIndex(p => p.Email).IsUnique().HasFilter("[Email] IS NOT NULL");
+                entity.HasIndex(p => p.GitHubId).IsUnique().HasFilter("[GitHubId] IS NOT NULL");
+                entity.HasIndex(p => p.GoogleId).IsUnique().HasFilter("[GoogleId] IS NOT NULL");
 
                 entity.Property(p => p.GitHubId)
                     .HasMaxLength(64)
