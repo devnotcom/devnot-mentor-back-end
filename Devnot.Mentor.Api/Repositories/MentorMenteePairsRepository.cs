@@ -33,5 +33,13 @@ namespace DevnotMentor.Api.Repositories
         {
             return DbContext.MentorMenteePairs.Count(i => i.MentorId == mentorId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
+
+        public async Task<MentorMenteePairs> GetByIdIncludeMenteeMentorAsync(int pairsId)
+        {
+             return await DbContext.MentorMenteePairs
+                .Include(x => x.Mentee)
+                .Include(x => x.Mentor)
+                .FirstOrDefaultAsync(x => x.Id == pairsId);
+        }
     }
 }

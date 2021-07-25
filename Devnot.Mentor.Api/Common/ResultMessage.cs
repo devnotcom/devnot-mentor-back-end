@@ -9,6 +9,7 @@
         public static string InvalidModel => "messages.error.general.invalidModel";
         public static string UnhandledException => "messages.error.general.unhandledException";
         public static string UnAuthorized => "messages.error.general.unAuthorized";
+        public static string Forbidden => "messages.error.general.Forbidden";
 
         public static string InternalServerError => "messages.error.general.internalServerError";
 
