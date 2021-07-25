@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Utilities
 {
@@ -15,17 +16,30 @@ namespace DevnotMentor.Api.Utilities
     {
         public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext ctx)
         {
-            var authGitHubResponse = await GetOAuthUserAsync<OAuthGitHubResponse>(ctx);
+            var authGitHubResponse = await GetOAuthUserPublicInformationAsync<OAuthGitHubResponse>(ctx);
+            authGitHubResponse.Emails = await GetGitHubEmailsAsync(ctx);
+
             return authGitHubResponse.MapToOAuthGitHubUser();
         }
 
         public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext ctx)
         {
-            var authGoogleResponse = await GetOAuthUserAsync<OAuthGoogleResponse>(ctx);
+            var authGoogleResponse = await GetOAuthUserPublicInformationAsync<OAuthGoogleResponse>(ctx);
             return authGoogleResponse.MapToOAuthGoogleUser();
         }
 
-        public static async Task<TOAuthResponse> GetOAuthUserAsync<TOAuthResponse>(OAuthCreatingTicketContext ctx)
+        public static async Task<List<OAuthGitHubEmailResponse>> GetGitHubEmailsAsync(OAuthCreatingTicketContext ctx)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user/emails");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
+            response.EnsureSuccessStatusCode();
+
+            return JsonConvert.DeserializeObject<List<OAuthGitHubEmailResponse>>(await response.Content.ReadAsStringAsync());
+        }
+
+        public static async Task<TOAuthResponse> GetOAuthUserPublicInformationAsync<TOAuthResponse>(OAuthCreatingTicketContext ctx)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);

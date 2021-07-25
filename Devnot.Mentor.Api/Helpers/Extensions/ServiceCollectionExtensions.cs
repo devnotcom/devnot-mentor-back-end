@@ -66,6 +66,7 @@ namespace DevnotMentor.Api.Helpers.Extensions
             {
                 options.ClientId = EnvironmentService.StaticConfiguration["GitHub:Client:ID"];
                 options.ClientSecret = EnvironmentService.StaticConfiguration["GitHub:Client:Secret"];
+                options.Scope.Add("user:email");
                 options.CallbackPath = new PathString("/auth/github/");
 
                 options.Events = new OAuthEvents
@@ -73,7 +74,6 @@ namespace DevnotMentor.Api.Helpers.Extensions
                     OnCreatingTicket = async ctx =>
                     {
                         var oAuthGitHubUser = await OAuthService.GetOAuthGitHubUserAsync(ctx);
-
                         await OAuthService.SignInAsync(oAuthGitHubUser, ctx.HttpContext);
                     }
                 };
