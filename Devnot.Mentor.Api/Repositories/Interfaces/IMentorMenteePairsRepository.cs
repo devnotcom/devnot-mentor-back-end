@@ -9,6 +9,6 @@ namespace DevnotMentor.Api.Repositories.Interfaces
         int GetCountForContinuesStatusByMenteeId(int menteeId);
         int GetCountForContinuesStatusByMentorId(int mentorId);
 
-        Task<IEnumerable<MentorMenteePairs>> GetByUserId(int userId);
+        Task<IEnumerable<MentorMenteePairs>> GetListByUserIdAsync(int userId);
     }
 }

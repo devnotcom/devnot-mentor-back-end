@@ -15,7 +15,7 @@ namespace DevnotMentor.Api.Repositories
         {
         }
 
-        public async Task<IEnumerable<MentorMenteePairs>> GetByUserId(int userId)
+        public async Task<IEnumerable<MentorMenteePairs>> GetListByUserIdAsync(int userId)
         {
             return await DbContext.MentorMenteePairs
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
