@@ -10,17 +10,17 @@ namespace DevnotMentor.Api.Utilities
 {
     public static class OAuthService
     {
-        public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext creatinTicketContext)
+        public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext creatingTicketContext)
         {
-            var authGitHubResponse = await OAuthServiceResponse.GetUserPublicInformationsAsync<OAuthGitHubResponse>(creatinTicketContext);
-            authGitHubResponse.Emails = await OAuthServiceResponse.GetGitHubEmailsAsync(creatinTicketContext);
+            var authGitHubResponse = await OAuthResponseService.GetUserPublicInformationsAsync<OAuthGitHubResponse>(creatingTicketContext);
+            authGitHubResponse.Emails = await OAuthResponseService.GetGitHubEmailsAsync(creatingTicketContext);
             
             return authGitHubResponse.MapToOAuthGitHubUser();
         }
 
-        public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext creatinTicketContext)
+        public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext creatingTicketContext)
         {
-            var authGoogleResponse = await OAuthServiceResponse.GetUserPublicInformationsAsync<OAuthGoogleResponse>(creatinTicketContext);
+            var authGoogleResponse = await OAuthResponseService.GetUserPublicInformationsAsync<OAuthGoogleResponse>(creatingTicketContext);
             return authGoogleResponse.MapToOAuthGoogleUser();
         }
 
