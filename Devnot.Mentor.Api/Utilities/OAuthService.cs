@@ -1,55 +1,26 @@
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using DevnotMentor.Api.CustomEntities.Auth;
 using DevnotMentor.Api.CustomEntities.Auth.Response;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Http;
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 
 namespace DevnotMentor.Api.Utilities
 {
     public static class OAuthService
     {
-        private static async Task<string> GetResponseContentAsStringAsync(HttpRequestMessage request, OAuthCreatingTicketContext ctx)
+        public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext creatinTicketContext)
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var response = await ctx.Backchannel.SendAsync(request, ctx.HttpContext.RequestAborted);
-
-            return await response.Content.ReadAsStringAsync();
-        }
-
-        private static async Task<TOAuthResponse> GetUserPublicInformationsAsync<TOAuthResponse>(OAuthCreatingTicketContext ctx)
-        {
-            var publicInfoRequest = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
-            var publicInfoResponse = await GetResponseContentAsStringAsync(publicInfoRequest, ctx);
-
-            return JsonConvert.DeserializeObject<TOAuthResponse>(publicInfoResponse);
-        }
-
-        private static async Task<List<OAuthGitHubEmailResponse>> GetGitHubEmailsAsync(OAuthCreatingTicketContext ctx)
-        {
-            var emailRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user/emails");
-            var emailResponse = await GetResponseContentAsStringAsync(emailRequest, ctx);
-
-            return JsonConvert.DeserializeObject<List<OAuthGitHubEmailResponse>>(emailResponse);
-        }
-
-        public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(OAuthCreatingTicketContext ctx)
-        {
-            var authGitHubResponse = await GetUserPublicInformationsAsync<OAuthGitHubResponse>(ctx);
-            authGitHubResponse.Emails = await GetGitHubEmailsAsync(ctx);
+            var authGitHubResponse = await OAuthServiceResponse.GetUserPublicInformationsAsync<OAuthGitHubResponse>(creatinTicketContext);
+            authGitHubResponse.Emails = await OAuthServiceResponse.GetGitHubEmailsAsync(creatinTicketContext);
             
             return authGitHubResponse.MapToOAuthGitHubUser();
         }
 
-        public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext ctx)
+        public static async Task<OAuthGoogleUser> GetOAuthGoogleUserAsync(OAuthCreatingTicketContext creatinTicketContext)
         {
-            var authGoogleResponse = await GetUserPublicInformationsAsync<OAuthGoogleResponse>(ctx);
+            var authGoogleResponse = await OAuthServiceResponse.GetUserPublicInformationsAsync<OAuthGoogleResponse>(creatinTicketContext);
             return authGoogleResponse.MapToOAuthGoogleUser();
         }
 
