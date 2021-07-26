@@ -15,7 +15,7 @@ namespace DevnotMentor.Api.Repositories
         {
         }
 
-        public async Task<IEnumerable<MentorMenteePairs>> GetListByUserIdAsync(int userId)
+        public async Task<IEnumerable<MentorMenteePairs>> GetPairsByUserIdAsync(int userId)
         {
             return await DbContext.MentorMenteePairs
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
@@ -24,22 +24,30 @@ namespace DevnotMentor.Api.Repositories
                 .ToListAsync();
         }
 
-        public int GetCountForContinuesStatusByMenteeId(int menteeId)
+        public int GetCountForStatusContinuesByMenteeId(int menteeId)
         {
             return DbContext.MentorMenteePairs.Count(i => i.MenteeId == menteeId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
 
-        public int GetCountForContinuesStatusByMentorId(int mentorId)
+        public int GetCountForStatusContinuesByMentorId(int mentorId)
         {
             return DbContext.MentorMenteePairs.Count(i => i.MentorId == mentorId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
 
-        public async Task<MentorMenteePairs> GetByIdIncludeMenteeMentorAsync(int pairsId)
+        public async Task<MentorMenteePairs> GetForStatusNotFinishedByIdAndAsync(int pairsId)
         {
-             return await DbContext.MentorMenteePairs
-                .Include(x => x.Mentee)
-                .Include(x => x.Mentor)
-                .FirstOrDefaultAsync(x => x.Id == pairsId);
+            return await DbContext.MentorMenteePairs
+               .Include(x => x.Mentee)
+               .Include(x => x.Mentor)
+               .FirstOrDefaultAsync(x => x.Id == pairsId && x.State != MentorMenteePairStatus.Finished.ToInt());
+        }
+
+        public async Task<MentorMenteePairs> GetForStatusFinishedByIdAndAsync(int pairsId)
+        {
+            return await DbContext.MentorMenteePairs
+               .Include(x => x.Mentee)
+               .Include(x => x.Mentor)
+               .FirstOrDefaultAsync(x => x.Id == pairsId && x.State == MentorMenteePairStatus.Finished.ToInt());
         }
     }
 }

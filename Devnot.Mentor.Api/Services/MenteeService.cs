@@ -87,7 +87,7 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse<List<PairsDto>>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var pairs = mapper.Map<List<PairsDto>>(await pairsRepository.GetListByUserIdAsync(userId));
+            var pairs = mapper.Map<List<PairsDto>>(await pairsRepository.GetPairsByUserIdAsync(userId));
 
             return new SuccessApiResponse<List<PairsDto>>(pairs);
         }

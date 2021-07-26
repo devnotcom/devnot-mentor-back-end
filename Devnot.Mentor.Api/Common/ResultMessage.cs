@@ -44,9 +44,9 @@
 
 
         public static string NotFoundMentorMenteePair => "messages.error.pair.notFoundMentorMenteePair";
+        public static string FeedbackAlreadyGiven => "messages.error.pair.feedbackAlreadyGiven";
         public static string ApplicationAlreadyApproved => "messages.error.pair.applicationAlreadyApproved";
         public static string MentorMenteePairAlreadyExist => "messages.error.pair.mentorMenteePairAlreadyExist";
         public static string ApplicationNotFoundWhenWaitingStatus => "messages.error.pair.notFoundAplicationWhenWaitingStatus";
-
     }
 }

@@ -6,11 +6,12 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IMentorMenteePairsRepository : IRepository<MentorMenteePairs>
     {
-        int GetCountForContinuesStatusByMenteeId(int menteeId);
-        int GetCountForContinuesStatusByMentorId(int mentorId);
+        int GetCountForStatusContinuesByMenteeId(int menteeId);
+        int GetCountForStatusContinuesByMentorId(int mentorId);
 
-        Task<IEnumerable<MentorMenteePairs>> GetListByUserIdAsync(int userId);
+        Task<IEnumerable<MentorMenteePairs>> GetPairsByUserIdAsync(int userId);
 
-        Task<MentorMenteePairs> GetByIdIncludeMenteeMentorAsync(int pairsId);
+        Task<MentorMenteePairs> GetForStatusNotFinishedByIdAndAsync(int pairsId);
+        Task<MentorMenteePairs> GetForStatusFinishedByIdAndAsync(int pairsId);
     }
 }
