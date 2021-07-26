@@ -23,12 +23,12 @@ namespace DevnotMentor.Api.Services
             this.pairsRepository = pairsRepository;
         }
 
-        public async Task<ApiResponse> FinisForAuthorizedUserById(int authorizedUserId, int pairId)
+        public async Task<ApiResponse> FinishByIdAndAuthorizedUser(int authorizedUserId, int pairId)
         {
-            var pair = await pairsRepository.GetForStatusNotFinishedByIdAndAsync(pairId);
+            var pair = await pairsRepository.GetByIdAndStatusNotFinishedAsync(pairId);
             if (pair == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
+                return new ErrorApiResponse(ResultMessage.NotFoundNotFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;
@@ -42,12 +42,12 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse();
         }
 
-        public async Task<ApiResponse> FeedbackForAuthorizedUserById(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
+        public async Task<ApiResponse> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
         {
-            var pair = await pairsRepository.GetForStatusFinishedByIdAndAsync(pairId);
+            var pair = await pairsRepository.GetByIdAndStatusFinishedAsync(pairId);
             if (pair == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
+                return new ErrorApiResponse(ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;

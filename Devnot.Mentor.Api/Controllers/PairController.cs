@@ -24,7 +24,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> Finish(int id)
         {
             var authorizedUserId = User.Claims.GetUserId();
-            var result = await pairsService.FinisForAuthorizedUserById(authorizedUserId, id);
+            var result = await pairsService.FinishByIdAndAuthorizedUser(authorizedUserId, id);
 
             return result.Success ? NoContent() : BadRequest(result);
         }
@@ -33,7 +33,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> Feedback(int id, [FromBody] PairFeedbackRequest pairFeedbackRequest)
         {
             var authorizedUserId = User.Claims.GetUserId();
-            var result = await pairsService.FeedbackForAuthorizedUserById(authorizedUserId, id, pairFeedbackRequest);
+            var result = await pairsService.FeedbackByIdAndAuthorizedUser(authorizedUserId, id, pairFeedbackRequest);
 
             return result.Success ? NoContent() : BadRequest(result);
         }

@@ -6,7 +6,21 @@ namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IPairService
     {
-        Task<ApiResponse> FinisForAuthorizedUserById(int authorizedUserId, int pairId);
-        Task<ApiResponse> FeedbackForAuthorizedUserById(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest);
+        /// <summary>
+        /// Finish a not finished pair, If Authorized User is a mentee or mentor for the pair.
+        /// </summary>
+        /// <param name="authorizedUserId"></param>
+        /// <param name="pairId"></param>
+        /// <returns><see cref="ApiResponse"/></returns>
+        Task<ApiResponse> FinishByIdAndAuthorizedUser(int authorizedUserId, int pairId);
+
+        /// <summary>
+        /// Add feedback as a mentor or mentee to finished pair, If Authorized User is a mentee or mentor for the pair.
+        /// <para>Decision mechanism to feedback as what, checking with Authorized User</para> 
+        /// </summary>
+        /// <param name="authorizedUserId"></param>
+        /// <param name="pairId"></param>
+        /// <returns><see cref="ApiResponse"/></returns>
+        Task<ApiResponse> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest);
     }
 }

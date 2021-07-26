@@ -24,17 +24,17 @@ namespace DevnotMentor.Api.Repositories
                 .ToListAsync();
         }
 
-        public int GetCountForStatusContinuesByMenteeId(int menteeId)
+        public int GetCountByMenteeIdAndStatusContinues(int menteeId)
         {
             return DbContext.MentorMenteePairs.Count(i => i.MenteeId == menteeId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
 
-        public int GetCountForStatusContinuesByMentorId(int mentorId)
+        public int GetCountByMentorIdAndStatusContinues(int mentorId)
         {
             return DbContext.MentorMenteePairs.Count(i => i.MentorId == mentorId && i.State == MentorMenteePairStatus.Continues.ToInt());
         }
 
-        public async Task<MentorMenteePairs> GetForStatusNotFinishedByIdAndAsync(int pairsId)
+        public async Task<MentorMenteePairs> GetByIdAndStatusNotFinishedAsync(int pairsId)
         {
             return await DbContext.MentorMenteePairs
                .Include(x => x.Mentee)
@@ -42,7 +42,7 @@ namespace DevnotMentor.Api.Repositories
                .FirstOrDefaultAsync(x => x.Id == pairsId && x.State != MentorMenteePairStatus.Finished.ToInt());
         }
 
-        public async Task<MentorMenteePairs> GetForStatusFinishedByIdAndAsync(int pairsId)
+        public async Task<MentorMenteePairs> GetByIdAndStatusFinishedAsync(int pairsId)
         {
             return await DbContext.MentorMenteePairs
                .Include(x => x.Mentee)

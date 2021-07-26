@@ -266,7 +266,7 @@ namespace DevnotMentor.Api.Services
         /// <returns>Number of mentor of the mentee is greater than or equal to default max. value?</returns>
         private bool MentorCountOfMenteeGtOrEqMaxCount(int menteeId)
         {
-            int count = pairsRepository.GetCountForStatusContinuesByMenteeId(menteeId);
+            int count = pairsRepository.GetCountByMenteeIdAndStatusContinues(menteeId);
             return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
         }
 
@@ -277,7 +277,7 @@ namespace DevnotMentor.Api.Services
         /// <returns>Number of mentee of the mentor is greater than or equal to default max. value?</returns>
         private bool MenteeCountOfMentorGtOrEqMaxCount(int mentorId)
         {
-            int count = pairsRepository.GetCountForStatusContinuesByMentorId(mentorId);
+            int count = pairsRepository.GetCountByMentorIdAndStatusContinues(mentorId);
             return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
         }
     }
