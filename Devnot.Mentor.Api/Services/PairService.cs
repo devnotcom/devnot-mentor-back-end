@@ -3,6 +3,7 @@ using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
+using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.PairRequest;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
@@ -38,22 +39,23 @@ namespace DevnotMentor.Api.Services
             }
 
             pair.State = MentorMenteePairStatus.Finished.ToInt();
+            pair.MentorEndDate = System.DateTime.Now;
             pairsRepository.Update(pair);
             return new SuccessApiResponse();
         }
 
-        public async Task<ApiResponse> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
+        public async Task<ApiResponse<PairsDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
         {
             var pair = await pairsRepository.GetByIdAndStatusFinishedAsync(pairId);
             if (pair == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundFinishedMentorMenteePair);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;
             if (!authorizedUserRelatedToPair)
             {
-                return new ErrorApiResponse(ResultMessage.Forbidden);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.Forbidden);
             }
 
             bool authorizedUserMenteeForPair = authorizedUserId == pair.Mentee.UserId;
@@ -62,30 +64,34 @@ namespace DevnotMentor.Api.Services
             : FeedbackFromMentor(pair, pairFeedbackRequest);
         }
 
-        private ApiResponse FeedbackFromMentee(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
+        private ApiResponse<PairsDto> FeedbackFromMentee(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
         {
             if (pair.MenteeScore != null || pair.MenteeComment != null)
             {
-                return new ErrorApiResponse(ResultMessage.FeedbackAlreadyGiven);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackAlreadyGiven);
             }
 
             pair.MenteeScore = pairFeedbackRequest.Score;
-            pair.MentorComment = pairFeedbackRequest.Comment;
+            pair.MenteeComment = pairFeedbackRequest.Comment;
             pairsRepository.Update(pair);
-            return new SuccessApiResponse();
+            var pairDto = mapper.Map<PairsDto>(pair);
+
+            return new SuccessApiResponse<PairsDto>(pairDto);
         }
-        
-        private ApiResponse FeedbackFromMentor(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
+
+        private ApiResponse<PairsDto> FeedbackFromMentor(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
         {
             if (pair.MentorScore != null || pair.MentorComment != null)
             {
-                return new ErrorApiResponse(ResultMessage.FeedbackAlreadyGiven);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackAlreadyGiven);
             }
 
             pair.MentorScore = pairFeedbackRequest.Score;
             pair.MentorComment = pairFeedbackRequest.Comment;
             pairsRepository.Update(pair);
-            return new SuccessApiResponse();
+            var pairDto = mapper.Map<PairsDto>(pair);
+
+            return new SuccessApiResponse<PairsDto>(pairDto);
         }
     }
 }

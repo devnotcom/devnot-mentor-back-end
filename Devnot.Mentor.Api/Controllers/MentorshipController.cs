@@ -10,12 +10,12 @@ namespace DevnotMentor.Api.Controllers
     [ServiceFilter(typeof(TokenAuthentication))]
     [ValidateModelState]
     [ApiController]
-    [Route("pairs")]
-    public class PairController : BaseController
+    [Route("mentorships")]
+    public class MentorshipController : BaseController
     {
         private readonly IPairService pairsService;
 
-        public PairController(IPairService pairsService)
+        public MentorshipController(IPairService pairsService)
         {
             this.pairsService = pairsService;
         }
@@ -35,7 +35,7 @@ namespace DevnotMentor.Api.Controllers
             var authorizedUserId = User.Claims.GetUserId();
             var result = await pairsService.FeedbackByIdAndAuthorizedUser(authorizedUserId, id, pairFeedbackRequest);
 
-            return result.Success ? NoContent() : BadRequest(result);
+            return result.Success ? Success(result) : BadRequest(result);
         }
     }
 }
