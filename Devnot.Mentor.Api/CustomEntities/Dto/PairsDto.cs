@@ -2,7 +2,7 @@ using System;
 
 namespace DevnotMentor.Api.CustomEntities.Dto
 {
-    public class PairsDto
+    public class PairDto
     {
         public int Id { get; set; }
         public int? MentorId { get; set; }

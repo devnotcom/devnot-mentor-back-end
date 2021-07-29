@@ -15,18 +15,18 @@ namespace DevnotMentor.Api.Services
 {
     public class PairService : BaseService, IPairService
     {
-        private readonly IMentorMenteePairsRepository pairsRepository;
+        private readonly IMentorMenteePairsRepository pairRepository;
 
         public PairService(IMapper mapper,
                             ILoggerRepository logger,
-                            IDevnotConfigurationContext devnotConfigurationContext, IMentorMenteePairsRepository pairsRepository) : base(mapper, logger, devnotConfigurationContext)
+                            IDevnotConfigurationContext devnotConfigurationContext, IMentorMenteePairsRepository pairRepository) : base(mapper, logger, devnotConfigurationContext)
         {
-            this.pairsRepository = pairsRepository;
+            this.pairRepository = pairRepository;
         }
 
         public async Task<ApiResponse> FinishByIdAndAuthorizedUser(int authorizedUserId, int pairId)
         {
-            var pair = await pairsRepository.GetByIdAndStatusNotFinishedAsync(pairId);
+            var pair = await pairRepository.GetByIdAndStatusNotFinishedAsync(pairId);
             if (pair == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundNotFinishedMentorMenteePair);
@@ -40,22 +40,22 @@ namespace DevnotMentor.Api.Services
 
             pair.State = MentorMenteePairStatus.Finished.ToInt();
             pair.MentorEndDate = System.DateTime.Now;
-            pairsRepository.Update(pair);
+            pairRepository.Update(pair);
             return new SuccessApiResponse();
         }
 
-        public async Task<ApiResponse<PairsDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
+        public async Task<ApiResponse<PairDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
         {
-            var pair = await pairsRepository.GetByIdAndStatusFinishedAsync(pairId);
+            var pair = await pairRepository.GetByIdAndStatusFinishedAsync(pairId);
             if (pair == null)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
+                return new ErrorApiResponse<PairDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;
             if (!authorizedUserRelatedToPair)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.Forbidden);
+                return new ErrorApiResponse<PairDto>(null, ResultMessage.Forbidden);
             }
 
             bool authorizedUserMenteeForPair = authorizedUserId == pair.Mentee.UserId;
@@ -64,34 +64,34 @@ namespace DevnotMentor.Api.Services
             : FeedbackFromMentor(pair, pairFeedbackRequest);
         }
 
-        private ApiResponse<PairsDto> FeedbackFromMentee(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
+        private ApiResponse<PairDto> FeedbackFromMentee(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
         {
             if (pair.MenteeScore != null || pair.MenteeComment != null)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
+                return new ErrorApiResponse<PairDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
             pair.MenteeScore = pairFeedbackRequest.Score;
             pair.MenteeComment = pairFeedbackRequest.Comment;
-            pairsRepository.Update(pair);
-            var pairDto = mapper.Map<PairsDto>(pair);
+            pairRepository.Update(pair);
+            var pairDto = mapper.Map<PairDto>(pair);
 
-            return new SuccessApiResponse<PairsDto>(pairDto);
+            return new SuccessApiResponse<PairDto>(pairDto);
         }
 
-        private ApiResponse<PairsDto> FeedbackFromMentor(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
+        private ApiResponse<PairDto> FeedbackFromMentor(MentorMenteePairs pair, PairFeedbackRequest pairFeedbackRequest)
         {
             if (pair.MentorScore != null || pair.MentorComment != null)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
+                return new ErrorApiResponse<PairDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
             pair.MentorScore = pairFeedbackRequest.Score;
             pair.MentorComment = pairFeedbackRequest.Comment;
-            pairsRepository.Update(pair);
-            var pairDto = mapper.Map<PairsDto>(pair);
+            pairRepository.Update(pair);
+            var pairDto = mapper.Map<PairDto>(pair);
 
-            return new SuccessApiResponse<PairsDto>(pairDto);
+            return new SuccessApiResponse<PairDto>(pairDto);
         }
     }
 }

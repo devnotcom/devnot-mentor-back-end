@@ -21,7 +21,7 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// </summary>
         /// <param name="authorizedUserId"></param>
         /// <param name="pairId"></param>
-        /// <returns><see cref="PairsDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<PairsDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest);
+        /// <returns><see cref="PairDto"/> inside the <see cref="ApiResponse"/></returns>
+        Task<ApiResponse<PairDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest);
     }
 }

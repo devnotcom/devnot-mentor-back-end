@@ -14,8 +14,8 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// Returns mentorship processes.
         /// </summary>
         /// <param name="userId">Mentee UserId</param>
-        /// <returns>List of <see cref="PairsDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<PairsDto>>> GetMentorshipsByUserId(int userId);
+        /// <returns>List of <see cref="PairDto"/> inside the <see cref="ApiResponse"/></returns>
+        Task<ApiResponse<List<PairDto>>> GetMentorshipsByUserId(int userId);
 
         /// <summary>
         /// Returns mentors who are paired with mentee.
