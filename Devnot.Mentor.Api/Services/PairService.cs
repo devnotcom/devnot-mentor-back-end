@@ -68,7 +68,7 @@ namespace DevnotMentor.Api.Services
         {
             if (pair.MenteeScore != null || pair.MenteeComment != null)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackAlreadyGiven);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
             pair.MenteeScore = pairFeedbackRequest.Score;
@@ -83,7 +83,7 @@ namespace DevnotMentor.Api.Services
         {
             if (pair.MentorScore != null || pair.MentorComment != null)
             {
-                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackAlreadyGiven);
+                return new ErrorApiResponse<PairsDto>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
             pair.MentorScore = pairFeedbackRequest.Score;
