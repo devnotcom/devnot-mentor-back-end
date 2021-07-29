@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevnotMentor.Api.Common;
@@ -16,23 +17,61 @@ namespace DevnotMentor.Api.Services
     public class PairService : BaseService, IPairService
     {
         private readonly IMentorMenteePairsRepository pairRepository;
+        private readonly IMenteeRepository menteeRepository;
+        private readonly IMentorRepository mentorRepository;
 
         public PairService(IMapper mapper,
+                            IMentorMenteePairsRepository pairRepository,
+                            IMenteeRepository menteeRepository,
+                            IMentorRepository mentorRepository,
                             ILoggerRepository logger,
-                            IDevnotConfigurationContext devnotConfigurationContext, IMentorMenteePairsRepository pairRepository) : base(mapper, logger, devnotConfigurationContext)
+                            IDevnotConfigurationContext devnotConfigurationContext
+                        ) : base(mapper, logger, devnotConfigurationContext)
         {
             this.pairRepository = pairRepository;
+            this.menteeRepository = menteeRepository;
+            this.mentorRepository = mentorRepository;
+        }
+
+        public async Task<ApiResponse<List<PairDto>>> GetMentorshipsOfMenteeByUserId(int userId)
+        {
+            var mentee = await menteeRepository.GetByUserIdAsync(userId);
+
+            if (mentee == null)
+            {
+                return new ErrorApiResponse<List<PairDto>>(data: default, message: ResultMessage.NotFoundMentee);
+            }
+
+            var pairs = mapper.Map<List<PairDto>>(await pairRepository.GetPairsByUserIdAsync(userId));
+
+            return new SuccessApiResponse<List<PairDto>>(pairs);
+        }
+
+        public async Task<ApiResponse<List<PairDto>>> GetMentorshipsOfMentorByUserIdAsync(int userId)
+        {
+            var mentor = await mentorRepository.GetByUserIdAsync(userId);
+
+            if (mentor == null)
+            {
+                return new ErrorApiResponse<List<PairDto>>(data: default, message: ResultMessage.NotFoundMentor);
+            }
+
+            var pairs = mapper.Map<List<PairDto>>(await pairRepository.GetPairsByUserIdAsync(userId));
+
+            return new SuccessApiResponse<List<PairDto>>(pairs);
         }
 
         public async Task<ApiResponse> FinishByIdAndAuthorizedUser(int authorizedUserId, int pairId)
         {
             var pair = await pairRepository.GetByIdAndStatusNotFinishedAsync(pairId);
+
             if (pair == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundNotFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;
+
             if (!authorizedUserRelatedToPair)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
@@ -40,25 +79,30 @@ namespace DevnotMentor.Api.Services
 
             pair.State = MentorMenteePairStatus.Finished.ToInt();
             pair.MentorEndDate = System.DateTime.Now;
+
             pairRepository.Update(pair);
+
             return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse<PairDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest)
         {
             var pair = await pairRepository.GetByIdAndStatusFinishedAsync(pairId);
+
             if (pair == null)
             {
                 return new ErrorApiResponse<PairDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
             bool authorizedUserRelatedToPair = pair.Mentee.UserId == authorizedUserId || pair.Mentor.UserId == authorizedUserId;
+
             if (!authorizedUserRelatedToPair)
             {
                 return new ErrorApiResponse<PairDto>(null, ResultMessage.Forbidden);
             }
 
             bool authorizedUserMenteeForPair = authorizedUserId == pair.Mentee.UserId;
+
             return authorizedUserMenteeForPair
             ? FeedbackFromMentee(pair, pairFeedbackRequest)
             : FeedbackFromMentor(pair, pairFeedbackRequest);

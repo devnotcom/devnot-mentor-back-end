@@ -76,19 +76,6 @@ namespace DevnotMentor.Api.Services
 
             return new SuccessApiResponse<List<MenteeDto>>(pairedMentees);
         }
-        public async Task<ApiResponse<List<PairDto>>> GetMentorshipsByUserIdAsync(int userId)
-        {
-            var mentor = await mentorRepository.GetByUserIdAsync(userId);
-
-            if (mentor == null)
-            {
-                return new ErrorApiResponse<List<PairDto>>(data: default, message: ResultMessage.NotFoundMentor);
-            }
-
-            var pairs = mapper.Map<List<PairDto>>(await pairsRepository.GetPairsByUserIdAsync(userId));
-
-            return new SuccessApiResponse<List<PairDto>>(pairs);
-        }
 
         public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId)
         {

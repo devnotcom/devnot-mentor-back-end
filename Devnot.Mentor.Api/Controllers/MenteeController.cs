@@ -13,9 +13,12 @@ namespace DevnotMentor.Api.Controllers
     public class MenteeController : BaseController
     {
         private readonly IMenteeService menteeService;
-        public MenteeController(IMenteeService menteeService)
+        private readonly IPairService pairService;
+
+        public MenteeController(IMenteeService menteeService, IPairService pairService)
         {
             this.menteeService = menteeService;
+            this.pairService = pairService;
         }
 
         [HttpGet("{userName}")]
@@ -36,12 +39,12 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet("me/mentorships")]
+        [HttpGet("me/paireds")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetMentorships()
         {
             var authenticatedUserId = User.Claims.GetUserId();
-            var result = await menteeService.GetMentorshipsByUserId(authenticatedUserId);
+            var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }

@@ -8,12 +8,6 @@ namespace DevnotMentor.Api.Services.Interfaces
 {
     public interface IMentorService
     {
-        /// <summary>
-        /// Returns mentorship processes.
-        /// </summary>
-        /// <param name="userId">Mentor UserId</param>
-        /// <returns>List of <see cref="PairDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<PairDto>>> GetMentorshipsByUserIdAsync(int userId);
         Task<ApiResponse<MentorDto>> GetMentorProfileAsync(string userName);
 
         Task<ApiResponse<MentorDto>> CreateMentorProfileAsync(CreateMentorProfileRequest request);
