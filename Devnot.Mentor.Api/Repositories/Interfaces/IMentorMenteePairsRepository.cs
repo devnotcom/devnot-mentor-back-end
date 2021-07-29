@@ -6,12 +6,39 @@ namespace DevnotMentor.Api.Repositories.Interfaces
 {
     public interface IMentorMenteePairsRepository : IRepository<MentorMenteePairs>
     {
-        int GetCountByMenteeIdAndStatusContinues(int menteeId);
-        int GetCountByMentorIdAndStatusContinues(int mentorId);
+        /// <summary>
+        /// Get total status count which has continuing status by mentee id.
+        /// </summary>
+        /// <param name="menteeId"></param>
+        /// <returns></returns>
 
+        int GetCountForContinuingStatusByMenteeId(int menteeId);
+        /// <summary>
+        /// Get total status count which has continuing status by mentor id.
+        /// </summary>
+        /// <param name="mentorId"></param>
+        /// <returns></returns>
+        int GetCountForContinuingStatusByMentorId(int mentorId);
+
+        /// <summary>
+        /// Get mentor mentee pair list for specified user.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         Task<IEnumerable<MentorMenteePairs>> GetPairsByUserIdAsync(int userId);
 
-        Task<MentorMenteePairs> GetByIdAndStatusNotFinishedAsync(int pairsId);
-        Task<MentorMenteePairs> GetByIdAndStatusFinishedAsync(int pairsId);
+        /// <summary>
+        /// Get mentor mentee pair which is not finished.
+        /// </summary>
+        /// <param name="pairId">Pair id.</param>
+        /// <returns></returns>
+        Task<MentorMenteePairs> GetWhichIsNotFinishedYetByIdAsync(int pairId);
+
+        /// <summary>
+        /// Get mentor mentee pair which is finished.
+        /// </summary>
+        /// <param name="pairsId"></param>
+        /// <returns>Pair id.</returns>
+        Task<MentorMenteePairs> GetWhichIsFinishedByIdAsync(int pairsId);
     }
 }

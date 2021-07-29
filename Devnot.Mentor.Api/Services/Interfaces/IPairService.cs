@@ -25,18 +25,18 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// <summary>
         /// Finish a not finished pair, If Authorized User is a mentee or mentor for the pair.
         /// </summary>
-        /// <param name="authorizedUserId"></param>
+        /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="ApiResponse"/></returns>
-        Task<ApiResponse> FinishByIdAndAuthorizedUser(int authorizedUserId, int pairId);
+        Task<ApiResponse> FinishContinuingPairAsync(int userId, int pairId);
 
         /// <summary>
         /// Add feedback as a mentor or mentee to finished pair, If Authorized User is a mentee or mentor for the pair.
         /// <para>The decision mechanism for who makes the feedback is related to the Authorized User.</para> 
         /// </summary>
-        /// <param name="authorizedUserId"></param>
+        /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="PairDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<PairDto>> FeedbackByIdAndAuthorizedUser(int authorizedUserId, int pairId, PairFeedbackRequest pairFeedbackRequest);
+        Task<ApiResponse<PairDto>> GiveFeedbackToFinishedPairAsync(int userId, int pairId, PairFeedbackRequest pairFeedbackRequest);
     }
 }

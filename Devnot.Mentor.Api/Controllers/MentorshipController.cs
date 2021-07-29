@@ -23,7 +23,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> Finish(int id)
         {
             var authorizedUserId = User.Claims.GetUserId();
-            var result = await pairService.FinishByIdAndAuthorizedUser(authorizedUserId, id);
+            var result = await pairService.FinishContinuingPairAsync(authorizedUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -32,7 +32,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> Feedback(int id, [FromBody] PairFeedbackRequest pairFeedbackRequest)
         {
             var authorizedUserId = User.Claims.GetUserId();
-            var result = await pairService.FeedbackByIdAndAuthorizedUser(authorizedUserId, id, pairFeedbackRequest);
+            var result = await pairService.GiveFeedbackToFinishedPairAsync(authorizedUserId, id, pairFeedbackRequest);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
