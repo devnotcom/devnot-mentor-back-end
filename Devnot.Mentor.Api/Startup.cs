@@ -49,13 +49,13 @@ namespace DevnotMentor.Api
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
+            services.AddScoped<IPairService, PairService>();
 
             services.AddScoped<IMailService, SmtpMailService>();
             services.AddScoped<IFileService, LocalFileService>();
 
             services.AddSingleton<ITokenService, JwtTokenService>();
             services.AddSingleton<IHashService, Sha256HashService>();
-
             services.AddSingleton<IDevnotConfigurationContext, DevnotConfigurationContext>();
             services.AddSingleton<IEnvironmentService, EnvironmentService>();
 

@@ -9,6 +9,7 @@
         public static string InvalidModel => "messages.error.general.invalidModel";
         public static string UnhandledException => "messages.error.general.unhandledException";
         public static string UnAuthorized => "messages.error.general.unAuthorized";
+        public static string Forbidden => "messages.error.general.Forbidden";
 
         public static string InternalServerError => "messages.error.general.internalServerError";
 
@@ -43,9 +44,11 @@
 
 
         public static string NotFoundMentorMenteePair => "messages.error.pair.notFoundMentorMenteePair";
+        public static string NotFoundNotFinishedMentorMenteePair => "messages.error.pair.notFoundNotFinishedMentorMenteePair";
+        public static string NotFoundFinishedMentorMenteePair => "messages.error.pair.notFoundFinishedMentorMenteePair";
+        public static string FeedbackWasAlreadyGiven => "messages.error.pair.feedbackWasAlreadyGiven";
         public static string ApplicationAlreadyApproved => "messages.error.pair.applicationAlreadyApproved";
         public static string MentorMenteePairAlreadyExist => "messages.error.pair.mentorMenteePairAlreadyExist";
         public static string ApplicationNotFoundWhenWaitingStatus => "messages.error.pair.notFoundAplicationWhenWaitingStatus";
-
     }
 }

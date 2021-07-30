@@ -12,7 +12,6 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
@@ -24,7 +23,8 @@ namespace DevnotMentor.Api.Services
         private readonly ITagRepository tagRepository;
         private readonly IUserRepository userRepository;
         private readonly IMentorRepository mentorRepository;
-        private readonly IMentorApplicationsRepository mentorApplicationsRepository;
+        private readonly IMentorApplicationsRepository applicationsRepository;
+        private readonly IMentorMenteePairsRepository pairsRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -35,6 +35,7 @@ namespace DevnotMentor.Api.Services
             IUserRepository userRepository,
             IMentorRepository mentorRepository,
             IMentorApplicationsRepository mentorApplicationsRepository,
+            IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             )
@@ -46,9 +47,10 @@ namespace DevnotMentor.Api.Services
             this.tagRepository = tagRepository;
             this.userRepository = userRepository;
             this.mentorRepository = mentorRepository;
-            this.mentorApplicationsRepository = mentorApplicationsRepository;
+            this.applicationsRepository = mentorApplicationsRepository;
+            this.pairsRepository = mentorMenteePairsRepository;
         }
-        // todo: fix duplications: get mentee and null check
+
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfileAsync(string userName)
         {
             var mentee = await menteeRepository.GetByUserNameAsync(userName);
@@ -85,7 +87,7 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var applications = mapper.Map<List<MentorApplicationsDto>>(await mentorApplicationsRepository.GetByUserIdAsync(userId));
+            var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
@@ -181,14 +183,14 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkThereAreAnyPair = await mentorApplicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
+            bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
 
             if (checkThereAreAnyPair)
             {
                 return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
             }
 
-            mentorApplicationsRepository.Create(new MentorApplications
+            applicationsRepository.Create(new MentorApplications
             {
                 ApllicationNotes = request.ApplicationNotes,
                 ApplyDate = DateTime.Now,
