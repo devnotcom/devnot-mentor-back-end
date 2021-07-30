@@ -45,8 +45,8 @@ namespace DevnotMentor.Api.Repositories
         public async Task<MentorMenteePairs> GetWhichIsFinishedByIdAsync(int pairId)
         {
             return await DbContext.MentorMenteePairs
-               .Include(x => x.Mentee)
-               .Include(x => x.Mentor)
+               .Include(x => x.Mentee).ThenInclude(x=>x.User)
+               .Include(x => x.Mentor).ThenInclude(x=>x.User)
                .FirstOrDefaultAsync(x => x.Id == pairId && x.State == MentorMenteePairStatus.Finished.ToInt());
         }
     }
