@@ -31,15 +31,15 @@ namespace DevnotMentor.Api.Services
             this.pairRepository = mentorMenteePairsRepository;
         }
 
-        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId)
+        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authorizedUserId)
         {
-            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(userId);
+            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(authorizedUserId);
             var applicationsDto = mapper.Map<List<MentorApplicationsDto>>(applications);
 
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applicationsDto);
         }
 
-        public async Task<ApiResponse> AcceptApplicationByIdAsync(int userId, int applicationId)
+        public async Task<ApiResponse> AcceptApplicationByIdAsync(int authorizedUserId, int applicationId)
         {
             var application = await applicationsRepository.GetWhichIsWaitingByIdAsync(applicationId);
             if (application == null)
@@ -47,8 +47,8 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
-            bool isUserMentor = application.Mentor.UserId == userId;
-            if (isUserMentor == false)
+            bool isUserMentorForThePair = application.Mentor.UserId == authorizedUserId;
+            if (isUserMentorForThePair == false)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
@@ -81,7 +81,7 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        public async Task<ApiResponse> RejectApplicationByIdAsync(int userId, int applicationId)
+        public async Task<ApiResponse> RejectApplicationByIdAsync(int authorizedUserId, int applicationId)
         {
             var application = await applicationsRepository.GetWhichIsWaitingByIdAsync(applicationId);
             if (application == null)
@@ -89,8 +89,8 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
-            bool isUserMentor = application.Mentor.UserId == userId;
-            if (isUserMentor is false)
+            bool isUserMentorForThePair = application.Mentor.UserId == authorizedUserId;
+            if (isUserMentorForThePair == false)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }

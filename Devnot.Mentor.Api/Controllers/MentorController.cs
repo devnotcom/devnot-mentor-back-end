@@ -24,7 +24,7 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpGet("{userName}")]
-        public async Task<IActionResult> GetAsync([FromRoute] string userName)
+        public async Task<IActionResult> GetMentorProfileAsync([FromRoute] string userName)
         {
             var result = await mentorService.GetMentorProfileAsync(userName);
 
@@ -33,7 +33,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpGet("me/paireds/mentees")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetPairedMentees()
+        public async Task<IActionResult> GetPairedMenteesAsync()
         {
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
@@ -43,7 +43,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpGet("me/paireds")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetMentorships()
+        public async Task<IActionResult> GetMentorshipProccesesAsync()
         {
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await pairService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
@@ -53,7 +53,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
+        public async Task<IActionResult> CreateMentorProfileAsync([FromBody] CreateMentorProfileRequest request)
         {
             request.UserId = User.Claims.GetUserId();
 
@@ -64,7 +64,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost("me/applications/{id}/accept")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> AcceptMentee([FromRoute] int id)
+        public async Task<IActionResult> AcceptApplicationAsync([FromRoute] int id)
         {
             var mentorUserId = User.Claims.GetUserId();
 
@@ -75,7 +75,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost("me/applications/{id}/reject")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> RejectMentee([FromRoute] int id)
+        public async Task<IActionResult> RejectApplicationAsync([FromRoute] int id)
         {
             var mentorUserId = User.Claims.GetUserId();
 
