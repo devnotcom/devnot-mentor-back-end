@@ -49,16 +49,6 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpGet("me/applications")]
-        [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetApplications()
-        {
-            var authenticatedUserId = User.Claims.GetUserId();
-            var result = await mentorService.GetApplicationsByUserIdAsync(authenticatedUserId);
-
-            return result.Success ? Success(result) : BadRequest(result);
-        }
-
         [HttpPost]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> Post([FromBody] CreateMentorProfileRequest request)
