@@ -19,7 +19,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetApplicationsAsync()
         {
-            var result = await applicationService.GetApplicationsByUserIdAsync(User.Claims.GetUserId());
+            var result = await applicationService.GetApplicationsByUserIdAsync(User.GetId());
 
             return result.Success ? Success(result) : BadRequest(result);
         }

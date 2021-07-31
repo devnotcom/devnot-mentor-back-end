@@ -11,26 +11,26 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// <summary>
         /// Returns applications with mentee and mentor informations
         /// </summary>
-        /// <param name="authorizedUserId">Authorized Mentor OR Mentee User Id</param>
+        /// <param name="authenticatedUserId">Authenticated Mentor OR Mentee User Id</param>
         /// <returns>List of <see cref="MentorApplicationsDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authorizedUserId);
+        Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authenticatedUserId);
 
         /// <summary>
         /// Accept the application
         /// <para>If Mentee or Mentor have already reached the max count for the continuing mentorship, Mentor can't accept the application.</para>
         /// </summary>
-        /// <param name="authorizedUserId">Authorized Mentor User Id</param>
+        /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
         /// <param name="applicationId">Id of the application to be accepted</param>
         /// <returns></returns>
-        Task<ApiResponse> AcceptApplicationByIdAsync(int authorizedUserId, int applicationId);
+        Task<ApiResponse> AcceptApplicationByIdAsync(int authenticatedUserId, int applicationId);
 
         /// <summary>
         /// Reject the application
         /// </summary>
-        /// <param name="authorizedUserId">Authorized Mentor User Id</param>
+        /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
         /// <param name="applicationId">Id of the application to be rejected</param>
         /// <returns></returns>
-        Task<ApiResponse> RejectApplicationByIdAsync(int authorizedUserId, int applicationId);
+        Task<ApiResponse> RejectApplicationByIdAsync(int authenticatedUserId, int applicationId);
 
         /// <summary>
         /// Create application via <see cref="ApplicationRequest"/>

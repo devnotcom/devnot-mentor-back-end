@@ -36,7 +36,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetPairedMenteesAsync()
         {
-            var authenticatedUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
             var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
@@ -46,7 +46,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetMentorshipProccesesAsync()
         {
-            var authenticatedUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
             var result = await pairService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
@@ -56,7 +56,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> CreateMentorProfileAsync([FromBody] CreateMentorProfileRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await mentorService.CreateMentorProfileAsync(request);
 
@@ -67,9 +67,9 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> AcceptApplicationAsync([FromRoute] int id)
         {
-            var mentorUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.AcceptApplicationByIdAsync(mentorUserId, id);
+            var result = await applicationService.AcceptApplicationByIdAsync(authenticatedUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -78,9 +78,9 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> RejectApplicationAsync([FromRoute] int id)
         {
-            var mentorUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.RejectApplicationByIdAsync(mentorUserId, id);
+            var result = await applicationService.RejectApplicationByIdAsync(authenticatedUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }

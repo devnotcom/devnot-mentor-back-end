@@ -8,7 +8,7 @@ namespace DevnotMentor.Api.CustomEntities.Request.MenteeRequest
         /// <summary>
         /// Which mentee wants to create application
         /// </summary>
-        /// <value>Authorized Mentee User Id - value is passing in controller side</value>
+        /// <value>Authenticated Mentee User Id - value is passing in controller side</value>
         [JsonIgnore]
         public int MenteeUserId { get; set; }
 
