@@ -12,10 +12,6 @@ namespace DevnotMentor.Api.Services.Interfaces
 
         Task<ApiResponse<MentorDto>> CreateMentorProfileAsync(CreateMentorProfileRequest request);
 
-        Task<ApiResponse> AcceptMenteeAsync(int mentorUserId, int mentorId, int menteeId);
-
-        Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId);
-
         /// <summary>
         /// Returns mentees who are paired with mentor.
         /// </summary>

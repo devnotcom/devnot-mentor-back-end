@@ -13,5 +13,10 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// <param name="userId">User ID</param>
         /// <returns>List of <see cref="MentorApplicationsDto"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId);
+
+        Task<ApiResponse> AcceptApplicationByIdAsync(int userId, int applicationId);
+
+        Task<ApiResponse> RejectApplicationByIdAsync(int userId, int applicationId);
+
     }
 }

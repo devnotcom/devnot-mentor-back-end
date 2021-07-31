@@ -13,12 +13,14 @@ namespace DevnotMentor.Api.Controllers
     public class MentorController : BaseController
     {
         private readonly IMentorService mentorService;
+        private readonly IApplicationService applicationService;
         private readonly IPairService pairService;
 
-        public MentorController(IMentorService mentorService, IPairService pairService)
+        public MentorController(IMentorService mentorService, IPairService pairService, IApplicationService applicationService)
         {
             this.mentorService = mentorService;
             this.pairService = pairService;
+            this.applicationService = applicationService;
         }
 
         [HttpGet("{userName}")]
@@ -60,24 +62,24 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("{mentorId}/applications/mentees/{menteeId}/accept")]
+        [HttpPost("me/applications/{id}/accept")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> AcceptMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
+        public async Task<IActionResult> AcceptMentee([FromRoute] int id)
         {
             var mentorUserId = User.Claims.GetUserId();
 
-            var result = await mentorService.AcceptMenteeAsync(mentorUserId, mentorId, menteeId);
+            var result = await applicationService.AcceptApplicationByIdAsync(mentorUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("{mentorId}/applications/mentees/{menteeId}/reject")]
+        [HttpPost("me/applications/{id}/reject")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> RejectMentee([FromRoute] int mentorId, [FromRoute] int menteeId)
+        public async Task<IActionResult> RejectMentee([FromRoute] int id)
         {
             var mentorUserId = User.Claims.GetUserId();
 
-            var result = await mentorService.RejectMenteeAsync(mentorUserId, mentorId, menteeId);
+            var result = await applicationService.RejectApplicationByIdAsync(mentorUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
