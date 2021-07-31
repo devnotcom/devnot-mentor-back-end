@@ -147,45 +147,5 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
-
-        public async Task<ApiResponse> ApplyToMentorAsync(ApplyToMentorRequest request)
-        {
-            if (request.MenteeUserId == request.MentorUserId)
-            {
-                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
-            }
-
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
-
-            if (menteeId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
-            }
-
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
-
-            if (mentorId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
-            }
-
-            bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
-
-            if (checkThereAreAnyPair)
-            {
-                return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
-            }
-
-            applicationsRepository.Create(new MentorApplications
-            {
-                ApllicationNotes = request.ApplicationNotes,
-                ApplyDate = DateTime.Now,
-                MenteeId = menteeId,
-                MentorId = mentorId,
-                Status = MentorApplicationStatus.Waiting.ToInt()
-            });
-
-            return new SuccessApiResponse(ResultMessage.Success);
-        }
     }
 }

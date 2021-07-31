@@ -16,14 +16,14 @@ namespace DevnotMentor.Api.Repositories
 
         }
 
-        public async Task<bool> IsExistsByUserIdAsync(int mentorId, int menteeId)
+        public async Task<bool> AnyWaitingApplicationBetweenMentorAndMenteeAsync(int mentorId, int menteeId)
         {
-            return await DbContext
-                .MentorApplications
-                .Where(i => i.MentorId == mentorId && i.MenteeId == menteeId)
-                .AnyAsync();
+            return await DbContext.MentorApplications.AnyAsync(x => 
+                x.Status == MentorApplicationStatus.Waiting.ToInt()
+                && x.MentorId == mentorId
+                && x.MenteeId == menteeId);
         }
-        
+
         public async Task<IEnumerable<MentorApplications>> GetApplicationsByUserIdAsync(int userId)
         {
             return await DbContext.MentorApplications

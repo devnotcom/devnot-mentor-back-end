@@ -5,6 +5,7 @@ using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Common.Response;
 using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
+using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
@@ -18,17 +19,23 @@ namespace DevnotMentor.Api.Services
 
         private readonly IMentorApplicationsRepository applicationsRepository;
         private readonly IMentorMenteePairsRepository pairRepository;
+        private readonly IMentorRepository mentorRepository;
+        private readonly IMenteeRepository menteeRepository;
 
         public ApplicationService(
             IMapper mapper,
             ILoggerRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext,
             IMentorApplicationsRepository mentorApplicationsRepository,
-            IMentorMenteePairsRepository mentorMenteePairsRepository
+            IMentorMenteePairsRepository mentorMenteePairsRepository,
+            IMentorRepository mentorRepository,
+            IMenteeRepository menteeRepository
         ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairRepository = mentorMenteePairsRepository;
+            this.mentorRepository = mentorRepository;
+            this.menteeRepository = menteeRepository;
         }
 
         public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authorizedUserId)
@@ -112,6 +119,44 @@ namespace DevnotMentor.Api.Services
         {
             int count = pairRepository.GetCountForContinuingStatusByMentorId(mentorId);
             return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
+        }
+
+        public async Task<ApiResponse> CreateApplicationAsync(ApplicationRequest request)
+        {
+            if (request.MenteeUserId == request.MentorUserId)
+            {
+                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
+            }
+
+            int menteeId = await menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
+
+            if (menteeId == default)
+            {
+                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
+            }
+
+            int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
+
+            if (mentorId == default)
+            {
+                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
+            }
+
+            if (await applicationsRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId))
+            {
+                return new ErrorApiResponse(ResultMessage.ThereIsAlreadyWaitingApplication);
+            }
+
+            applicationsRepository.Create(new MentorApplications
+            {
+                ApllicationNotes = request.ApplicationNotes,
+                ApplyDate = System.DateTime.Now,
+                MenteeId = menteeId,
+                MentorId = mentorId,
+                Status = MentorApplicationStatus.Waiting.ToInt()
+            });
+
+            return new SuccessApiResponse(ResultMessage.Success);
         }
     }
 }
