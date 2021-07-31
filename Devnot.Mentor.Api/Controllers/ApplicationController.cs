@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace DevnotMentor.Api.Controllers
 {
     [ApiController]
-    [Route("applications")]
     public class ApplicationController : BaseController
     {
         private readonly IApplicationService applicationService;
@@ -16,9 +15,9 @@ namespace DevnotMentor.Api.Controllers
             this.applicationService = applicationService;
         }
 
-        [HttpGet("me")]
+        [HttpGet("/users/me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetApplications()
+        public async Task<IActionResult> GetApplicationsAsync()
         {
             var result = await applicationService.GetApplicationsByUserIdAsync(User.Claims.GetUserId());
 

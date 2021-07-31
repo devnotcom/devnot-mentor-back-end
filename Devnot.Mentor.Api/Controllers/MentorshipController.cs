@@ -18,9 +18,10 @@ namespace DevnotMentor.Api.Controllers
         {
             this.pairService = pairsService;
         }
-
+        
+        //todo: paireds or mentorship
         [HttpPost("/users/me/paireds/{id}/finish")]
-        public async Task<IActionResult> Finish(int id)
+        public async Task<IActionResult> FinishAsync([FromRoute] int id)
         {
             var authorizedUserId = User.Claims.GetUserId();
             var result = await pairService.FinishContinuingPairAsync(authorizedUserId, id);
@@ -29,7 +30,7 @@ namespace DevnotMentor.Api.Controllers
         }
 
         [HttpPost("/users/me/paireds/{id}/feedback")]
-        public async Task<IActionResult> Feedback(int id, [FromBody] PairFeedbackRequest pairFeedbackRequest)
+        public async Task<IActionResult> FeedbackAsync([FromRoute] int id, [FromBody] PairFeedbackRequest pairFeedbackRequest)
         {
             var authorizedUserId = User.Claims.GetUserId();
             var result = await pairService.GiveFeedbackToFinishedPairAsync(authorizedUserId, id, pairFeedbackRequest);

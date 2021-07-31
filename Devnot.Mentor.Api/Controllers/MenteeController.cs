@@ -9,7 +9,7 @@ namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
     [ApiController]
-    [Route("/mentees/")]
+    [Route("mentees")]
     public class MenteeController : BaseController
     {
         private readonly IMenteeService menteeService;
@@ -30,7 +30,8 @@ namespace DevnotMentor.Api.Controllers
 
             return result.Success ? Success(result) : BadRequest(result);
         }
-
+        
+        //todo: paireds or mentorship
         [HttpGet("me/paireds/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetPairedMentorsAsync()
@@ -64,7 +65,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> CreateApplicationAsync(ApplicationRequest request)
+        public async Task<IActionResult> CreateApplicationAsync([FromBody] ApplicationRequest request)
         {
             request.MenteeUserId = User.Claims.GetUserId();
 
