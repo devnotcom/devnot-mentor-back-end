@@ -54,8 +54,8 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
-            bool isUserMentorForThePair = application.Mentor.UserId == authenticatedUserId;
-            if (isUserMentorForThePair == false)
+            bool isUserMentorForTheApplication = application.Mentor.UserId == authenticatedUserId;
+            if (isUserMentorForTheApplication == false)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
@@ -96,8 +96,8 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
-            bool isUserMentorForThePair = application.Mentor.UserId == authenticatedUserId;
-            if (isUserMentorForThePair == false)
+            bool isUserMentorForTheApplication = application.Mentor.UserId == authenticatedUserId;
+            if (isUserMentorForTheApplication == false)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
