@@ -14,15 +14,17 @@ namespace DevnotMentor.Api.Controllers
     {
         private readonly IMenteeService menteeService;
         private readonly IPairService pairService;
+        private readonly IApplicationService applicationService;
 
-        public MenteeController(IMenteeService menteeService, IPairService pairService)
+        public MenteeController(IMenteeService menteeService, IPairService pairService, IApplicationService applicationService)
         {
             this.menteeService = menteeService;
             this.pairService = pairService;
+            this.applicationService = applicationService;
         }
 
         [HttpGet("{userName}")]
-        public async Task<IActionResult> Get([FromRoute] string userName)
+        public async Task<IActionResult> GetMenteeProfileAsync([FromRoute] string userName)
         {
             var result = await menteeService.GetMenteeProfileAsync(userName);
 
@@ -31,7 +33,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpGet("me/paireds/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetPairedMentors()
+        public async Task<IActionResult> GetPairedMentorsAsync()
         {
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await menteeService.GetPairedMentorsByUserIdAsync(authenticatedUserId);
@@ -41,7 +43,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpGet("me/paireds")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetMentorships()
+        public async Task<IActionResult> GetMentorshipsAsync()
         {
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
@@ -51,7 +53,7 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> Post([FromBody] CreateMenteeProfileRequest request)
+        public async Task<IActionResult> CreateMenteeProfileAsync([FromBody] CreateMenteeProfileRequest request)
         {
             request.UserId = User.Claims.GetUserId();
 
@@ -62,11 +64,11 @@ namespace DevnotMentor.Api.Controllers
 
         [HttpPost("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> ApplyToMentor(ApplyToMentorRequest request)
+        public async Task<IActionResult> CreateApplicationAsync(ApplicationRequest request)
         {
             request.MenteeUserId = User.Claims.GetUserId();
 
-            var result = await menteeService.ApplyToMentorAsync(request);
+            var result = await applicationService.CreateApplicationAsync(request);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
