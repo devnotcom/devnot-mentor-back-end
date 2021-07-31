@@ -22,7 +22,7 @@ namespace DevnotMentor.Api.Repositories
                 .AnyAsync();
         }
 
-        public async Task<MentorApplications> GetAsync(int mentorId, int menteeId)
+        public async Task<MentorApplications> GetAsyncByMentorIdAndMenteeId(int mentorId, int menteeId)
         {
             return await DbContext
                 .MentorApplications
@@ -30,7 +30,7 @@ namespace DevnotMentor.Api.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<MentorApplications>> GetByUserIdAsync(int userId)
+        public async Task<IEnumerable<MentorApplications>> GetApplicationsByUserIdAsync(int userId)
         {
             return await DbContext.MentorApplications
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
