@@ -11,7 +11,10 @@ namespace DevnotMentor.Api.CustomEntities.Request.MenteeRequest
         /// <value>Authenticated Mentee User Id - value is passing in controller side</value>
         [JsonIgnore]
         public int MenteeUserId { get; set; }
-
+        
+        /// <summary>
+        /// Mentor to whom the mentee is applying
+        /// </summary>
         [Required]
         public int MentorUserId { get; set; }
 

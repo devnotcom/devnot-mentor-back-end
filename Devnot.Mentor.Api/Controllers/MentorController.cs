@@ -69,7 +69,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.AcceptApplicationByIdAsync(authenticatedUserId, id);
+            var result = await applicationService.ApproveWaitingApplicationByIdAsync(authenticatedUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }
@@ -80,7 +80,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.RejectApplicationByIdAsync(authenticatedUserId, id);
+            var result = await applicationService.RejectWaitingApplicationByIdAsync(authenticatedUserId, id);
 
             return result.Success ? Success(result) : BadRequest(result);
         }

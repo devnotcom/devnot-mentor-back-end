@@ -48,7 +48,7 @@
         public static string NotFoundFinishedMentorMenteePair => "messages.error.pair.notFoundFinishedMentorMenteePair";
         public static string FeedbackWasAlreadyGiven => "messages.error.pair.feedbackWasAlreadyGiven";
         public static string MentorMenteePairAlreadyExist => "messages.error.pair.mentorMenteePairAlreadyExist";
-        public static string ApplicationNotFoundWhenWaitingStatus => "messages.error.pair.notFoundAplicationWhenWaitingStatus";
+        public static string NotFoundWaitingApplication => "messages.error.pair.notFoundWaitingApplication";
         public static string ThereIsAlreadyWaitingApplication => "messages.error.application.thereIsAlreadyWaitingApplication";
     }
 }

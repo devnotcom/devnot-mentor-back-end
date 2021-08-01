@@ -16,27 +16,28 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authenticatedUserId);
 
         /// <summary>
-        /// Accept the application
-        /// <para>If Mentee or Mentor have already reached the max count for the continuing mentorship, Mentor can't accept the application.</para>
+        /// Approve the waiting application
+        /// <para>If Mentee or Mentor have already reached the max count for the continuing mentorship, cannot be approved.</para>
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
-        /// <param name="applicationId">Id of the application to be accepted</param>
-        /// <returns></returns>
-        Task<ApiResponse> AcceptApplicationByIdAsync(int authenticatedUserId, int applicationId);
+        /// <param name="toBeAcceptedApplicationId">Id of the application to be accepted</param>
+        /// <returns><see cref="ApiResponse"/></returns>
+        Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeAcceptedApplicationId);
 
         /// <summary>
-        /// Reject the application
+        /// Reject the waiting application
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
-        /// <param name="applicationId">Id of the application to be rejected</param>
-        /// <returns></returns>
-        Task<ApiResponse> RejectApplicationByIdAsync(int authenticatedUserId, int applicationId);
+        /// <param name="toBeRejectedApplicationId">Id of the application to be rejected</param>
+        /// <returns><see cref="ApiResponse"/></returns>
+        Task<ApiResponse> RejectWaitingApplicationByIdAsync(int authenticatedUserId, int toBeRejectedApplicationId);
 
         /// <summary>
         /// Create application via <see cref="ApplicationRequest"/>
+        /// <para>If there is any waiting application between Mentee and Mentor, cannot be created.</para>
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="request"><see cref="ApplicationRequest"/></param>
+        /// <returns><see cref="ApiResponse"/></returns>
         Task<ApiResponse> CreateApplicationAsync(ApplicationRequest request);
     }
 }
