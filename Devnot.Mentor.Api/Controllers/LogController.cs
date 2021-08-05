@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using DevnotMentor.Api.Configuration.Environment;
 using DevnotMentor.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -8,31 +9,35 @@ namespace DevnotMentor.Api.Controllers
     [Route("logs")]
     public class LogController : ControllerBase
     {
-        private readonly ILoggerRepository loggerRepository;
-        private readonly IEnvironmentService environmentService;
-        
+        private readonly ILoggerRepository _loggerRepository;
+        private readonly IEnvironmentService _environmentService;
+
         public LogController(ILoggerRepository loggerRepository, IEnvironmentService environmentService)
         {
-            this.loggerRepository = loggerRepository;
-            this.environmentService = environmentService;
+            _loggerRepository = loggerRepository;
+            _environmentService = environmentService;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery] int count = 5)
         {
-            if (environmentService.IsDevelopment)
+            if (_environmentService.IsDevelopment)
             {
-                var logs = loggerRepository.GetList();
+                var logs = await _loggerRepository.GetListAsync(count);
                 return Ok(logs);
             }
 
             return NotFound();
         }
 
+        /// <summary>
+        /// It creates new dummy log for development environment.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Create()
         {
-            if (environmentService.IsDevelopment)
+            if (_environmentService.IsDevelopment)
             {
                 throw new System.Exception();
             }
