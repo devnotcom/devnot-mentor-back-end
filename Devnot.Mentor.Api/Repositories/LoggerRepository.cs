@@ -1,7 +1,10 @@
 ﻿using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DevnotMentor.Api.Repositories
 {
@@ -9,6 +12,11 @@ namespace DevnotMentor.Api.Repositories
     {
         public LoggerRepository(MentorDBContext context) : base(context)
         {
+        }
+
+        public Task<List<Log>> GetListAsync(int count)
+        {
+            return DbContext.Log.OrderByDescending(log => log.InsertDate).Take(count).ToListAsync();
         }
 
         public async Task WriteInfoAsync(string message)
