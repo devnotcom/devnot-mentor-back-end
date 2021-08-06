@@ -12,6 +12,7 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 
 namespace DevnotMentor.Api.Services
 {
@@ -74,7 +75,6 @@ namespace DevnotMentor.Api.Services
             }
 
             var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
-
             return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
         }
 
@@ -88,7 +88,6 @@ namespace DevnotMentor.Api.Services
             }
 
             var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
-
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
@@ -200,6 +199,12 @@ namespace DevnotMentor.Api.Services
             });
 
             return new SuccessApiResponse(ResultMessage.Success);
+        }
+
+        public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
+        {
+            var mappedMentees = mapper.Map<List<MenteeDto>>(await menteeRepository.SearchAsync(request));
+            return new SuccessApiResponse<List<MenteeDto>>(mappedMentees);
         }
     }
 }
