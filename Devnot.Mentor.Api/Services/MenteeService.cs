@@ -207,12 +207,12 @@ namespace DevnotMentor.Api.Services
             var menteeUser = await userRepository.GetByIdAsync(menteeId);
 
 
-            await SendApplyToMentorNotifyMailAsync(mentorUser,menteeUser);
+            await SendApplyToMentorNotificationMailAsync(mentorUser,menteeUser);
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        private async Task SendApplyToMentorNotifyMailAsync(User mentor,User mentee)
+        private async Task SendApplyToMentorNotificationMailAsync(User mentor,User mentee)
         {
             
             List<string> to = new List<string>() { mentor.Email };

@@ -253,7 +253,7 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        private async Task SendAccepMenteeNotifyMailAsync(User mentor, User mentee)
+        private async Task SendAccepMenteeNotificationMailAsync(User mentor, User mentee)
         {    
             List<string> to = new List<string>() { mentee.Email };   
             await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(mentor, mentee));
