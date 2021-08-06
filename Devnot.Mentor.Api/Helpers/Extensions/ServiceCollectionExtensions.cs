@@ -3,9 +3,6 @@ using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Configuration.Environment;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using DevnotMentor.Api.Services;
 using DevnotMentor.Api.Utilities.Email;
 using DevnotMentor.Api.Utilities.Security.Token;
@@ -14,7 +11,6 @@ using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Repositories;
 using DevnotMentor.Api.Utilities.Email.SmtpMail;
 using DevnotMentor.Api.Utilities.Security.Token.Jwt;
-using DevnotMentor.Api.Utilities;
 
 namespace DevnotMentor.Api.Helpers.Extensions
 {
@@ -55,44 +51,6 @@ namespace DevnotMentor.Api.Helpers.Extensions
             services.AddScoped<IMentorTagsRepository, MentorTagsRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-
-            return services;
-        }
-
-        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services)
-        {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie()
-            .AddGitHub(options =>
-            {
-                options.ClientId = EnvironmentService.StaticConfiguration["GitHub:Client:ID"];
-                options.ClientSecret = EnvironmentService.StaticConfiguration["GitHub:Client:Secret"];
-                options.Scope.Add("user:email");
-                options.CallbackPath = new PathString("/auth/github/");
-
-                options.Events = new OAuthEvents
-                {
-                    OnCreatingTicket = async creatingTicketContext =>
-                    {
-                        var oAuthGitHubUser = await OAuthService.GetOAuthGitHubUserAsync(creatingTicketContext);
-                        await OAuthService.SignInAsync(oAuthGitHubUser, creatingTicketContext.HttpContext);
-                    }
-                };
-            })
-            .AddGoogle(options =>
-            {
-                options.ClientId = EnvironmentService.StaticConfiguration["Google:Client:ID"];
-                options.ClientSecret = EnvironmentService.StaticConfiguration["Google:Client:Secret"];
-                options.CallbackPath = new PathString("/auth/google/");
-
-                options.Events = new OAuthEvents
-                {
-                    OnCreatingTicket = async creatingTicketContext =>
-                    {
-                        var oAuthGoogleUser = await OAuthService.GetOAuthGoogleUserAsync(creatingTicketContext);
-                        await OAuthService.SignInAsync(oAuthGoogleUser, creatingTicketContext.HttpContext);
-                    }
-                };
-            });
 
             return services;
         }

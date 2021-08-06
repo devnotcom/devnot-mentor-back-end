@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Configuration.Environment;
 using DevnotMentor.Api.Middlewares;
-using Microsoft.AspNetCore.Http;
 using DevnotMentor.Api.Helpers.Extensions;
 
 namespace DevnotMentor.Api
@@ -33,7 +32,6 @@ namespace DevnotMentor.Api
             services.AddAutoMapper(typeof(Startup));
 
             services.AddCustomServices();
-            services.AddCustomAuthentication();
             services.AddRepositories();
 
             services.AddCors(options =>
@@ -65,10 +63,7 @@ namespace DevnotMentor.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCookiePolicy(new CookiePolicyOptions()
-            {
-                MinimumSameSitePolicy = SameSiteMode.Lax
-            });
+
             app.UseRouting();
             app.UseAuthentication();
             app.UseCors("AllowMyOrigin");
