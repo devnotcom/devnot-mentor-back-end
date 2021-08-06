@@ -221,7 +221,7 @@ namespace DevnotMentor.Api.Services
 
             var mentee = await menteeRepository.GetByIdAsync(menteeId);
 
-            await SendAccepMenteeNotificationMailAsync(mentor.User, mentee.User);
+            await SendAcceptMenteeNotificationMailAsync(mentor.User, mentee.User);
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
@@ -260,7 +260,7 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorDto>>(mappedMentors);
         }
 
-        private async Task SendAccepMenteeNotificationMailAsync(User mentor,User mentee)
+        private async Task SendAcceptMenteeNotificationMailAsync(User mentor,User mentee)
         {
             List<string> to = new List<string>() { mentee.Email };
             await mailService.SendEmailAsync(to,EmailTemplate.ApplyToMentorSubject,EmailTemplate.AcceptMenteeBody(mentor,mentee));
