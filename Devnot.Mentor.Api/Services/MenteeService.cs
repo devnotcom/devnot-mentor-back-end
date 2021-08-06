@@ -12,6 +12,7 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
+using DevnotMentor.Api.Utilities.Email;
 
 namespace DevnotMentor.Api.Services
 {
@@ -25,6 +26,7 @@ namespace DevnotMentor.Api.Services
         private readonly IMentorRepository mentorRepository;
         private readonly IMentorApplicationsRepository applicationsRepository;
         private readonly IMentorMenteePairsRepository pairsRepository;
+        private readonly IMailService mailService;
 
         public MenteeService(
             IMapper mapper,
@@ -37,7 +39,8 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
-            IDevnotConfigurationContext devnotConfigurationContext
+            IDevnotConfigurationContext devnotConfigurationContext,
+            IMailService mailService
             )
             : base(mapper, loggerRepository, devnotConfigurationContext)
         {
@@ -49,6 +52,7 @@ namespace DevnotMentor.Api.Services
             this.mentorRepository = mentorRepository;
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
+            this.mailService = mailService;
         }
 
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfileAsync(string userName)
@@ -199,7 +203,21 @@ namespace DevnotMentor.Api.Services
                 Status = MentorApplicationStatus.Waiting.ToInt()
             });
 
+            var mentorUser = await userRepository.GetByIdAsync(mentorId);
+            var menteeUser = await userRepository.GetByIdAsync(menteeId);
+
+
+            await SendApplyToMentorNotifyMailAsync(mentorUser,menteeUser);
+
             return new SuccessApiResponse(ResultMessage.Success);
+        }
+
+        private async Task SendApplyToMentorNotifyMailAsync(User mentor,User mentee)
+        {
+            
+            List<string> to = new List<string>() { mentor.Email };
+           
+            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.ApplyToMentorBody(mentor, mentee));
         }
     }
 }

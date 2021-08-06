@@ -12,6 +12,7 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using System.Collections.Generic;
+using DevnotMentor.Api.Utilities.Email;
 
 namespace DevnotMentor.Api.Services
 {
@@ -25,7 +26,7 @@ namespace DevnotMentor.Api.Services
         private readonly IUserRepository userRepository;
         private readonly IMentorApplicationsRepository applicationsRepository;
         private readonly IMentorMenteePairsRepository pairsRepository;
-
+        private readonly IMailService mailService;
         public MentorService(
             IMapper mapper,
             IMentorRepository mentorRepository,
@@ -37,7 +38,8 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
-            IDevnotConfigurationContext devnotConfigurationContext
+            IDevnotConfigurationContext devnotConfigurationContext,
+            IMailService mailService
             ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.mentorRepository = mentorRepository;
@@ -48,6 +50,7 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
+            this.mailService = mailService;
         }
         
         public async Task<ApiResponse<MentorDto>> GetMentorProfileAsync(string userName)
@@ -214,6 +217,10 @@ namespace DevnotMentor.Api.Services
 
             pairsRepository.Create(mentorMenteePairs);
 
+            var mentorUser= await userRepository.GetByIdAsync(mentorId);
+            var menteeUser= await userRepository.GetByIdAsync(menteeId);
+
+            await SendAccepMenteeNotifyMailAsync(mentorUser, menteeUser);
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
@@ -244,6 +251,12 @@ namespace DevnotMentor.Api.Services
             applicationsRepository.Update(mentorApplication);
 
             return new SuccessApiResponse(ResultMessage.Success);
+        }
+
+        private async Task SendAccepMenteeNotifyMailAsync(User mentor, User mentee)
+        {    
+            List<string> to = new List<string>() { mentee.Email };   
+            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(mentor, mentee));
         }
 
         /// <summary>
