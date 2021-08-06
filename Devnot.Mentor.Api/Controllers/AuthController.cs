@@ -1,28 +1,37 @@
-using Microsoft.AspNetCore.Authentication;
+using System.Threading.Tasks;
+using DevnotMentor.Api.Services.Interfaces;
+using DevnotMentor.Api.Utilities.OAuth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.Api.Controllers
 {
     public class AuthController : BaseController
     {
-        [Route("/auth/okay")]
-        [HttpGet]
-        public IActionResult OK()
+        private readonly IUserService _userService;
+        
+        public AuthController(IUserService userService)
         {
-            return Ok("OAuth: okay");
+            _userService = userService;
         }
 
         [Route("/auth/github")]
-        [HttpGet]
-        public IActionResult GitHubChallenge()
+        [HttpPost]
+        public async Task<IActionResult> GitHubAsync([FromBody] string accesToken)
         {
-            return Challenge(new AuthenticationProperties() { RedirectUri = "/auth/okay" }, "GitHub");
+            var oAuthGitHubUser = await OAuthService.GetOAuthGitHubUserAsync(accesToken);
+            var githubSignInResponse = await _userService.SignInAsync(oAuthGitHubUser);
+
+            return githubSignInResponse.Success ? Success(githubSignInResponse) : BadRequest();
         }
+
         [Route("/auth/google")]
-        [HttpGet]
-        public IActionResult GoogleChallenge()
+        [HttpPost]
+        public async Task<IActionResult> GoogleAsync([FromBody] string accesToken)
         {
-            return Challenge(new AuthenticationProperties() { RedirectUri = "/auth/okay" }, "Google");
+            var oAuthGoogleUser = await OAuthService.GetOAuthGoogleUserAsync(accesToken);
+            var googleSignInResponse = await _userService.SignInAsync(oAuthGoogleUser);
+
+            return googleSignInResponse.Success ? Success(googleSignInResponse) : BadRequest();
         }
     }
 }
