@@ -25,7 +25,11 @@ namespace DevnotMentor.Api.Repositories
                 .User
                 .Where(u => u.UserName == userName && u.Password == hashedPassword)
                 .Include(user => user.Mentee)
+                    .ThenInclude(mentee => mentee.MenteeTags)
+                        .ThenInclude(menteeTag => menteeTag.Tag)
                 .Include(user => user.Mentor)
+                    .ThenInclude(mentor => mentor.MentorTags)
+                        .ThenInclude(mentorTag => mentorTag.Tag)
                 .FirstOrDefaultAsync();
         }
 

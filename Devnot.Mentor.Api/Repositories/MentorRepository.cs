@@ -18,14 +18,19 @@ namespace DevnotMentor.Api.Repositories
         {
             if (request is null || request.IsNotValid())
             {
-                return DbContext.Mentor.Include(mentor => mentor.User).ToListAsync();
+                return DbContext
+                    .Mentor
+                    .Include(mentor => mentor.User)
+                    .Include(mentor => mentor.MentorTags)
+                        .ThenInclude(mentorTag => mentorTag.Tag)
+                    .ToListAsync();
             }
 
             var queryableMentor = DbContext.Mentor.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.FullName))
             {
-                queryableMentor = queryableMentor.Where(mentor => (mentor.User.Name + mentor.User.SurName).Contains(request.FullName));
+                queryableMentor = queryableMentor.Where(mentor => (mentor.User.Name + " " + mentor.User.SurName).Contains(request.FullName));
             }
 
             if (!string.IsNullOrEmpty(request.Title))
@@ -45,6 +50,8 @@ namespace DevnotMentor.Api.Repositories
 
             return queryableMentor
                 .Include(mentor => mentor.User)
+                .Include(mentor => mentor.MentorTags)
+                    .ThenInclude(mentorTag => mentorTag.Tag)
                 .ToListAsync();
         }
 

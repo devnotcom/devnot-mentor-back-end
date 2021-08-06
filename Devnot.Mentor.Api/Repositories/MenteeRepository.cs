@@ -21,14 +21,19 @@ namespace DevnotMentor.Api.Repositories
         {
             if (request is null || request.IsNotValid())
             {
-                return DbContext.Mentee.Include(mentee => mentee.User).ToListAsync();
+                return DbContext
+                    .Mentee
+                    .Include(mentee => mentee.User)
+                    .Include(mentee => mentee.MenteeTags)
+                        .ThenInclude(menteeTag => menteeTag.Tag)
+                    .ToListAsync();
             }
 
             var queryableMentee = DbContext.Mentee.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.FullName))
             {
-                queryableMentee = queryableMentee.Where(mentee => (mentee.User.Name + mentee.User.SurName).Contains(request.FullName));
+                queryableMentee = queryableMentee.Where(mentee => (mentee.User.Name + " " + mentee.User.SurName).Contains(request.FullName));
             }
 
             if (!string.IsNullOrEmpty(request.Title))
@@ -48,6 +53,8 @@ namespace DevnotMentor.Api.Repositories
 
             return queryableMentee
                 .Include(mentee => mentee.User)
+                .Include(mentee => mentee.MenteeTags)
+                    .ThenInclude(menteeTag => menteeTag.Tag)
                 .ToListAsync();
         }
 
