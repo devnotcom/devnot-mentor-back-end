@@ -26,16 +26,17 @@ namespace DevnotMentor.Api.Utilities.OAuth
             oauthRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             oauthRequest.Headers.Add("User-Agent", OAuthDefaults.UserAgent);
 
-            HttpResponseMessage oauthResponse = await httpClient.SendAsync(oauthRequest);
+            using (HttpResponseMessage oauthResponse = await httpClient.SendAsync(oauthRequest))
+            {
+                oauthRequest.Dispose();
+                httpClient.Dispose();
+                
+                var oauthResponseContentAsString = await oauthResponse.Content.ReadAsStringAsync();
 
-            oauthRequest.Dispose();
-            httpClient.Dispose();
-
-            var oauthResponseContentAsString = await oauthResponse.Content.ReadAsStringAsync();
-
-            return oauthResponse.IsSuccessStatusCode
-                ? JsonConvert.DeserializeObject<TOAuthResponse>(oauthResponseContentAsString)
-                : throw new System.Exception(oauthResponseContentAsString); // todo: return meaningful message for client
+                return oauthResponse.IsSuccessStatusCode
+                    ? JsonConvert.DeserializeObject<TOAuthResponse>(oauthResponseContentAsString)
+                    : throw new System.Exception(oauthResponseContentAsString); // todo: return meaningful message for client
+            };
         }
 
         public static async Task<OAuthGitHubUser> GetOAuthGitHubUserAsync(string accessToken)
