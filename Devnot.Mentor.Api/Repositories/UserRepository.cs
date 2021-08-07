@@ -16,11 +16,17 @@ namespace DevnotMentor.Api.Repositories
         {
             return await DbContext.User.Where(i => i.Id == id).FirstOrDefaultAsync();
         }
+        
         public async Task<User> GetByIdIncludeMenteeMentorAsync(int id)
         {
             return await DbContext.User
-            .Include(x => x.Mentor).Include(x => x.Mentee)
-            .Where(i => i.Id == id).FirstOrDefaultAsync();
+                .Include(user => user.Mentee)
+                    .ThenInclude(mentee => mentee.MenteeTags)
+                        .ThenInclude(menteeTag => menteeTag.Tag)
+                .Include(user => user.Mentor)
+                    .ThenInclude(mentor => mentor.MentorTags)
+                        .ThenInclude(mentorTag => mentorTag.Tag)
+                .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<bool> AnyByUserNameAsync(string userName)

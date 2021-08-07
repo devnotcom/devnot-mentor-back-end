@@ -28,7 +28,11 @@ namespace DevnotMentor.Api
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
             services.AddSingleton<TokenAuthentication>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddCustomServices();

@@ -1,9 +1,11 @@
-﻿using DevnotMentor.Api.Entities;
+﻿using System;
+using DevnotMentor.Api.Entities;
 using DevnotMentor.Api.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 
 namespace DevnotMentor.Api.Repositories
 {
@@ -13,6 +15,47 @@ namespace DevnotMentor.Api.Repositories
         public MenteeRepository(MentorDBContext context) : base(context)
         {
 
+        }
+
+        public Task<List<Mentee>> SearchAsync(SearchRequest request)
+        {
+            if (request is null || request.IsNotValid())
+            {
+                return DbContext
+                    .Mentee
+                    .Include(mentee => mentee.User)
+                    .Include(mentee => mentee.MenteeTags)
+                        .ThenInclude(menteeTag => menteeTag.Tag)
+                    .ToListAsync();
+            }
+
+            var queryableMentee = DbContext.Mentee.AsQueryable();
+
+            if (!string.IsNullOrEmpty(request.FullName))
+            {
+                queryableMentee = queryableMentee.Where(mentee => (mentee.User.FullName).Contains(request.FullName));
+            }
+
+            if (!string.IsNullOrEmpty(request.Title))
+            {
+                queryableMentee = queryableMentee.Where(mentee => mentee.Title.Contains(request.Title));
+            }
+
+            if (!string.IsNullOrEmpty(request.Description))
+            {
+                queryableMentee = queryableMentee.Where(mentee => mentee.Description.Contains(request.Description));
+            }
+
+            if (request.Tags.Any())
+            {
+                queryableMentee = queryableMentee.Where(mentee => mentee.MenteeTags.Any(tags => request.Tags.Contains(tags.Tag.Name)));
+            }
+
+            return queryableMentee
+                .Include(mentee => mentee.User)
+                .Include(mentee => mentee.MenteeTags)
+                    .ThenInclude(menteeTag => menteeTag.Tag)
+                .ToListAsync();
         }
 
         public async Task<Mentee> GetByUserIdAsync(int userId)

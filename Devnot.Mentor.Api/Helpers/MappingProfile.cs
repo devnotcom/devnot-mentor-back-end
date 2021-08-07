@@ -15,6 +15,7 @@ namespace DevnotMentor.Api.Helpers
             CreateMap<Mentor, MentorDto>();
 
             CreateMap<User, UserDto>();
+
             CreateMap<OAuthUser, User>()
             .ForMember(user => user.GitHubId, opt => // if OAuthUser type is GitHub, map Id to GitHubId
             {
@@ -30,6 +31,10 @@ namespace DevnotMentor.Api.Helpers
 
             CreateMap<MentorApplications, MentorApplicationsDto>();
 
+            CreateMap<MentorApplications, MentorApplicationsDto>();
+            CreateMap<MentorMenteePairs, PairDto>();
+
+
             CreateMap<CreateMentorProfileRequest, Mentor>()
                 .ForMember(dest => dest.MentorTags, opt => opt.Ignore())
                 .ForMember(dest => dest.MentorLinks, opt => opt.Ignore())
@@ -39,6 +44,10 @@ namespace DevnotMentor.Api.Helpers
                 .ForMember(dest => dest.MenteeTags, opt => opt.Ignore())
                 .ForMember(dest => dest.MenteeLinks, opt => opt.Ignore())
                 .ReverseMap();
+
+            CreateMap<Tag, TagDto>();
+            CreateMap<MentorTags, MentorTagDto>();
+            CreateMap<MenteeTags, MenteeTagDto>();
         }
     }
 }

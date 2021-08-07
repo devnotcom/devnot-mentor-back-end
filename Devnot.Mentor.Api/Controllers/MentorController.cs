@@ -2,6 +2,7 @@
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using DevnotMentor.Api.Helpers.Extensions;
 
@@ -13,9 +14,20 @@ namespace DevnotMentor.Api.Controllers
     public class MentorController : BaseController
     {
         private readonly IMentorService mentorService;
-        public MentorController(IMentorService mentorService)
+        private readonly IPairService pairService;
+
+        public MentorController(IMentorService mentorService, IPairService pairService)
         {
             this.mentorService = mentorService;
+            this.pairService = pairService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index([FromQuery] SearchRequest request)
+        {
+            var result = await mentorService.SearchAsync(request);
+
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpGet("{userName}")]
@@ -32,6 +44,16 @@ namespace DevnotMentor.Api.Controllers
         {
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
+
+            return result.Success ? Success(result) : BadRequest(result);
+        }
+
+        [HttpGet("me/paireds")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetMentorships()
+        {
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await pairService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
 
             return result.Success ? Success(result) : BadRequest(result);
         }

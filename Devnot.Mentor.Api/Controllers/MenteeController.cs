@@ -2,6 +2,7 @@
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.Helpers.Extensions;
 
@@ -13,9 +14,20 @@ namespace DevnotMentor.Api.Controllers
     public class MenteeController : BaseController
     {
         private readonly IMenteeService menteeService;
-        public MenteeController(IMenteeService menteeService)
+        private readonly IPairService pairService;
+
+        public MenteeController(IMenteeService menteeService, IPairService pairService)
         {
             this.menteeService = menteeService;
+            this.pairService = pairService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index([FromQuery] SearchRequest request)
+        {
+            var result = await menteeService.SearchAsync(request);
+
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpGet("{userName}")]
@@ -35,7 +47,17 @@ namespace DevnotMentor.Api.Controllers
 
             return result.Success ? Success(result) : BadRequest(result);
         }
-        
+
+        [HttpGet("me/paireds")]
+        [ServiceFilter(typeof(TokenAuthentication))]
+        public async Task<IActionResult> GetMentorships()
+        {
+            var authenticatedUserId = User.Claims.GetUserId();
+            var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
+
+            return result.Success ? Success(result) : BadRequest(result);
+        }
+
         [HttpGet("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetApplications()
