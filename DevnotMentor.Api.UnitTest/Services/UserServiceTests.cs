@@ -61,11 +61,11 @@ namespace DevnotMentor.Api.UnitTest.Services
             var userService = CreateUserService();
 
             mockFileService
-                .Setup(x => x.InsertProfileImage(It.IsAny<IFormFile>()))
+                .Setup(x => x.InsertProfileImageAsync(It.IsAny<IFormFile>()))
                 .Returns(() => Task.FromResult(new FileResult(true, string.Empty, "file.png", "/file.png")));
 
             // Act
-            var result = await userService.Register(request);
+            var result = await userService.RegisterAsync(request);
 
             // Assert
             result.Success.Should().BeTrue();
@@ -80,11 +80,11 @@ namespace DevnotMentor.Api.UnitTest.Services
             var message = "File couldn't be uploaded!";
 
             mockFileService
-                .Setup(x => x.InsertProfileImage(It.IsAny<IFormFile>()))
+                .Setup(x => x.InsertProfileImageAsync(It.IsAny<IFormFile>()))
                 .Returns(() => Task.FromResult(new FileResult(false, message, string.Empty, string.Empty)));
 
             // Act
-            var result = await userService.Register(request);
+            var result = await userService.RegisterAsync(request);
 
             // Assert
             result.Message.Should().Be(message);
@@ -104,11 +104,11 @@ namespace DevnotMentor.Api.UnitTest.Services
             };
 
             mockHashService.Setup(x => x.CreateHash(request.Password)).Returns(user.Password);
-            mockUserRepository.Setup(x => x.Get(request.UserName, user.Password)).Returns(Task.FromResult(user));
+            mockUserRepository.Setup(x => x.GetAsync(request.UserName, user.Password)).Returns(Task.FromResult(user));
             mockTokenService.Setup(x => x.CreateToken(user.Id, user.UserName)).Returns(tokenInfo);
 
             // Act
-            var result = await userService.Login(request);
+            var result = await userService.LoginAsync(request);
 
             // Assert
             result.Success.Should().BeTrue();
@@ -128,10 +128,10 @@ namespace DevnotMentor.Api.UnitTest.Services
             };
 
             mockHashService.Setup(x => x.CreateHash(request.Password)).Returns(hashedPassword);
-            mockUserRepository.Setup(x => x.Get(request.UserName, user.Password)).Returns(Task.FromResult(user));
+            mockUserRepository.Setup(x => x.GetAsync(request.UserName, user.Password)).Returns(Task.FromResult(user));
 
             // Act
-            var result = await userService.Login(request);
+            var result = await userService.LoginAsync(request);
 
             // Assert
             result.Success.Should().BeFalse();
