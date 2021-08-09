@@ -25,7 +25,7 @@ namespace DevnotMentor.Api.Controllers
             var authorizedUserId = User.Claims.GetUserId();
             var result = await pairService.FinishContinuingPairAsync(authorizedUserId, id);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return Response(result);
         }
 
         [HttpPost("/users/me/paireds/{id}/feedback")]
@@ -34,7 +34,7 @@ namespace DevnotMentor.Api.Controllers
             var authorizedUserId = User.Claims.GetUserId();
             var result = await pairService.GiveFeedbackToFinishedPairAsync(authorizedUserId, id, pairFeedbackRequest);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return Response(result);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace DevnotMentor.Api.Services
 
             pairRepository.Update(pair);
 
-            return new SuccessApiResponse();
+            return new SuccessApiResponse(ResponseStatus.NoContent);
         }
 
         public async Task<ApiResponse<PairDto>> GiveFeedbackToFinishedPairAsync(int userId, int pairId, PairFeedbackRequest pairFeedbackRequest)
