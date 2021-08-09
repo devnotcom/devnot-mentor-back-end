@@ -6,9 +6,9 @@ namespace DevnotMentor.Api.Controllers
     public class BaseController : ControllerBase
     {
         [NonAction]
-        protected IActionResult ApiResponse(ApiResponse response) => StatusCode((int)response.ResponseStatus, response);
+        protected IActionResult ApiResponse(ApiResponse response) => StatusCode((int)response.StatusCode, response);
 
         [NonAction]
-        protected IActionResult ApiResponse<T>(ApiResponse<T> response) => StatusCode((int)response.ResponseStatus, response);
+        protected IActionResult ApiResponse<T>(ApiResponse<T> response) => StatusCode((int)response.StatusCode, response);
     }
 }
