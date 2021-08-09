@@ -4,7 +4,7 @@ namespace DevnotMentor.Api.Common.Response
     {
         Ok = 200,
         Created = 201,
-        NoContent = 204,
+        //NoContent = 204,
         BadRequest = 400,
         UnAuthorized = 401,
         Forbid = 403,

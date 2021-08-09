@@ -27,7 +27,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await mentorService.SearchAsync(request);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("{userName}")]
@@ -35,7 +35,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await mentorService.GetMentorProfileAsync(userName);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds/mentees")]
@@ -45,7 +45,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds")]
@@ -55,7 +55,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await pairService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/applications")]
@@ -65,7 +65,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await mentorService.GetApplicationsByUserIdAsync(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -76,7 +76,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await mentorService.CreateMentorProfileAsync(request);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("{mentorId}/applications/mentees/{menteeId}/accept")]
@@ -87,7 +87,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await mentorService.AcceptMenteeAsync(mentorUserId, mentorId, menteeId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("{mentorId}/applications/mentees/{menteeId}/reject")]
@@ -98,7 +98,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await mentorService.RejectMenteeAsync(mentorUserId, mentorId, menteeId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
     }
 }

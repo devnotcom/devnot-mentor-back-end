@@ -8,15 +8,6 @@ namespace DevnotMentor.Api.Common.Response
     /// <typeparam name="T">Response data</typeparam>
     public class ApiResponse<T> : ApiResponse
     {
-        public ApiResponse()
-        {
-
-        }
-        
-        public ApiResponse(ResponseStatus status) : base(status)
-        {
-        }
-
         public ApiResponse(ResponseStatus status, string message) : base(status, message)
         {
         }
@@ -35,18 +26,12 @@ namespace DevnotMentor.Api.Common.Response
     {
         public ApiResponse()
         {
-
-        }
-        public ApiResponse(ResponseStatus status)
-        {
-            ResponseStatus = status;
-            Success = ResponseStatus < ResponseStatus.BadRequest;
         }
 
         public ApiResponse(ResponseStatus status, string message)
         {
             ResponseStatus = status;
-            Success = ResponseStatus < ResponseStatus.BadRequest;
+            Success = status < ResponseStatus.BadRequest;
             Message = message;
         }
 
@@ -58,7 +43,9 @@ namespace DevnotMentor.Api.Common.Response
         /// Result message. It provides error message when success is false. Otherwise success message.
         /// </summary>
         public string Message { get; set; }
-        
+        /// <summary>
+        /// Result status code
+        /// </summary>
         [JsonIgnore]
         public ResponseStatus ResponseStatus { get; set; }
     }

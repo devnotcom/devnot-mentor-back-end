@@ -27,7 +27,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await menteeService.SearchAsync(request);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("{userName}")]
@@ -35,7 +35,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await menteeService.GetMenteeProfileAsync(userName);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds/mentors")]
@@ -45,7 +45,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await menteeService.GetPairedMentorsByUserIdAsync(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds")]
@@ -55,7 +55,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/applications")]
@@ -65,7 +65,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.Claims.GetUserId();
             var result = await menteeService.GetApplicationsByUserIdAsync(authenticatedUserId);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -76,7 +76,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await menteeService.CreateMenteeProfileAsync(request);
 
-            return Response(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("me/applications")]
@@ -87,7 +87,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await menteeService.ApplyToMentorAsync(request);
 
-            return Response(result);
+            return ApiResponse(result);
         }
     }
 }

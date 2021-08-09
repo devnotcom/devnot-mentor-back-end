@@ -2,23 +2,19 @@
 {
     public class SuccessApiResponse<T> : ApiResponse<T>
     {
-        public SuccessApiResponse(ResponseStatus status, T data) : base(status)
-        {
-            ResponseStatus = status;
-            Data = data;
-        }
-
-        public SuccessApiResponse(ResponseStatus status, T data, string message) : base(status, message: message)
+        public SuccessApiResponse(ResponseStatus status, T data, string message) : base(status, message)
         {
             Data = data;
         }
 
-        public SuccessApiResponse(T data, string message) : base(ResponseStatus.Ok, message)
+        public SuccessApiResponse(ResponseStatus status, T data) : base(status, ResultMessage.Success)
         {
+            Data = data;
         }
 
-        public SuccessApiResponse(T data) : base(ResponseStatus.Ok)
+        public SuccessApiResponse(T data) : base(ResponseStatus.Ok, ResultMessage.Success)
         {
+            Data = data;
         }
     }
 
@@ -27,16 +23,15 @@
     /// </summary>
     public class SuccessApiResponse : ApiResponse
     {
-
-        public SuccessApiResponse(ResponseStatus status) : base(status)
+        public SuccessApiResponse(ResponseStatus status, string message) : base(status, message)
         {
         }
 
-        public SuccessApiResponse(ResponseStatus status, string message) : base(status, message: message)
+        public SuccessApiResponse(ResponseStatus status) : base(status, ResultMessage.Success)
         {
         }
 
-        public SuccessApiResponse(string message) : base(ResponseStatus.Ok, message)
+        public SuccessApiResponse() : base(ResponseStatus.Ok, ResultMessage.Success)
         {
         }
     }
