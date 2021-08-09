@@ -57,7 +57,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<MentorDto>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
             var mappedMentor = mapper.Map<MentorDto>(mentor);
@@ -70,7 +70,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<MenteeDto>>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
             var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentor);
             }
 
             var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
@@ -98,7 +98,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
+                return new ErrorApiResponse<MentorDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
             var registeredMentor = await mentorRepository.GetByUserIdAsync(user.Id);
@@ -169,19 +169,19 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null || mentor.Id != mentorId)
             {
-                return new ErrorApiResponse(ResultMessage.UnAuthorized);
+                return new ErrorApiResponse(ResponseStatus.UnAuthorized, ResultMessage.UnAuthorized);
             }
 
             var mentorApplication = await applicationsRepository.GetAsync(mentorId, menteeId);
 
             if (mentorApplication == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundMentorMenteePair);
             }
 
             if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
             {
-                return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
             bool checkMenteeCountGtOrEqual = MenteeCountOfMentorGtOrEqMaxCount(mentorId);
@@ -215,7 +215,7 @@ namespace DevnotMentor.Api.Services
 
             pairsRepository.Create(mentorMenteePairs);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse(ResponseStatus.Created);
         }
 
         public async Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId)
@@ -224,19 +224,19 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null || mentor.Id != mentorId)
             {
-                return new ErrorApiResponse(ResultMessage.UnAuthorized);
+                return new ErrorApiResponse(ResponseStatus.UnAuthorized, ResultMessage.UnAuthorized);
             }
 
             var mentorApplication = await applicationsRepository.GetAsync(mentorId, menteeId);
 
             if (mentorApplication == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundMentorMenteePair);
             }
 
             if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
             {
-                return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.ApplicationNotFoundWhenWaitingStatus);
             }
 
             mentorApplication.CompleteDate = DateTime.Now;
@@ -244,7 +244,7 @@ namespace DevnotMentor.Api.Services
 
             applicationsRepository.Update(mentorApplication);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)

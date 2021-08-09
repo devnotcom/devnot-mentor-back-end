@@ -54,14 +54,14 @@ namespace DevnotMentor.Api.Services
 
             if (currentUser == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundUser);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundUser);
             }
 
             currentUser.Password = hashService.CreateHash(request.NewPassword);
 
             userRepository.Update(currentUser);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse<UserLoginResponse>> LoginAsync(UserLoginRequest request)
@@ -89,7 +89,7 @@ namespace DevnotMentor.Api.Services
 
             var loginResponse = new UserLoginResponse(mappedUser, user.Token, user.TokenExpireDate);
 
-            return new SuccessApiResponse<UserLoginResponse>(data: loginResponse, ResultMessage.Success);
+            return new SuccessApiResponse<UserLoginResponse>(loginResponse);
         }
 
         public async Task<ApiResponse> RegisterAsync(RegisterUserRequest request)
@@ -106,7 +106,7 @@ namespace DevnotMentor.Api.Services
 
             userRepository.Create(mapper.Map<User>(request));
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse> RemindPasswordAsync(string email)
@@ -120,7 +120,7 @@ namespace DevnotMentor.Api.Services
 
             if (currentUser == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundUser);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundUser);
             }
 
             currentUser.SecurityKey = Guid.NewGuid();
@@ -130,7 +130,7 @@ namespace DevnotMentor.Api.Services
 
             await SendRemindPasswordMailAsync(currentUser);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         // TODO: İlerleyen zamanlarda template olarak veri tabanı ya da dosyadan okunulacak.
@@ -165,7 +165,7 @@ namespace DevnotMentor.Api.Services
 
             userRepository.Update(currentUser);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request)
@@ -187,7 +187,7 @@ namespace DevnotMentor.Api.Services
 
             userRepository.Update(currentUser);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
     }
 }

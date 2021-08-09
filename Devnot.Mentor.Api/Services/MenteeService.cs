@@ -58,7 +58,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
@@ -71,7 +71,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<List<MentorDto>>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorApplicationsDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
@@ -97,7 +97,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
             var registeredMentee = await menteeRepository.GetByUserIdAsync(user.Id);
@@ -172,14 +172,14 @@ namespace DevnotMentor.Api.Services
 
             if (menteeId == default)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundMentee);
             }
 
             int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
 
             if (mentorId == default)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundMentor);
             }
 
             bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
@@ -198,7 +198,7 @@ namespace DevnotMentor.Api.Services
                 Status = MentorApplicationStatus.Waiting.ToInt()
             });
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse(ResponseStatus.Created);
         }
 
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
