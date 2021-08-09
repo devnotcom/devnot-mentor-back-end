@@ -2,14 +2,19 @@
 {
     public class ErrorApiResponse<T> : ApiResponse<T>
     {
-        public ErrorApiResponse(T data) : base(success: false)
+        public ErrorApiResponse(ResponseStatus status, T data) : base(status)
+        {
+            ResponseStatus = status;
+            Data = data;
+        }
+
+        public ErrorApiResponse(ResponseStatus status, T data, string message) : base(status, message: message)
         {
             Data = data;
         }
 
-        public ErrorApiResponse(T data, string message) : base(success: false, message: message)
+        public ErrorApiResponse(T data, string message) : base(ResponseStatus.BadRequest, message)
         {
-            Data = data;
         }
     }
 
@@ -18,11 +23,15 @@
     /// </summary>
     public class ErrorApiResponse : ApiResponse
     {
-        public ErrorApiResponse() : base(success: false)
+        public ErrorApiResponse(ResponseStatus status) : base(status)
         {
         }
 
-        public ErrorApiResponse(string message) : base(success: false, message: message)
+        public ErrorApiResponse(ResponseStatus status, string message) : base(status, message: message)
+        {
+        }
+
+        public ErrorApiResponse(string message) : base(ResponseStatus.BadRequest, message)
         {
         }
     }

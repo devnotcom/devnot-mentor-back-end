@@ -1,4 +1,6 @@
-﻿namespace DevnotMentor.Api.Common.Response
+﻿using System.Text.Json.Serialization;
+
+namespace DevnotMentor.Api.Common.Response
 {
     /// <summary>
     /// Api response with data.
@@ -10,12 +12,12 @@
         {
 
         }
-
-        public ApiResponse(bool success) : base(success)
+        
+        public ApiResponse(ResponseStatus status) : base(status)
         {
         }
 
-        public ApiResponse(bool success, string message) : base(success, message)
+        public ApiResponse(ResponseStatus status, string message) : base(status, message)
         {
         }
 
@@ -35,15 +37,16 @@
         {
 
         }
-
-        public ApiResponse(bool success)
+        public ApiResponse(ResponseStatus status)
         {
-            Success = success;
+            ResponseStatus = status;
+            Success = ResponseStatus < ResponseStatus.BadRequest;
         }
 
-        public ApiResponse(bool success, string message)
+        public ApiResponse(ResponseStatus status, string message)
         {
-            Success = success;
+            ResponseStatus = status;
+            Success = ResponseStatus < ResponseStatus.BadRequest;
             Message = message;
         }
 
@@ -55,5 +58,8 @@
         /// Result message. It provides error message when success is false. Otherwise success message.
         /// </summary>
         public string Message { get; set; }
+        
+        [JsonIgnore]
+        public ResponseStatus ResponseStatus { get; set; }
     }
 }
