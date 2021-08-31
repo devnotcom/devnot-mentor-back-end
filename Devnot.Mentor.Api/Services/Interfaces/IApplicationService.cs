@@ -20,9 +20,9 @@ namespace DevnotMentor.Api.Services.Interfaces
         /// <para>If Mentee or Mentor have already reached the max count for the continuing mentorship, cannot be approved.</para>
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
-        /// <param name="toBeAcceptedApplicationId">Id of the application to be accepted</param>
+        /// <param name="toBeApprovedApplicationId">Id of the application to be approved</param>
         /// <returns><see cref="ApiResponse"/></returns>
-        Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeAcceptedApplicationId);
+        Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId);
 
         /// <summary>
         /// Reject the waiting application

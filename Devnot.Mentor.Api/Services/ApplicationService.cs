@@ -45,26 +45,26 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorApplicationsDto>>(applicationsDto);
         }
 
-        public async Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeAcceptedApplicationId)
+        public async Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId)
         {
-            var toBeAcceptedApplication = await applicationRepository.GetWhichIsWaitingByIdAsync(toBeAcceptedApplicationId);
-            if (toBeAcceptedApplication == null)
+            var toBeApprovedApplication = await applicationRepository.GetWhichIsWaitingByIdAsync(toBeApprovedApplicationId);
+            if (toBeApprovedApplication == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
             }
 
-            bool isUserMentorForTheApplication = toBeAcceptedApplication.Mentor.UserId == authenticatedUserId;
-            if (isUserMentorForTheApplication == false)
+            bool userMentorOfApplication = toBeApprovedApplication.Mentor.UserId == authenticatedUserId;
+            if (!userMentorOfApplication)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
 
-            if (IsCountOfMentorshipsWhichAreContinuingGreaterThanOREqualToMaxCountForMentee((int)toBeAcceptedApplication.MenteeId))
+            if (isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentee((int)toBeApprovedApplication.MenteeId))
             {
                 return new ErrorApiResponse(ResultMessage.MenteeAlreadyHasTheMaxMentorCount);
             }
 
-            if (IsCountOfMentorshipsWhichAreContinuingGreaterThanOREqualToMaxCountForMentor((int)toBeAcceptedApplication.MentorId))
+            if (isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentor((int)toBeApprovedApplication.MentorId))
             {
                 return new ErrorApiResponse(ResultMessage.MentorAlreadyHasTheMaxMenteeCount);
             }
@@ -73,16 +73,16 @@ namespace DevnotMentor.Api.Services
 
             var mentorMenteePairs = new MentorMenteePairs
             {
-                MentorId = toBeAcceptedApplication.MentorId,
-                MenteeId = toBeAcceptedApplication.MenteeId,
+                MentorId = toBeApprovedApplication.MentorId,
+                MenteeId = toBeApprovedApplication.MenteeId,
                 MentorStartDate = dateTimeNow,
                 State = MentorMenteePairStatus.Continues.ToInt()
             };
             pairRepository.Create(mentorMenteePairs);
 
-            toBeAcceptedApplication.Status = MentorApplicationStatus.Approved.ToInt();
-            toBeAcceptedApplication.CompleteDate = dateTimeNow;
-            applicationRepository.Update(toBeAcceptedApplication);
+            toBeApprovedApplication.Status = MentorApplicationStatus.Approved.ToInt();
+            toBeApprovedApplication.CompleteDate = dateTimeNow;
+            applicationRepository.Update(toBeApprovedApplication);
 
             return new SuccessApiResponse(ResultMessage.Success);
         }
@@ -95,8 +95,8 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
             }
 
-            bool isUserMentorForTheApplication = toBeRejectedApplication.Mentor.UserId == authenticatedUserId;
-            if (isUserMentorForTheApplication == false)
+            bool userMentorOfApplication = toBeRejectedApplication.Mentor.UserId == authenticatedUserId;
+            if (!userMentorOfApplication)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
@@ -108,13 +108,13 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse(ResultMessage.Success);
         }
 
-        private bool IsCountOfMentorshipsWhichAreContinuingGreaterThanOREqualToMaxCountForMentee(int menteeId)
+        private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentee(int menteeId)
         {
             int count = pairRepository.GetCountForContinuingStatusByMenteeId(menteeId);
             return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
         }
 
-        private bool IsCountOfMentorshipsWhichAreContinuingGreaterThanOREqualToMaxCountForMentor(int mentorId)
+        private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentor(int mentorId)
         {
             int count = pairRepository.GetCountForContinuingStatusByMentorId(mentorId);
             return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;

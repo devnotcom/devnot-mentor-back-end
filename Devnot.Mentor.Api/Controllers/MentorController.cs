@@ -63,9 +63,9 @@ namespace DevnotMentor.Api.Controllers
             return result.Success ? Success(result) : BadRequest(result);
         }
 
-        [HttpPost("me/applications/{id}/accept")]
+        [HttpPost("me/applications/{id}/approve")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> AcceptApplicationAsync([FromRoute] int id)
+        public async Task<IActionResult> ApproveApplicationAsync([FromRoute] int id)
         {
             var authenticatedUserId = User.GetId();
 
