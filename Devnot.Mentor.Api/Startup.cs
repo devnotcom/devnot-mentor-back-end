@@ -41,7 +41,11 @@ namespace DevnotMentor.Api
             var connectionString = EnvironmentService.StaticConfiguration["ConnectionStrings:SQLServerConnectionString"];
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddSingleton<TokenAuthentication>();
@@ -50,6 +54,8 @@ namespace DevnotMentor.Api
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
             services.AddScoped<IPairService, PairService>();
+            services.AddScoped<IApplicationService, ApplicationService>();
+
 
             services.AddScoped<IMailService, SmtpMailService>();
             services.AddScoped<IFileService, LocalFileService>();

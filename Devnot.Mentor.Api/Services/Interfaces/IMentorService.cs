@@ -24,37 +24,12 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<MentorDto>> CreateMentorProfileAsync(CreateMentorProfileRequest request);
 
         /// <summary>
-        /// Accept mentee application
-        /// </summary>
-        /// <param name="mentorUserId">User id who is mentor</param>
-        /// <param name="mentorId">Mentor id</param>
-        /// <param name="menteeId">Mentee id</param>
-        /// <returns></returns>
-        Task<ApiResponse> AcceptMenteeAsync(int mentorUserId, int mentorId, int menteeId);
-
-        /// <summary>
-        /// Reject mentee application.
-        /// </summary>
-        /// <param name="mentorUserId">User id who is mentor</param>
-        /// <param name="mentorId">Mentor id</param>
-        /// <param name="menteeId">Mentee id</param>
-        /// <returns></returns>
-        Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId);
-
-        /// <summary>
         /// Returns mentees who are paired with mentor.
         /// </summary>
         /// <param name="userId">Mentor UserId</param>
         /// <returns>List of <see cref="MenteeDto"/>  inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MenteeDto>>> GetPairedMenteesByUserIdAsync(int userId);
-
-        /// <summary>
-        /// Returns mentoring applications with mentee informations.
-        /// </summary>
-        /// <param name="userId">Mentor UserId</param>
-        /// <returns>List of <see cref="MentorApplicationsDto"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId);
-
+        
         /// <summary>
         /// Get mentor list which contains properties in search request.
         /// </summary>

@@ -1,15 +1,10 @@
 ﻿using System.Collections.Generic;
+using DevnotMentor.Api.CustomEntities.Request.Base;
 
 namespace DevnotMentor.Api.CustomEntities.Request.MentorRequest
 {
-    public class CreateMentorProfileRequest
+    public class CreateMentorProfileRequest : CreateProfileBase
     {
-        public string Title { get; set; }
-
-        public string Description { get; set; }
-
-        public int UserId { get; set; }
-
         public List<string> MentorLinks { get; set; }
 
         public List<string> MentorTags { get; set; }
