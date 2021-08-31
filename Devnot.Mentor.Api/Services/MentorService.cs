@@ -12,6 +12,7 @@ using DevnotMentor.Api.Configuration.Context;
 using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using System.Collections.Generic;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 
 namespace DevnotMentor.Api.Services
 {
@@ -49,7 +50,7 @@ namespace DevnotMentor.Api.Services
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
         }
-        
+
         public async Task<ApiResponse<MentorDto>> GetMentorProfileAsync(string userName)
         {
             var mentor = await mentorRepository.GetByUserNameAsync(userName);
@@ -146,6 +147,11 @@ namespace DevnotMentor.Api.Services
             }
 
             return mentor;
+        }
+        public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)
+        {
+            var mappedMentors = mapper.Map<List<MentorDto>>(await mentorRepository.SearchAsync(request));
+            return new SuccessApiResponse<List<MentorDto>>(mappedMentors);
         }
     }
 }

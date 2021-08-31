@@ -2,6 +2,7 @@
 using DevnotMentor.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using DevnotMentor.Api.Helpers.Extensions;
 
@@ -21,6 +22,14 @@ namespace DevnotMentor.Api.Controllers
             this.menteeService = menteeService;
             this.pairService = pairService;
             this.applicationService = applicationService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index([FromQuery] SearchRequest request)
+        {
+            var result = await menteeService.SearchAsync(request);
+
+            return result.Success ? Success(result) : BadRequest(result);
         }
 
         [HttpGet("{userName}")]

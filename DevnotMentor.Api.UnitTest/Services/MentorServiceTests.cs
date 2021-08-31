@@ -1,13 +1,13 @@
 //using DevnotMentor.Api.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using DevnotMentor.Api.Services.Interfaces;
 using System;
+using Xunit;
 
 namespace DevnotMentor.Api.UnitTest
 {
-    [TestClass]
     public class MentorServiceTests
     {
-        [TestMethod]
+        [Fact]
         public void CreateMentor_ForNewMentor()
         {
             //var userService = new UserService();
@@ -17,20 +17,19 @@ namespace DevnotMentor.Api.UnitTest
             //    Password = "123"
             //});
 
-
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateMentor_ForExistingMentor()
         {
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateMentor_WithNewTag()
         {
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateMentor_WithExistingTag()
         {
         }

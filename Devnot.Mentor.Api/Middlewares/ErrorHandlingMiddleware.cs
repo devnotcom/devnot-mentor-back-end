@@ -4,12 +4,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Common.Response;
+using DevnotMentor.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace DevnotMentor.Api.Middlewares
 {
-	/// <summary>
+    /// <summary>
     /// for all types of unexpected errors
     /// </summary>
     public class ErrorHandlingMiddleware
@@ -33,7 +34,7 @@ namespace DevnotMentor.Api.Middlewares
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ILoggerRepository loggerRepository)
         {
             try
             {
@@ -41,17 +42,18 @@ namespace DevnotMentor.Api.Middlewares
             }
             catch (Exception error)
             {
-                var response = context.Response;
-               
-                response.ContentType = "application/json";
+#pragma warning disable 4014
+                loggerRepository.WriteErrorAsync(error);
+#pragma warning disable 4014
 
+                var response = context.Response;
+                response.ContentType = "application/json";
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 var resp = new ErrorApiResponse(ResultMessage.InternalServerError);
-
                 var result = JsonSerializer.Serialize(resp);
 
-                logger.LogError(error, result); 
+                logger.LogError(error, result);
 
                 await response.WriteAsync(result);
             }

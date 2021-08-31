@@ -21,7 +21,16 @@ namespace DevnotMentor.Api.Repositories
 
         public async Task<User> GetAsync(string userName, string hashedPassword)
         {
-            return await DbContext.User.Where(u => u.UserName == userName && u.Password == hashedPassword).FirstOrDefaultAsync();
+            return await DbContext
+                .User
+                .Where(u => u.UserName == userName && u.Password == hashedPassword)
+                .Include(user => user.Mentee)
+                    .ThenInclude(mentee => mentee.MenteeTags)
+                        .ThenInclude(menteeTag => menteeTag.Tag)
+                .Include(user => user.Mentor)
+                    .ThenInclude(mentor => mentor.MentorTags)
+                        .ThenInclude(mentorTag => mentorTag.Tag)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<User> GetAsync(int userId, string hashedPassword)

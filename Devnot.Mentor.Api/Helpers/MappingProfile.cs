@@ -29,6 +29,10 @@ namespace DevnotMentor.Api.Helpers
 
 
             CreateMap<RegisterUserRequest, User>();
+
+            CreateMap<Tag, TagDto>();
+            CreateMap<MentorTags, MentorTagDto>();
+            CreateMap<MenteeTags, MenteeTagDto>();
         }
     }
 }
