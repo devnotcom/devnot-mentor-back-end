@@ -58,7 +58,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
@@ -71,7 +71,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<List<MentorDto>>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
             var registeredMentee = await menteeRepository.GetByUserIdAsync(user.Id);
@@ -147,6 +147,7 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
+        
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentees = mapper.Map<List<MenteeDto>>(await menteeRepository.SearchAsync(request));

@@ -20,8 +20,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetApplicationsAsync()
         {
             var result = await applicationService.GetApplicationsByUserIdAsync(User.GetId());
-
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
     }
 }

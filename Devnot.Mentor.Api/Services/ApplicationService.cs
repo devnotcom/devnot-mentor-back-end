@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Services
             toBeApprovedApplication.CompleteDate = dateTimeNow;
             applicationRepository.Update(toBeApprovedApplication);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse> RejectWaitingApplicationByIdAsync(int authenticatedUserId, int toBeRejectedApplicationId)
@@ -105,7 +105,7 @@ namespace DevnotMentor.Api.Services
             toBeRejectedApplication.CompleteDate = System.DateTime.Now;
             applicationRepository.Update(toBeRejectedApplication);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentee(int menteeId)
@@ -154,7 +154,7 @@ namespace DevnotMentor.Api.Services
                 Status = MentorApplicationStatus.Waiting.ToInt()
             });
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse(ResponseStatus.Created);
         }
     }
 }

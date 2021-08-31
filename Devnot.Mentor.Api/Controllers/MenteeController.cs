@@ -29,7 +29,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await menteeService.SearchAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("{userName}")]
@@ -37,7 +37,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await menteeService.GetMenteeProfileAsync(userName);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
         
         //todo: paireds or mentorship
@@ -48,7 +48,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.GetId();
             var result = await menteeService.GetPairedMentorsByUserIdAsync(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds")]
@@ -58,7 +58,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.GetId();
             var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -69,7 +69,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await menteeService.CreateMenteeProfileAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("me/applications")]
@@ -80,7 +80,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await applicationService.CreateApplicationAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await mentorService.SearchAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("{userName}")]
@@ -37,7 +37,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await mentorService.GetMentorProfileAsync(userName);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
         
         //todo: paireds or mentorship
@@ -48,7 +48,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.GetId();
             var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds")]
@@ -58,7 +58,7 @@ namespace DevnotMentor.Api.Controllers
             var authenticatedUserId = User.GetId();
             var result = await pairService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -69,7 +69,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await mentorService.CreateMentorProfileAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("me/applications/{id}/approve")]
@@ -80,7 +80,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await applicationService.ApproveWaitingApplicationByIdAsync(authenticatedUserId, id);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("me/applications/{id}/reject")]
@@ -91,7 +91,7 @@ namespace DevnotMentor.Api.Controllers
 
             var result = await applicationService.RejectWaitingApplicationByIdAsync(authenticatedUserId, id);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
     }
 }

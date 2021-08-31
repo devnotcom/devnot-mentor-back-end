@@ -57,7 +57,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<MentorDto>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
             var mappedMentor = mapper.Map<MentorDto>(mentor);
@@ -70,7 +70,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<List<MenteeDto>>(data: default, ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<MenteeDto>>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
             var pairedMentees = mapper.Map<List<MenteeDto>>(await mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
@@ -84,7 +84,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                return new ErrorApiResponse<MentorDto>(data: default, message: ResultMessage.NotFoundUser);
+                return new ErrorApiResponse<MentorDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
             var registeredMentor = await mentorRepository.GetByUserIdAsync(user.Id);
@@ -148,6 +148,7 @@ namespace DevnotMentor.Api.Services
 
             return mentor;
         }
+        
         public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentors = mapper.Map<List<MentorDto>>(await mentorRepository.SearchAsync(request));
