@@ -40,7 +40,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await userService.ChangePasswordAsync(request);
 
@@ -52,7 +52,7 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await userService.UpdateAsync(request);
 

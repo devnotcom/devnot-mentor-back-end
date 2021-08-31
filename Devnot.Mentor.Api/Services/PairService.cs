@@ -70,9 +70,9 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundNotFinishedMentorMenteePair);
             }
 
-            bool checkUserHasThePair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
+            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
 
-            if (!checkUserHasThePair)
+            if (!userRelatedToPair)
             {
                 return new ErrorApiResponse(ResultMessage.Forbidden);
             }
@@ -94,16 +94,16 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse<PairDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
-            bool checkUserHasThePair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
+            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
 
-            if (!checkUserHasThePair)
+            if (!userRelatedToPair)
             {
                 return new ErrorApiResponse<PairDto>(null, ResultMessage.Forbidden);
             }
 
-            bool checkUserIsMentee = userId == pair.Mentee.UserId;
+            bool isUserMentee = userId == pair.Mentee.UserId;
 
-            return checkUserIsMentee
+            return isUserMentee
             ? GiveFeedbackFromMentee(pair, pairFeedbackRequest)
             : GiveFeedbackFromMentor(pair, pairFeedbackRequest);
         }

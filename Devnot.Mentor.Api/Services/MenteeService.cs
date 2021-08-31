@@ -78,19 +78,6 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
         }
 
-        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId)
-        {
-            var mentee = await menteeRepository.GetByUserIdAsync(userId);
-
-            if (mentee == null)
-            {
-                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
-            }
-
-            var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
-            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
-        }
-
         public async Task<ApiResponse<MenteeDto>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request)
         {
             var user = await userRepository.GetByIdAsync(request.UserId);
@@ -160,47 +147,6 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
-
-        public async Task<ApiResponse> ApplyToMentorAsync(ApplyToMentorRequest request)
-        {
-            if (request.MenteeUserId == request.MentorUserId)
-            {
-                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
-            }
-
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
-
-            if (menteeId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
-            }
-
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
-
-            if (mentorId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
-            }
-
-            bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
-
-            if (checkThereAreAnyPair)
-            {
-                return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
-            }
-
-            applicationsRepository.Create(new MentorApplications
-            {
-                ApllicationNotes = request.ApplicationNotes,
-                ApplyDate = DateTime.Now,
-                MenteeId = menteeId,
-                MentorId = mentorId,
-                Status = MentorApplicationStatus.Waiting.ToInt()
-            });
-
-            return new SuccessApiResponse(ResultMessage.Success);
-        }
-
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentees = mapper.Map<List<MenteeDto>>(await menteeRepository.SearchAsync(request));
