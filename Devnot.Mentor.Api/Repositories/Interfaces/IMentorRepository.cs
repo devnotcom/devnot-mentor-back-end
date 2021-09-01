@@ -8,6 +8,7 @@ namespace DevnotMentor.Api.Repositories.Interfaces
     public interface IMentorRepository : IRepository<Mentor>
     {
         Task<List<Mentor>> SearchAsync(SearchRequest request);
+        Task<Mentor> GetByIdAsync(int mentorId);
         Task<int> GetIdByUserIdAsync(int userId);
         Task<Mentor> GetByUserNameAsync(string userName);
         Task<Mentor> GetByUserIdAsync(int userId);

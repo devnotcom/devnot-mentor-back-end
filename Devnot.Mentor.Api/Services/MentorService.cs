@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using System;
@@ -13,6 +11,7 @@ using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
+using DevnotMentor.Api.Utilities.Email;
 
 namespace DevnotMentor.Api.Services
 {
@@ -26,7 +25,7 @@ namespace DevnotMentor.Api.Services
         private readonly IUserRepository userRepository;
         private readonly IMentorApplicationsRepository applicationsRepository;
         private readonly IMentorMenteePairsRepository pairsRepository;
-
+        private readonly IMailService mailService;
         public MentorService(
             IMapper mapper,
             IMentorRepository mentorRepository,
@@ -148,11 +147,12 @@ namespace DevnotMentor.Api.Services
 
             return mentor;
         }
-        
+
         public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentors = mapper.Map<List<MentorDto>>(await mentorRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MentorDto>>(mappedMentors);
         }
+
     }
 }

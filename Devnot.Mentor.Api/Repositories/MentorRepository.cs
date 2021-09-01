@@ -83,5 +83,10 @@ namespace DevnotMentor.Api.Repositories
                 .Select(x => x.Mentee)
                 .ToListAsync();
         }
+
+        public async Task<Mentor> GetByIdAsync(int mentorId)
+        {
+            return await DbContext.Mentor.Include(x=>x.User).Where(x => x.Id == mentorId).FirstOrDefaultAsync();
+        }
     }
 }

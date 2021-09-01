@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using System;
@@ -13,7 +11,6 @@ using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
-
 namespace DevnotMentor.Api.Services
 {
     public class MenteeService : BaseService, IMenteeService
@@ -50,6 +47,7 @@ namespace DevnotMentor.Api.Services
             this.mentorRepository = mentorRepository;
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
+            
         }
 
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfileAsync(string userName)
@@ -147,11 +145,11 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
-        
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentees = mapper.Map<List<MenteeDto>>(await menteeRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MenteeDto>>(mappedMentees);
         }
+
     }
 }
