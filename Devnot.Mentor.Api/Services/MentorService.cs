@@ -40,8 +40,7 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
-            IDevnotConfigurationContext devnotConfigurationContext,
-            IMailService mailSerive
+            IDevnotConfigurationContext devnotConfigurationContext
             ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.mentorRepository = mentorRepository;
@@ -52,7 +51,6 @@ namespace DevnotMentor.Api.Services
             this.userRepository = userRepository;
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
-            this.mailService = mailSerive;
         }
 
         public async Task<ApiResponse<MentorDto>> GetMentorProfileAsync(string userName)
@@ -153,107 +151,10 @@ namespace DevnotMentor.Api.Services
             return mentor;
         }
 
-
-        public async Task<ApiResponse> AcceptMenteeAsync(int mentorUserId, int mentorId, int menteeId)
-        {
-            var mentor = await mentorRepository.GetByUserIdAsync(mentorUserId);
-
-            if (mentor == null || mentor.Id != mentorId)
-            {
-                return new ErrorApiResponse(ResultMessage.UnAuthorized);
-            }
-            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(mentorUserId);
-            var mentorApplication = applications.FirstOrDefault(x => x.MenteeId == menteeId);
-
-            if (mentorApplication == null)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
-            }
-
-            if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
-            }
-
-            bool checkMenteeCountGtOrEqual = MenteeCountOfMentorGtOrEqMaxCount(mentorId);
-
-            if (checkMenteeCountGtOrEqual)
-            {
-                return new ErrorApiResponse(ResultMessage.MentorAlreadyHasTheMaxMenteeCount);
-            }
-
-            bool checkMentorCountGtOrEqual = MentorCountOfMenteeGtOrEqMaxCount(menteeId);
-
-            if (checkMentorCountGtOrEqual)
-            {
-                return new ErrorApiResponse(ResultMessage.MenteeAlreadyHasTheMaxMentorCount);
-            }
-
-            DateTime now = DateTime.Now;
-
-            mentorApplication.Status = MentorApplicationStatus.Approved.ToInt();
-            mentorApplication.CompleteDate = now;
-
-            applicationsRepository.Update(mentorApplication);
-
-            var mentorMenteePairs = new MentorMenteePairs
-            {
-                MentorId = mentorId,
-                MenteeId = menteeId,
-                MentorStartDate = now,
-                State = MentorMenteePairStatus.Continues.ToInt()
-            };
-
-            pairsRepository.Create(mentorMenteePairs);
-
-
-            var mentee = await menteeRepository.GetByIdAsync(menteeId);
-
-            await SendAcceptMenteeNotificationMailAsync(mentor.User, mentee.User);
-            return new SuccessApiResponse();
-        }
-
-        public async Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId)
-        {
-            var mentor = await mentorRepository.GetByUserIdAsync(mentorUserId);
-
-            if (mentor == null || mentor.Id != mentorId)
-            {
-                return new ErrorApiResponse(ResultMessage.UnAuthorized);
-            }
-
-            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(mentorUserId);
-            var mentorApplication = applications.FirstOrDefault(x => x.MenteeId == menteeId);
-            
-            if (mentorApplication == null)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
-            }
-
-            if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
-            }
-
-            mentorApplication.CompleteDate = DateTime.Now;
-            mentorApplication.Status = MentorApplicationStatus.Rejected.ToInt();
-
-            applicationsRepository.Update(mentorApplication);
-
-            return new SuccessApiResponse();
-        }
-
         public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentors = mapper.Map<List<MentorDto>>(await mentorRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MentorDto>>(mappedMentors);
-        }
-
-
-        private async Task SendAcceptMenteeNotificationMailAsync(User mentor, User mentee)
-        {
-            List<string> to = new List<string>() { mentee.Email };
-            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(mentor, mentee));
         }
 
         /// <summary>

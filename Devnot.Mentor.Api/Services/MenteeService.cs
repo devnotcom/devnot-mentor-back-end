@@ -41,8 +41,7 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             ILoggerRepository loggerRepository,
-            IDevnotConfigurationContext devnotConfigurationContext,
-            IMailService mailSerivce
+            IDevnotConfigurationContext devnotConfigurationContext
             )
             : base(mapper, loggerRepository, devnotConfigurationContext)
         {
@@ -54,7 +53,7 @@ namespace DevnotMentor.Api.Services
             this.mentorRepository = mentorRepository;
             this.applicationsRepository = mentorApplicationsRepository;
             this.pairsRepository = mentorMenteePairsRepository;
-            this.mailService = mailSerivce;
+            
         }
 
         public async Task<ApiResponse<MenteeDto>> GetMenteeProfileAsync(string userName)
@@ -152,62 +151,11 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
-
-
-        public async Task<ApiResponse> ApplyToMentorAsync(ApplyToMentorRequest request)
-        {
-            if (request.MenteeUserId == request.MentorUserId)
-            {
-                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
-            }
-
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
-
-            if (menteeId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
-            }
-
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
-
-            if (mentorId == default)
-            {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
-            }
-
-            bool checkThereAreAnyPair = await applicationsRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId);
-
-            if (checkThereAreAnyPair)
-            {
-                return new ErrorApiResponse(ResultMessage.MentorMenteePairAlreadyExist);
-            }
-
-            applicationsRepository.Create(new MentorApplications
-            {
-                ApllicationNotes = request.ApplicationNotes,
-                ApplyDate = DateTime.Now,
-                MenteeId = menteeId,
-                MentorId = mentorId,
-                Status = MentorApplicationStatus.Waiting.ToInt()
-            });
-
-            var mentee= await menteeRepository.GetByIdAsync(menteeId);
-            var mentor= await mentorRepository.GetByIdAsync(menteeId);
-
-            await SendApplyToMentorNotificationMailAsync(mentor.User, mentee.User);
-            return new SuccessApiResponse(ResponseStatus.Ok,ResultMessage.Success);
-        }
-
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
         {
             var mappedMentees = mapper.Map<List<MenteeDto>>(await menteeRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MenteeDto>>(mappedMentees);
         }
 
-        private async Task SendApplyToMentorNotificationMailAsync(User mentor,User mentee)
-        {
-            List<string> to = new List<string>() { mentor.Email };
-            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.ApplyToMentorBody(mentor, mentee));
-        }
     }
 }

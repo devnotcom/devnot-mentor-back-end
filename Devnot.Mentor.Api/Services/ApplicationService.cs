@@ -11,6 +11,7 @@ using DevnotMentor.Api.Enums;
 using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
+using DevnotMentor.Api.Utilities.Email;
 
 namespace DevnotMentor.Api.Services
 {
@@ -20,6 +21,8 @@ namespace DevnotMentor.Api.Services
         private readonly IMentorMenteePairsRepository pairRepository;
         private readonly IMentorRepository mentorRepository;
         private readonly IMenteeRepository menteeRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IMailService mailService;
 
         public ApplicationService(
             IMapper mapper,
@@ -28,13 +31,17 @@ namespace DevnotMentor.Api.Services
             IMentorApplicationsRepository mentorApplicationsRepository,
             IMentorMenteePairsRepository mentorMenteePairsRepository,
             IMentorRepository mentorRepository,
-            IMenteeRepository menteeRepository
+            IMenteeRepository menteeRepository,
+            IUserRepository userRepository,
+            IMailService mailService
         ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             this.applicationRepository = mentorApplicationsRepository;
             this.pairRepository = mentorMenteePairsRepository;
             this.mentorRepository = mentorRepository;
             this.menteeRepository = menteeRepository;
+            this.userRepository = userRepository;
+            this.mailService = mailService;
         }
 
         public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int authenticatedUserId)
@@ -83,6 +90,10 @@ namespace DevnotMentor.Api.Services
             toBeApprovedApplication.Status = MentorApplicationStatus.Approved.ToInt();
             toBeApprovedApplication.CompleteDate = dateTimeNow;
             applicationRepository.Update(toBeApprovedApplication);
+
+
+            var to = new List<string>() { toBeApprovedApplication.Mentee.User.Email };
+            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(toBeApprovedApplication.Mentor.User, toBeApprovedApplication.Mentee.User));
 
             return new SuccessApiResponse();
         }
@@ -153,6 +164,12 @@ namespace DevnotMentor.Api.Services
                 MentorId = mentorId,
                 Status = MentorApplicationStatus.Waiting.ToInt()
             });
+
+            var mentorUser = await userRepository.GetByIdAsync(request.MentorUserId);
+            var menteeUser = await userRepository.GetByIdAsync(request.MenteeUserId);
+
+            var to = new List<string>() { mentorUser.Email };
+            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.ApplyToMentorBody(mentorUser, menteeUser));
 
             return new SuccessApiResponse(ResponseStatus.Created);
         }
