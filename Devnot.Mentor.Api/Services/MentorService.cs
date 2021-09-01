@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Common;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using System;
@@ -14,7 +12,6 @@ using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.Utilities.Email;
-using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
@@ -157,26 +154,5 @@ namespace DevnotMentor.Api.Services
             return new SuccessApiResponse<List<MentorDto>>(mappedMentors);
         }
 
-        /// <summary>
-        /// This method checks that the number of mentor of the mentee is greater than or equal to default max. value
-        /// </summary>
-        /// <param name="menteeId">mentee id</param>
-        /// <returns>Number of mentor of the mentee is greater than or equal to default max. value?</returns>
-        private bool MentorCountOfMenteeGtOrEqMaxCount(int menteeId)
-        {
-            int count = pairsRepository.GetCountForContinuingStatusByMenteeId(menteeId);
-            return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
-        }
-
-        /// <summary>
-        /// This method checks that the number of mentee of the mentor is greater than or equal to default max. value
-        /// </summary>
-        /// <param name="mentorId">mentor id</param>
-        /// <returns>Number of mentee of the mentor is greater than or equal to default max. value?</returns>
-        private bool MenteeCountOfMentorGtOrEqMaxCount(int mentorId)
-        {
-            int count = pairsRepository.GetCountForContinuingStatusByMentorId(mentorId);
-            return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
-        }
     }
 }
