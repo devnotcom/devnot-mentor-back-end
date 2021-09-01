@@ -91,9 +91,11 @@ namespace DevnotMentor.Api.Services
             toBeApprovedApplication.CompleteDate = dateTimeNow;
             applicationRepository.Update(toBeApprovedApplication);
 
-
             var to = new List<string>() { toBeApprovedApplication.Mentee.User.Email };
-            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(toBeApprovedApplication.Mentor.User, toBeApprovedApplication.Mentee.User));
+            await mailService.SendEmailAsync(
+                to,
+                EmailTemplate.ApplicationSubject,
+                EmailTemplate.ApplicationApprovedBody(toBeApprovedApplication.Mentor.User, toBeApprovedApplication.Mentee.User));
 
             return new SuccessApiResponse();
         }
@@ -169,7 +171,10 @@ namespace DevnotMentor.Api.Services
             var menteeUser = await userRepository.GetByIdAsync(request.MenteeUserId);
 
             var to = new List<string>() { mentorUser.Email };
-            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.ApplyToMentorBody(mentorUser, menteeUser));
+            await mailService.SendEmailAsync(
+                to,
+                EmailTemplate.ApplicationSubject,
+                EmailTemplate.ApplicationAppliedBody(mentorUser, menteeUser));
 
             return new SuccessApiResponse(ResponseStatus.Created);
         }
