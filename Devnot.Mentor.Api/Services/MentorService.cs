@@ -14,6 +14,7 @@ using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.Utilities.Email;
+using System.Linq;
 
 namespace DevnotMentor.Api.Services
 {
@@ -161,8 +162,8 @@ namespace DevnotMentor.Api.Services
             {
                 return new ErrorApiResponse(ResultMessage.UnAuthorized);
             }
-
-            var mentorApplication = await applicationsRepository.GetAsync(mentorId, menteeId);
+            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(mentorUserId);
+            var mentorApplication = applications.FirstOrDefault(x => x.MenteeId == menteeId);
 
             if (mentorApplication == null)
             {
@@ -171,7 +172,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
             {
-                return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
+                return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
             }
 
             bool checkMenteeCountGtOrEqual = MenteeCountOfMentorGtOrEqMaxCount(mentorId);
@@ -209,7 +210,7 @@ namespace DevnotMentor.Api.Services
             var mentee = await menteeRepository.GetByIdAsync(menteeId);
 
             await SendAcceptMenteeNotificationMailAsync(mentor.User, mentee.User);
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse> RejectMenteeAsync(int mentorUserId, int mentorId, int menteeId)
@@ -221,8 +222,9 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.UnAuthorized);
             }
 
-            var mentorApplication = await applicationsRepository.GetAsync(mentorId, menteeId);
-
+            var applications = await applicationsRepository.GetApplicationsByUserIdAsync(mentorUserId);
+            var mentorApplication = applications.FirstOrDefault(x => x.MenteeId == menteeId);
+            
             if (mentorApplication == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundMentorMenteePair);
@@ -230,7 +232,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentorApplication.Status != MentorApplicationStatus.Waiting.ToInt())
             {
-                return new ErrorApiResponse(ResultMessage.ApplicationNotFoundWhenWaitingStatus);
+                return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
             }
 
             mentorApplication.CompleteDate = DateTime.Now;
@@ -238,7 +240,7 @@ namespace DevnotMentor.Api.Services
 
             applicationsRepository.Update(mentorApplication);
 
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse<List<MentorDto>>> SearchAsync(SearchRequest request)
@@ -248,10 +250,10 @@ namespace DevnotMentor.Api.Services
         }
 
 
-        private async Task SendAcceptMenteeNotificationMailAsync(User mentor,User mentee)
+        private async Task SendAcceptMenteeNotificationMailAsync(User mentor, User mentee)
         {
             List<string> to = new List<string>() { mentee.Email };
-            await mailService.SendEmailAsync(to,EmailTemplate.ApplyToMentorSubject,EmailTemplate.AcceptMenteeBody(mentor,mentee));
+            await mailService.SendEmailAsync(to, EmailTemplate.ApplyToMentorSubject, EmailTemplate.AcceptMenteeBody(mentor, mentee));
         }
 
         /// <summary>

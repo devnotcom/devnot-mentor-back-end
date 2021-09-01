@@ -14,6 +14,7 @@ using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
 using DevnotMentor.Api.Utilities.Email;
+using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
 
 namespace DevnotMentor.Api.Services
 {
@@ -174,7 +175,7 @@ namespace DevnotMentor.Api.Services
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool checkThereAreAnyPair = await applicationsRepository.IsExistsByUserIdAsync(mentorId, menteeId);
+            bool checkThereAreAnyPair = await applicationsRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId);
 
             if (checkThereAreAnyPair)
             {
@@ -194,7 +195,7 @@ namespace DevnotMentor.Api.Services
             var mentor= await mentorRepository.GetByIdAsync(menteeId);
 
             await SendApplyToMentorNotificationMailAsync(mentor.User, mentee.User);
-            return new SuccessApiResponse(ResultMessage.Success);
+            return new SuccessApiResponse(ResponseStatus.Ok,ResultMessage.Success);
         }
 
         public async Task<ApiResponse<List<MenteeDto>>> SearchAsync(SearchRequest request)
