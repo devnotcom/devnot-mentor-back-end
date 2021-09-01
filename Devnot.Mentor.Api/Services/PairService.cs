@@ -39,7 +39,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<List<PairDto>>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<PairDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var pairs = mapper.Map<List<PairDto>>(await pairRepository.GetPairsByUserIdAsync(userId));
@@ -53,7 +53,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentor == null)
             {
-                return new ErrorApiResponse<List<PairDto>>(data: default, message: ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<List<PairDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentor);
             }
 
             var pairs = mapper.Map<List<PairDto>>(await pairRepository.GetPairsByUserIdAsync(userId));
@@ -67,14 +67,14 @@ namespace DevnotMentor.Api.Services
 
             if (pair == null)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundNotFinishedMentorMenteePair);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundNotFinishedMentorMenteePair);
             }
 
-            bool checkUserHasThePair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
+            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
 
-            if (!checkUserHasThePair)
+            if (!userRelatedToPair)
             {
-                return new ErrorApiResponse(ResultMessage.Forbidden);
+                return new ErrorApiResponse(ResponseStatus.Forbid, ResultMessage.Forbidden);
             }
 
             pair.State = MentorMenteePairStatus.Finished.ToInt();
@@ -91,19 +91,19 @@ namespace DevnotMentor.Api.Services
 
             if (pair == null)
             {
-                return new ErrorApiResponse<PairDto>(null, ResultMessage.NotFoundFinishedMentorMenteePair);
+                return new ErrorApiResponse<PairDto>(ResponseStatus.NotFound, default, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
-            bool checkUserHasThePair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
+            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
 
-            if (!checkUserHasThePair)
+            if (!userRelatedToPair)
             {
-                return new ErrorApiResponse<PairDto>(null, ResultMessage.Forbidden);
+                return new ErrorApiResponse<PairDto>(ResponseStatus.Forbid, default, ResultMessage.Forbidden);
             }
 
-            bool checkUserIsMentee = userId == pair.Mentee.UserId;
+            bool isUserMentee = userId == pair.Mentee.UserId;
 
-            return checkUserIsMentee
+            return isUserMentee
             ? GiveFeedbackFromMentee(pair, pairFeedbackRequest)
             : GiveFeedbackFromMentor(pair, pairFeedbackRequest);
         }

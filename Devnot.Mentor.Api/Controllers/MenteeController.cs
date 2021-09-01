@@ -10,16 +10,18 @@ namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
     [ApiController]
-    [Route("/mentees/")]
+    [Route("mentees")]
     public class MenteeController : BaseController
     {
         private readonly IMenteeService menteeService;
         private readonly IPairService pairService;
+        private readonly IApplicationService applicationService;
 
-        public MenteeController(IMenteeService menteeService, IPairService pairService)
+        public MenteeController(IMenteeService menteeService, IPairService pairService, IApplicationService applicationService)
         {
             this.menteeService = menteeService;
             this.pairService = pairService;
+            this.applicationService = applicationService;
         }
 
         [HttpGet]
@@ -27,67 +29,58 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await menteeService.SearchAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("{userName}")]
-        public async Task<IActionResult> Get([FromRoute] string userName)
+        public async Task<IActionResult> GetMenteeProfileAsync([FromRoute] string userName)
         {
             var result = await menteeService.GetMenteeProfileAsync(userName);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
-
+        
+        //todo: paireds or mentorship
         [HttpGet("me/paireds/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetPairedMentors()
+        public async Task<IActionResult> GetPairedMentorsAsync()
         {
-            var authenticatedUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
             var result = await menteeService.GetPairedMentorsByUserIdAsync(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpGet("me/paireds")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetMentorships()
+        public async Task<IActionResult> GetMentorshipsAsync()
         {
-            var authenticatedUserId = User.Claims.GetUserId();
+            var authenticatedUserId = User.GetId();
             var result = await pairService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
 
-            return result.Success ? Success(result) : BadRequest(result);
-        }
-
-        [HttpGet("me/applications")]
-        [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> GetApplications()
-        {
-            var authenticatedUserId = User.Claims.GetUserId();
-            var result = await menteeService.GetApplicationsByUserIdAsync(authenticatedUserId);
-
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> Post([FromBody] CreateMenteeProfileRequest request)
+        public async Task<IActionResult> CreateMenteeProfileAsync([FromBody] CreateMenteeProfileRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await menteeService.CreateMenteeProfileAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost("me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
-        public async Task<IActionResult> ApplyToMentor(ApplyToMentorRequest request)
+        public async Task<IActionResult> CreateApplicationAsync([FromBody] ApplicationRequest request)
         {
-            request.MenteeUserId = User.Claims.GetUserId();
+            request.MenteeUserId = User.GetId();
 
-            var result = await menteeService.ApplyToMentorAsync(request);
+            var result = await applicationService.CreateApplicationAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
     }
 }

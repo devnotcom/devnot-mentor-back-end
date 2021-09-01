@@ -23,7 +23,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await userService.LoginAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -32,7 +32,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await userService.RegisterAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -40,11 +40,11 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await userService.ChangePasswordAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPatch]
@@ -52,11 +52,11 @@ namespace DevnotMentor.Api.Controllers
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> UpdateUser([FromForm] UpdateUserRequest request)
         {
-            request.UserId = User.Claims.GetUserId();
+            request.UserId = User.GetId();
 
             var result = await userService.UpdateAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [Route("/users/{email}/remind-password")]
@@ -65,7 +65,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await userService.RemindPasswordAsync(email);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
 
         [HttpPost]
@@ -74,7 +74,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var result = await userService.RemindPasswordCompleteAsync(request);
 
-            return result.Success ? Success(result) : BadRequest(result);
+            return ApiResponse(result);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse<List<PairDto>>> GetMentorshipsOfMentorByUserIdAsync(int userId);
 
         /// <summary>
-        /// Finish a not finished pair, If Authorized User is a mentee or mentor for the pair.
+        /// Finish a not finished pair, If Authenticated User is a mentee or mentor for the pair.
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="pairId"></param>
@@ -31,8 +31,8 @@ namespace DevnotMentor.Api.Services.Interfaces
         Task<ApiResponse> FinishContinuingPairAsync(int userId, int pairId);
 
         /// <summary>
-        /// Add feedback as a mentor or mentee to finished pair, If Authorized User is a mentee or mentor for the pair.
-        /// <para>The decision mechanism for who makes the feedback is related to the Authorized User.</para> 
+        /// Add feedback as a mentor or mentee to finished pair, If Authenticated User is a mentee or mentor for the pair.
+        /// <para>The decision mechanism for who makes the feedback is related to the Authenticated User.</para> 
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="pairId"></param>

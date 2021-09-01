@@ -54,6 +54,8 @@ namespace DevnotMentor.Api
             services.AddScoped<IMentorService, MentorService>();
             services.AddScoped<IMenteeService, MenteeService>();
             services.AddScoped<IPairService, PairService>();
+            services.AddScoped<IApplicationService, ApplicationService>();
+
 
             services.AddScoped<IMailService, SmtpMailService>();
             services.AddScoped<IFileService, LocalFileService>();

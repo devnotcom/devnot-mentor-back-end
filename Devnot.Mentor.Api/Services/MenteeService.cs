@@ -62,7 +62,7 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var mappedMentee = mapper.Map<Mentee, MenteeDto>(mentee);
@@ -75,24 +75,11 @@ namespace DevnotMentor.Api.Services
 
             if (mentee == null)
             {
-                return new ErrorApiResponse<List<MentorDto>>(data: default, message: ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<List<MentorDto>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
             var pairedMentors = mapper.Map<List<MentorDto>>(await menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
             return new SuccessApiResponse<List<MentorDto>>(pairedMentors);
-        }
-
-        public async Task<ApiResponse<List<MentorApplicationsDto>>> GetApplicationsByUserIdAsync(int userId)
-        {
-            var mentee = await menteeRepository.GetByUserIdAsync(userId);
-
-            if (mentee == null)
-            {
-                return new ErrorApiResponse<List<MentorApplicationsDto>>(data: default, message: ResultMessage.NotFoundMentee);
-            }
-
-            var applications = mapper.Map<List<MentorApplicationsDto>>(await applicationsRepository.GetByUserIdAsync(userId));
-            return new SuccessApiResponse<List<MentorApplicationsDto>>(applications);
         }
 
         public async Task<ApiResponse<MenteeDto>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request)
@@ -101,7 +88,7 @@ namespace DevnotMentor.Api.Services
 
             if (user == null)
             {
-                return new ErrorApiResponse<MenteeDto>(data: default, message: ResultMessage.NotFoundUser);
+                return new ErrorApiResponse<MenteeDto>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
             var registeredMentee = await menteeRepository.GetByUserIdAsync(user.Id);
@@ -164,6 +151,7 @@ namespace DevnotMentor.Api.Services
 
             return mentee;
         }
+
 
         public async Task<ApiResponse> ApplyToMentorAsync(ApplyToMentorRequest request)
         {
