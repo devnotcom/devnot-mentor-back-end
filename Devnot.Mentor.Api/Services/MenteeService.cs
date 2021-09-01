@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DevnotMentor.Api.Entities;
-using DevnotMentor.Api.Enums;
-using DevnotMentor.Api.Helpers.Extensions;
 using DevnotMentor.Api.Repositories.Interfaces;
 using DevnotMentor.Api.Services.Interfaces;
 using System;
@@ -13,9 +11,6 @@ using DevnotMentor.Api.CustomEntities.Dto;
 using DevnotMentor.Api.CustomEntities.Request.MenteeRequest;
 using System.Collections.Generic;
 using DevnotMentor.Api.CustomEntities.Request.CommonRequest;
-using DevnotMentor.Api.Utilities.Email;
-using DevnotMentor.Api.CustomEntities.Request.MentorRequest;
-
 namespace DevnotMentor.Api.Services
 {
     public class MenteeService : BaseService, IMenteeService
@@ -28,7 +23,6 @@ namespace DevnotMentor.Api.Services
         private readonly IMentorRepository mentorRepository;
         private readonly IMentorApplicationsRepository applicationsRepository;
         private readonly IMentorMenteePairsRepository pairsRepository;
-        private readonly IMailService mailService;
 
         public MenteeService(
             IMapper mapper,
