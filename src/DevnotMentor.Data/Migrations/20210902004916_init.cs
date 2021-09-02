@@ -111,7 +111,7 @@ namespace DevnotMentor.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Mentor",
+                name: "Mentors",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -122,7 +122,7 @@ namespace DevnotMentor.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mentor", x => x.Id);
+                    table.PrimaryKey("PK_Mentors", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Mentor_User",
                         column: x => x.UserId,
@@ -185,7 +185,7 @@ namespace DevnotMentor.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MentorApplications",
+                name: "Applications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -199,7 +199,7 @@ namespace DevnotMentor.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MentorApplications", x => x.Id);
+                    table.PrimaryKey("PK_Applications", x => x.Id);
                     table.ForeignKey(
                         name: "FK_MentorApplications_Mentee",
                         column: x => x.MenteeId,
@@ -209,7 +209,7 @@ namespace DevnotMentor.Data.Migrations
                     table.ForeignKey(
                         name: "FK_MentorApplications_Mentor",
                         column: x => x.MentorId,
-                        principalTable: "Mentor",
+                        principalTable: "Mentors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -236,13 +236,13 @@ namespace DevnotMentor.Data.Migrations
                     table.ForeignKey(
                         name: "FK_MentorLinks_Mentor",
                         column: x => x.MentorId,
-                        principalTable: "Mentor",
+                        principalTable: "Mentors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MentorQuestion",
+                name: "MentorQuestions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -254,11 +254,11 @@ namespace DevnotMentor.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MentorQuestion", x => x.Id);
+                    table.PrimaryKey("PK_MentorQuestions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_MentorQuestion_Mentor",
                         column: x => x.MentorId,
-                        principalTable: "Mentor",
+                        principalTable: "Mentors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -297,7 +297,7 @@ namespace DevnotMentor.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Mentorships_Mentor",
                         column: x => x.MentorId,
-                        principalTable: "Mentor",
+                        principalTable: "Mentors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -317,7 +317,7 @@ namespace DevnotMentor.Data.Migrations
                     table.ForeignKey(
                         name: "FK_MentorTags_Mentor",
                         column: x => x.MentorId,
-                        principalTable: "Mentor",
+                        principalTable: "Mentors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -350,10 +350,20 @@ namespace DevnotMentor.Data.Migrations
                     table.ForeignKey(
                         name: "FK_MenteeAnswers_MentorQuestion",
                         column: x => x.MentorQuestionId,
-                        principalTable: "MentorQuestion",
+                        principalTable: "MentorQuestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_MenteeId",
+                table: "Applications",
+                column: "MenteeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_MentorId",
+                table: "Applications",
+                column: "MentorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenteeAnswers_MenteeId",
@@ -391,21 +401,6 @@ namespace DevnotMentor.Data.Migrations
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Mentor_UserId",
-                table: "Mentor",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MentorApplications_MenteeId",
-                table: "MentorApplications",
-                column: "MenteeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MentorApplications_MentorId",
-                table: "MentorApplications",
-                column: "MentorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MentorLinks_LinkTypeId",
                 table: "MentorLinks",
                 column: "LinkTypeId");
@@ -416,14 +411,19 @@ namespace DevnotMentor.Data.Migrations
                 column: "MentorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MentorQuestion_MentorId",
-                table: "MentorQuestion",
+                name: "IX_MentorQuestions_MentorId",
+                table: "MentorQuestions",
                 column: "MentorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MentorQuestion_QuestionTypeId",
-                table: "MentorQuestion",
+                name: "IX_MentorQuestions_QuestionTypeId",
+                table: "MentorQuestions",
                 column: "QuestionTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Mentors_UserId",
+                table: "Mentors",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mentorships_MenteeId",
@@ -449,6 +449,9 @@ namespace DevnotMentor.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Applications");
+
+            migrationBuilder.DropTable(
                 name: "Logs");
 
             migrationBuilder.DropTable(
@@ -461,9 +464,6 @@ namespace DevnotMentor.Data.Migrations
                 name: "MenteeTags");
 
             migrationBuilder.DropTable(
-                name: "MentorApplications");
-
-            migrationBuilder.DropTable(
                 name: "MentorLinks");
 
             migrationBuilder.DropTable(
@@ -473,7 +473,7 @@ namespace DevnotMentor.Data.Migrations
                 name: "MentorTags");
 
             migrationBuilder.DropTable(
-                name: "MentorQuestion");
+                name: "MentorQuestions");
 
             migrationBuilder.DropTable(
                 name: "LinkTypes");
@@ -485,7 +485,7 @@ namespace DevnotMentor.Data.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "Mentor");
+                name: "Mentors");
 
             migrationBuilder.DropTable(
                 name: "QuestionTypes");

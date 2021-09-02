@@ -19,14 +19,14 @@ namespace DevnotMentor.Data
             if (request is null || request.IsNotValid())
             {
                 return DbContext
-                    .Mentor
+                    .Mentors
                     .Include(mentor => mentor.User)
                     .Include(mentor => mentor.MentorTags)
                         .ThenInclude(mentorTag => mentorTag.Tag)
                     .ToListAsync();
             }
 
-            var queryableMentor = DbContext.Mentor.AsQueryable();
+            var queryableMentor = DbContext.Mentors.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.FullName))
             {
@@ -57,22 +57,22 @@ namespace DevnotMentor.Data
 
         public async Task<int> GetIdByUserIdAsync(int userId)
         {
-            return await DbContext.Mentor.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
+            return await DbContext.Mentors.Where(i => i.UserId == userId).Select(i => i.Id).FirstOrDefaultAsync();
         }
 
         public async Task<Mentor> GetByUserNameAsync(string userName)
         {
-            return await DbContext.Mentor.Include(x => x.User).Where(i => i.User.UserName == userName).FirstOrDefaultAsync();
+            return await DbContext.Mentors.Include(x => x.User).Where(i => i.User.UserName == userName).FirstOrDefaultAsync();
         }
 
         public async Task<Mentor> GetByUserIdAsync(int userId)
         {
-            return await DbContext.Mentor.Where(i => i.UserId == userId).FirstOrDefaultAsync();
+            return await DbContext.Mentors.Where(i => i.UserId == userId).FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsExistsByUserIdAsync(int userId)
         {
-            return await DbContext.Mentor.AnyAsync(i => i.UserId == userId);
+            return await DbContext.Mentors.AnyAsync(i => i.UserId == userId);
         }
 
         public async Task<IEnumerable<Mentee>> GetPairedMenteesByMentorIdAsync(int mentorId)
@@ -86,7 +86,7 @@ namespace DevnotMentor.Data
 
         public async Task<Mentor> GetByIdAsync(int mentorId)
         {
-            return await DbContext.Mentor.Include(x=>x.User).Where(x => x.Id == mentorId).FirstOrDefaultAsync();
+            return await DbContext.Mentors.Include(x=>x.User).Where(x => x.Id == mentorId).FirstOrDefaultAsync();
         }
     }
 }

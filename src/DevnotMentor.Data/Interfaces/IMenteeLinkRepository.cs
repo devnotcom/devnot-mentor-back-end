@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DevnotMentor.Data.Interfaces
 {
-    public interface IMenteeLinksRepository : IRepository<MenteeLink>
+    public interface IMenteeLinkRepository : IRepository<MenteeLink>
     {
         void Create(int mentorId, List<string> list);
     }

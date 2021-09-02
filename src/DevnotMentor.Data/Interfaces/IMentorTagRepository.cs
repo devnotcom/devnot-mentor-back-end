@@ -2,8 +2,7 @@
 
 namespace DevnotMentor.Data.Interfaces
 {
-    public interface ITagRepository : IRepository<Tag>
+    public interface IMentorTagRepository : IRepository<MentorTag>
     {
-        Tag Get(string tagName);
     }
 }

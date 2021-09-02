@@ -2,7 +2,7 @@
 
 namespace DevnotMentor.Data.Interfaces
 {
-    public interface IMenteeTagsRepository : IRepository<MenteeTag>
+    public interface IMenteeTagRepository : IRepository<MenteeTag>
     {
     }
 }

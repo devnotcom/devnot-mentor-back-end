@@ -36,10 +36,7 @@ namespace DevnotMentor.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            System.Console.WriteLine("TEST");
-
             var connectionString = EnvironmentService.StaticConfiguration["ConnectionStrings:SQLServerConnectionString"];
-            System.Console.WriteLine(connectionString);
             services.AddDbContext<MentorDBContext>(options => options.UseSqlServer(connectionString));
 
             services.AddControllers()
@@ -69,14 +66,14 @@ namespace DevnotMentor.Api
             #region Repositories
 
             services.AddScoped<ILogRepository, LogRepository>();
-            services.AddScoped<IMenteeLinksRepository, MenteeLinksRepository>();
+            services.AddScoped<IMenteeLinkRepository, MenteeLinkRepository>();
             services.AddScoped<IMenteeRepository, MenteeRepository>();
-            services.AddScoped<IMenteeTagsRepository, MenteeTagsRepository>();
+            services.AddScoped<IMenteeTagRepository, MenteeTagRepository>();
             services.AddScoped<IApplicationsRepository, IApplicationRepository>();
-            services.AddScoped<IMentorLinksRepository, MentorLinksRepository>();
+            services.AddScoped<IMentorLinkRepository, MentorLinkRepository>();
             services.AddScoped<IMentorshipsRepository, MentorshipsRepository>();
             services.AddScoped<IMentorRepository, MentorRepository>();
-            services.AddScoped<IMentorTagsRepository, MentorTagsRepository>();
+            services.AddScoped<IMentorTagRepository, MentorTagRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 

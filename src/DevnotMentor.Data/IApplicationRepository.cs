@@ -17,7 +17,7 @@ namespace DevnotMentor.Data
 
         public async Task<bool> AnyWaitingApplicationBetweenMentorAndMenteeAsync(int mentorId, int menteeId)
         {
-            return await DbContext.MentorApplications.AnyAsync(x => 
+            return await DbContext.Applications.AnyAsync(x => 
                 x.Status == (int)ApplicationStatus.Waiting
                 && x.MentorId == mentorId
                 && x.MenteeId == menteeId);
@@ -25,7 +25,7 @@ namespace DevnotMentor.Data
 
         public async Task<IEnumerable<Application>> GetApplicationsByUserIdAsync(int userId)
         {
-            return await DbContext.MentorApplications
+            return await DbContext.Applications
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
                 .Include(x => x.Mentor).ThenInclude(x => x.User)
                 .Where(x => x.Mentor.UserId == userId || x.Mentee.UserId == userId)
@@ -34,7 +34,7 @@ namespace DevnotMentor.Data
 
         public async Task<Application> GetWhichIsWaitingByIdAsync(int applicationId)
         {
-            return await DbContext.MentorApplications
+            return await DbContext.Applications
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
                 .Include(x => x.Mentor).ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == applicationId && x.Status == (int)ApplicationStatus.Waiting);

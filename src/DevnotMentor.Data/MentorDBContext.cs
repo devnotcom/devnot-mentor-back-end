@@ -16,11 +16,11 @@ namespace DevnotMentor.Data
         public virtual DbSet<MenteeAnswer> MenteeAnswers { get; set; }
         public virtual DbSet<MenteeLink> MenteeLinks { get; set; }
         public virtual DbSet<MenteeTag> MenteeTags { get; set; }
-        public virtual DbSet<Mentor> Mentor { get; set; }
-        public virtual DbSet<Application> MentorApplications { get; set; }
+        public virtual DbSet<Mentor> Mentors { get; set; }
+        public virtual DbSet<Application> Applications { get; set; }
         public virtual DbSet<MentorLink> MentorLinks { get; set; }
         public virtual DbSet<Mentorship> Mentorships { get; set; }
-        public virtual DbSet<MentorQuestion> MentorQuestion { get; set; }
+        public virtual DbSet<MentorQuestion> MentorQuestions { get; set; }
         public virtual DbSet<MentorTag> MentorTags { get; set; }
         public virtual DbSet<QuestionType> QuestionTypes { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }

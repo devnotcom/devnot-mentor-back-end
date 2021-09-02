@@ -52,7 +52,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("MentorId");
 
-                    b.ToTable("MentorApplications");
+                    b.ToTable("Applications");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.LinkType", b =>
@@ -238,7 +238,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Mentor");
+                    b.ToTable("Mentors");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.MentorLink", b =>
@@ -297,7 +297,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("QuestionTypeId");
 
-                    b.ToTable("MentorQuestion");
+                    b.ToTable("MentorQuestions");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.MentorTag", b =>

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace DevnotMentor.Data
 {
-    public class MentorLinksRepository : BaseRepository<MentorLink>, IMentorLinksRepository
+    public class MentorLinkRepository : BaseRepository<MentorLink>, IMentorLinkRepository
     {
-        public MentorLinksRepository(MentorDBContext context) : base(context)
+        public MentorLinkRepository(MentorDBContext context) : base(context)
         {
         }
 

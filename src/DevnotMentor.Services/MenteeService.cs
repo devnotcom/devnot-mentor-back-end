@@ -16,8 +16,8 @@ namespace DevnotMentor.Services
     public class MenteeService : BaseService, IMenteeService
     {
         private readonly IMenteeRepository menteeRepository;
-        private readonly IMenteeLinksRepository menteeLinksRepository;
-        private readonly IMenteeTagsRepository menteeTagsRepository;
+        private readonly IMenteeLinkRepository menteeLinksRepository;
+        private readonly IMenteeTagRepository menteeTagsRepository;
         private readonly ITagRepository tagRepository;
         private readonly IUserRepository userRepository;
         private readonly IMentorRepository mentorRepository;
@@ -27,8 +27,8 @@ namespace DevnotMentor.Services
         public MenteeService(
             IMapper mapper,
             IMenteeRepository menteeRepository,
-            IMenteeLinksRepository menteeLinksRepository,
-            IMenteeTagsRepository menteeTagsRepository,
+            IMenteeLinkRepository menteeLinksRepository,
+            IMenteeTagRepository menteeTagsRepository,
             ITagRepository tagRepository,
             IUserRepository userRepository,
             IMentorRepository mentorRepository,

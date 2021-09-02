@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DevnotMentor.Data.Migrations
 {
     [DbContext(typeof(MentorDBContext))]
-    [Migration("20210902001020_init")]
+    [Migration("20210902004916_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,7 +54,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("MentorId");
 
-                    b.ToTable("MentorApplications");
+                    b.ToTable("Applications");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.LinkType", b =>
@@ -240,7 +240,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Mentor");
+                    b.ToTable("Mentors");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.MentorLink", b =>
@@ -299,7 +299,7 @@ namespace DevnotMentor.Data.Migrations
 
                     b.HasIndex("QuestionTypeId");
 
-                    b.ToTable("MentorQuestion");
+                    b.ToTable("MentorQuestions");
                 });
 
             modelBuilder.Entity("DevnotMentor.Data.Entities.MentorTag", b =>

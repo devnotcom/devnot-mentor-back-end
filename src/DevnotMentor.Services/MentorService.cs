@@ -18,8 +18,8 @@ namespace DevnotMentor.Services
     {
         private readonly IMentorRepository mentorRepository;
         private readonly IMenteeRepository menteeRepository;
-        private readonly IMentorLinksRepository mentorLinksRepository;
-        private readonly IMentorTagsRepository mentorTagsRepository;
+        private readonly IMentorLinkRepository mentorLinksRepository;
+        private readonly IMentorTagRepository mentorTagsRepository;
         private readonly ITagRepository tagRepository;
         private readonly IUserRepository userRepository;
         private readonly IApplicationsRepository applicationsRepository;
@@ -29,8 +29,8 @@ namespace DevnotMentor.Services
             IMapper mapper,
             IMentorRepository mentorRepository,
             IMenteeRepository menteeRepository,
-            IMentorLinksRepository mentorLinksRepository,
-            IMentorTagsRepository mentorTagsRepository,
+            IMentorLinkRepository mentorLinksRepository,
+            IMentorTagRepository mentorTagsRepository,
             ITagRepository tagRepository,
             IUserRepository userRepository,
             IApplicationsRepository mentorApplicationsRepository,
