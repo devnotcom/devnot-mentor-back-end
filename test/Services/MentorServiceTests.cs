@@ -1,5 +1,5 @@
-//using DevnotMentor.Services;
-using DevnotMentor.Services.Repository.Interfaces;
+//using DevnotMentor.Business;
+using DevnotMentor.Business.Repository.Interfaces;
 using System;
 using Xunit;
 

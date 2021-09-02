@@ -34,6 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DevnotMentor.Services\DevnotMentor.Services.csproj" />
+    <ProjectReference Include="..\DevnotMentor.Business\DevnotMentor.Business.csproj" />
   </ItemGroup>
 </Project>

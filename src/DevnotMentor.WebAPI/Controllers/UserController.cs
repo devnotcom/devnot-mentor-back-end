@@ -2,7 +2,7 @@
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Common.Requests.User;
 using DevnotMentor.Api.Helpers.Extensions;
-using DevnotMentor.Services.Repository.Interfaces;
+using DevnotMentor.Business.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.Api.Controllers

@@ -1,5 +1,5 @@
 ﻿using DevnotMentor.Api.ActionFilters;
-using DevnotMentor.Services.Repository.Interfaces;
+using DevnotMentor.Business.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Common.Requests;
