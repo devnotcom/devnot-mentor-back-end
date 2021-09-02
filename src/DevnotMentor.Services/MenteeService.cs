@@ -4,7 +4,6 @@ using DevnotMentor.Data.Interfaces;
 using DevnotMentor.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
-using DevnotMentor.Common;
 using DevnotMentor.Common.API;
 using DevnotMentor.Configurations.Context;
 using DevnotMentor.Common.DTO;
@@ -15,14 +14,14 @@ namespace DevnotMentor.Services
 {
     public class MenteeService : BaseService, IMenteeService
     {
-        private readonly IMenteeRepository menteeRepository;
-        private readonly IMenteeLinkRepository menteeLinksRepository;
-        private readonly IMenteeTagRepository menteeTagsRepository;
-        private readonly ITagRepository tagRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IMentorRepository mentorRepository;
-        private readonly IApplicationsRepository applicationsRepository;
-        private readonly IMentorshipsRepository pairsRepository;
+        private readonly IMenteeRepository _menteeRepository;
+        private readonly IMenteeLinkRepository _menteeLinkRepository;
+        private readonly IMenteeTagRepository _menteeTagsRepository;
+        private readonly ITagRepository _tagRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMentorRepository _mentorRepository;
+        private readonly IApplicationRepository _applicationRepository;
+        private readonly IMentorshipRepository _mentorshipRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -32,27 +31,26 @@ namespace DevnotMentor.Services
             ITagRepository tagRepository,
             IUserRepository userRepository,
             IMentorRepository mentorRepository,
-            IApplicationsRepository mentorApplicationsRepository,
-            IMentorshipsRepository MentorshipsRepository,
+            IApplicationRepository mentorApplicationsRepository,
+            IMentorshipRepository MentorshipsRepository,
             ILogRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             )
             : base(mapper, loggerRepository, devnotConfigurationContext)
         {
-            this.menteeRepository = menteeRepository;
-            this.menteeLinksRepository = menteeLinksRepository;
-            this.menteeTagsRepository = menteeTagsRepository;
-            this.tagRepository = tagRepository;
-            this.userRepository = userRepository;
-            this.mentorRepository = mentorRepository;
-            this.applicationsRepository = mentorApplicationsRepository;
-            this.pairsRepository = MentorshipsRepository;
-            
+            _menteeRepository = menteeRepository;
+            _menteeLinkRepository = menteeLinksRepository;
+            _menteeTagsRepository = menteeTagsRepository;
+            _tagRepository = tagRepository;
+            _userRepository = userRepository;
+            _mentorRepository = mentorRepository;
+            _applicationRepository = mentorApplicationsRepository;
+            _mentorshipRepository = MentorshipsRepository;
         }
 
         public async Task<ApiResponse<MenteeDTO>> GetMenteeProfileAsync(string userName)
         {
-            var mentee = await menteeRepository.GetByUserNameAsync(userName);
+            var mentee = await _menteeRepository.GetByUserNameAsync(userName);
 
             if (mentee == null)
             {
@@ -65,27 +63,27 @@ namespace DevnotMentor.Services
 
         public async Task<ApiResponse<List<MentorDTO>>> GetPairedMentorsByUserIdAsync(int userId)
         {
-            var mentee = await menteeRepository.GetByUserIdAsync(userId);
+            var mentee = await _menteeRepository.GetByUserIdAsync(userId);
 
             if (mentee == null)
             {
                 return new ErrorApiResponse<List<MentorDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var pairedMentors = mapper.Map<List<MentorDTO>>(await menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
+            var pairedMentors = mapper.Map<List<MentorDTO>>(await _menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
             return new SuccessApiResponse<List<MentorDTO>>(pairedMentors);
         }
 
         public async Task<ApiResponse<MenteeDTO>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request)
         {
-            var user = await userRepository.GetByIdAsync(request.UserId);
+            var user = await _userRepository.GetByIdAsync(request.UserId);
 
             if (user == null)
             {
                 return new ErrorApiResponse<MenteeDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var registeredMentee = await menteeRepository.GetByUserIdAsync(user.Id);
+            var registeredMentee = await _menteeRepository.GetByUserIdAsync(user.Id);
 
             if (registeredMentee != null)
             {
@@ -110,14 +108,14 @@ namespace DevnotMentor.Services
             var newMentee = mapper.Map<Mentee>(request);
             newMentee.UserId = user.Id;
 
-            mentee = menteeRepository.Create(newMentee);
+            mentee = _menteeRepository.Create(newMentee);
 
             if (mentee == null)
             {
                 return null;
             }
 
-            menteeLinksRepository.Create(mentee.Id, request.MenteeLinks);
+            _menteeLinkRepository.Create(mentee.Id, request.MenteeLinks);
 
             foreach (var menteeTag in request.MenteeTags)
             {
@@ -126,19 +124,19 @@ namespace DevnotMentor.Services
                     continue;
                 }
 
-                var tag = tagRepository.Get(menteeTag);
+                var tag = _tagRepository.Get(menteeTag);
 
                 if (tag != null)
                 {
-                    menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = mentee.Id });
+                    _menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = mentee.Id });
                 }
                 else
                 {
-                    var newTag = tagRepository.Create(new Tag { Name = menteeTag });
+                    var newTag = _tagRepository.Create(new Tag { Name = menteeTag });
 
                     if (newTag != null)
                     {
-                        menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = mentee.Id });
+                        _menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = mentee.Id });
                     }
                 }
             }
@@ -147,7 +145,7 @@ namespace DevnotMentor.Services
         }
         public async Task<ApiResponse<List<MenteeDTO>>> SearchAsync(SearchRequest request)
         {
-            var mappedMentees = mapper.Map<List<MenteeDTO>>(await menteeRepository.SearchAsync(request));
+            var mappedMentees = mapper.Map<List<MenteeDTO>>(await _menteeRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MenteeDTO>>(mappedMentees);
         }
 

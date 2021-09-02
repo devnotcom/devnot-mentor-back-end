@@ -209,9 +209,9 @@ namespace DevnotMentor.Data
                     .HasMaxLength(1000)
                     .IsUnicode(false);
 
-                entity.Property(e => e.MentorEndDate).HasColumnType("datetime");
+                entity.Property(e => e.FinishedAt).HasColumnType("datetime");
 
-                entity.Property(e => e.MentorStartDate).HasColumnType("datetime");
+                entity.Property(e => e.StartedAt).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Mentee)
                     .WithMany(p => p.Mentorships)

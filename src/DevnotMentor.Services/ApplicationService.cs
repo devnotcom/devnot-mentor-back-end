@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using DevnotMentor.Common;
 using DevnotMentor.Common.API;
 using DevnotMentor.Configurations.Context;
 using DevnotMentor.Common.DTO;
@@ -16,36 +15,36 @@ namespace DevnotMentor.Services
 {
     public class ApplicationService : BaseService, IApplicationService
     {
-        private readonly IApplicationsRepository applicationRepository;
-        private readonly IMentorshipsRepository pairRepository;
-        private readonly IMentorRepository mentorRepository;
-        private readonly IMenteeRepository menteeRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IMailService mailService;
+        private readonly IApplicationRepository _applicationRepository;
+        private readonly IMentorshipRepository _mentorshipRepository;
+        private readonly IMentorRepository _mentorRepository;
+        private readonly IMenteeRepository _menteeRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMailService _mailService;
 
         public ApplicationService(
             IMapper mapper,
             ILogRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext,
-            IApplicationsRepository mentorApplicationsRepository,
-            IMentorshipsRepository MentorshipsRepository,
+            IApplicationRepository mentorApplicationsRepository,
+            IMentorshipRepository MentorshipsRepository,
             IMentorRepository mentorRepository,
             IMenteeRepository menteeRepository,
             IUserRepository userRepository,
             IMailService mailService
         ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
-            this.applicationRepository = mentorApplicationsRepository;
-            this.pairRepository = MentorshipsRepository;
-            this.mentorRepository = mentorRepository;
-            this.menteeRepository = menteeRepository;
-            this.userRepository = userRepository;
-            this.mailService = mailService;
+            _applicationRepository = mentorApplicationsRepository;
+            _mentorshipRepository = MentorshipsRepository;
+            _mentorRepository = mentorRepository;
+            _menteeRepository = menteeRepository;
+            _userRepository = userRepository;
+            _mailService = mailService;
         }
 
         public async Task<ApiResponse<List<ApplicationDTO>>> GetApplicationsByUserIdAsync(int authenticatedUserId)
         {
-            var applications = await applicationRepository.GetApplicationsByUserIdAsync(authenticatedUserId);
+            var applications = await _applicationRepository.GetApplicationsByUserIdAsync(authenticatedUserId);
             var ApplicationDTO = mapper.Map<List<ApplicationDTO>>(applications);
 
             return new SuccessApiResponse<List<ApplicationDTO>>(ApplicationDTO);
@@ -53,7 +52,7 @@ namespace DevnotMentor.Services
 
         public async Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId)
         {
-            var toBeApprovedApplication = await applicationRepository.GetWhichIsWaitingByIdAsync(toBeApprovedApplicationId);
+            var toBeApprovedApplication = await _applicationRepository.GetWhichIsWaitingByIdAsync(toBeApprovedApplicationId);
             if (toBeApprovedApplication == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
@@ -77,21 +76,21 @@ namespace DevnotMentor.Services
 
             var dateTimeNow = System.DateTime.Now;
 
-            var Mentorships = new Mentorship
+            var mentorship = new Mentorship
             {
                 MentorId = toBeApprovedApplication.MentorId,
                 MenteeId = toBeApprovedApplication.MenteeId,
-                MentorStartDate = dateTimeNow,
+                StartedAt = dateTimeNow,
                 State = (int)MentorshipStatus.Continues
             };
-            pairRepository.Create(Mentorships);
+            _mentorshipRepository.Create(mentorship);
 
             toBeApprovedApplication.Status = (int)ApplicationStatus.Approved;
             toBeApprovedApplication.CompletedAt = dateTimeNow;
-            applicationRepository.Update(toBeApprovedApplication);
+            _applicationRepository.Update(toBeApprovedApplication);
 
             var to = new List<string>() { toBeApprovedApplication.Mentee.User.Email };
-            await mailService.SendEmailAsync(
+            await _mailService.SendEmailAsync(
                 to,
                 EmailTemplate.ApplicationSubject,
                 EmailTemplate.ApplicationApprovedBody(toBeApprovedApplication.Mentor.User, toBeApprovedApplication.Mentee.User));
@@ -101,7 +100,7 @@ namespace DevnotMentor.Services
 
         public async Task<ApiResponse> RejectWaitingApplicationByIdAsync(int authenticatedUserId, int toBeRejectedApplicationId)
         {
-            var toBeRejectedApplication = await applicationRepository.GetWhichIsWaitingByIdAsync(toBeRejectedApplicationId);
+            var toBeRejectedApplication = await _applicationRepository.GetWhichIsWaitingByIdAsync(toBeRejectedApplicationId);
             if (toBeRejectedApplication == null)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundWaitingApplication);
@@ -115,20 +114,20 @@ namespace DevnotMentor.Services
 
             toBeRejectedApplication.Status = (int)ApplicationStatus.Rejected;
             toBeRejectedApplication.CompletedAt = System.DateTime.Now;
-            applicationRepository.Update(toBeRejectedApplication);
+            _applicationRepository.Update(toBeRejectedApplication);
 
             return new SuccessApiResponse();
         }
 
         private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentee(int menteeId)
         {
-            int count = pairRepository.GetCountForContinuingStatusByMenteeId(menteeId);
+            int count = _mentorshipRepository.GetCountForContinuingStatusByMenteeId(menteeId);
             return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
         }
 
         private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentor(int mentorId)
         {
-            int count = pairRepository.GetCountForContinuingStatusByMentorId(mentorId);
+            int count = _mentorshipRepository.GetCountForContinuingStatusByMentorId(mentorId);
             return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
         }
 
@@ -139,25 +138,25 @@ namespace DevnotMentor.Services
                 return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
             }
 
-            int menteeId = await menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
+            int menteeId = await _menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
             if (menteeId == default)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundMentee);
             }
 
-            int mentorId = await mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
+            int mentorId = await _mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
             if (mentorId == default)
             {
                 return new ErrorApiResponse(ResultMessage.NotFoundMentor);
             }
 
-            bool anyWaitingApplicationBetweenMentorAndMentee = await applicationRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId);
+            bool anyWaitingApplicationBetweenMentorAndMentee = await _applicationRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId);
             if (anyWaitingApplicationBetweenMentorAndMentee)
             {
                 return new ErrorApiResponse(ResultMessage.ThereIsAlreadyWaitingApplication);
             }
 
-            applicationRepository.Create(new Application
+            _applicationRepository.Create(new Application
             {
                 Note = request.ApplicationNotes,
                 AppliedAt = System.DateTime.Now,
@@ -166,11 +165,11 @@ namespace DevnotMentor.Services
                 Status = (int)ApplicationStatus.Waiting
             });
 
-            var mentorUser = await userRepository.GetByIdAsync(request.MentorUserId);
-            var menteeUser = await userRepository.GetByIdAsync(request.MenteeUserId);
+            var mentorUser = await _userRepository.GetByIdAsync(request.MentorUserId);
+            var menteeUser = await _userRepository.GetByIdAsync(request.MenteeUserId);
 
             var to = new List<string>() { mentorUser.Email };
-            await mailService.SendEmailAsync(
+            await _mailService.SendEmailAsync(
                 to,
                 EmailTemplate.ApplicationSubject,
                 EmailTemplate.ApplicationAppliedBody(mentorUser, menteeUser));

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DevnotMentor.Data.Entities
+﻿namespace DevnotMentor.Data.Entities
 {
     public partial class MenteeLink
     {

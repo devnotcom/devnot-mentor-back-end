@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Common;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Data.Interfaces;
 using DevnotMentor.Services.Interfaces;
@@ -16,14 +15,14 @@ namespace DevnotMentor.Services
 {
     public class MentorService : BaseService, IMentorService
     {
-        private readonly IMentorRepository mentorRepository;
-        private readonly IMenteeRepository menteeRepository;
-        private readonly IMentorLinkRepository mentorLinksRepository;
-        private readonly IMentorTagRepository mentorTagsRepository;
-        private readonly ITagRepository tagRepository;
-        private readonly IUserRepository userRepository;
-        private readonly IApplicationsRepository applicationsRepository;
-        private readonly IMentorshipsRepository pairsRepository;
+        private readonly IMentorRepository _mentorRepository;
+        private readonly IMenteeRepository _menteeRepository;
+        private readonly IMentorLinkRepository _mentorLinkRepository;
+        private readonly IMentorTagRepository _mentorTagRepository;
+        private readonly ITagRepository _tagRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IApplicationRepository _applicationRepository;
+        private readonly IMentorshipRepository _mentorshipRepository;
 
         public MentorService(
             IMapper mapper,
@@ -33,25 +32,25 @@ namespace DevnotMentor.Services
             IMentorTagRepository mentorTagsRepository,
             ITagRepository tagRepository,
             IUserRepository userRepository,
-            IApplicationsRepository mentorApplicationsRepository,
-            IMentorshipsRepository MentorshipsRepository,
+            IApplicationRepository mentorApplicationsRepository,
+            IMentorshipRepository MentorshipsRepository,
             ILogRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
-            this.mentorRepository = mentorRepository;
-            this.menteeRepository = menteeRepository;
-            this.mentorLinksRepository = mentorLinksRepository;
-            this.mentorTagsRepository = mentorTagsRepository;
-            this.tagRepository = tagRepository;
-            this.userRepository = userRepository;
-            this.applicationsRepository = mentorApplicationsRepository;
-            this.pairsRepository = MentorshipsRepository;
+            _mentorRepository = mentorRepository;
+            _menteeRepository = menteeRepository;
+            _mentorLinkRepository = mentorLinksRepository;
+            _mentorTagRepository = mentorTagsRepository;
+            _tagRepository = tagRepository;
+            _userRepository = userRepository;
+            _applicationRepository = mentorApplicationsRepository;
+            _mentorshipRepository = MentorshipsRepository;
         }
 
         public async Task<ApiResponse<MentorDTO>> GetMentorProfileAsync(string userName)
         {
-            var mentor = await mentorRepository.GetByUserNameAsync(userName);
+            var mentor = await _mentorRepository.GetByUserNameAsync(userName);
 
             if (mentor == null)
             {
@@ -64,28 +63,28 @@ namespace DevnotMentor.Services
 
         public async Task<ApiResponse<List<MenteeDTO>>> GetPairedMenteesByUserIdAsync(int userId)
         {
-            var mentor = await mentorRepository.GetByUserIdAsync(userId);
+            var mentor = await _mentorRepository.GetByUserIdAsync(userId);
 
             if (mentor == null)
             {
                 return new ErrorApiResponse<List<MenteeDTO>>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
-            var pairedMentees = mapper.Map<List<MenteeDTO>>(await mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
+            var pairedMentees = mapper.Map<List<MenteeDTO>>(await _mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
 
             return new SuccessApiResponse<List<MenteeDTO>>(pairedMentees);
         }
 
         public async Task<ApiResponse<MentorDTO>> CreateMentorProfileAsync(CreateMentorProfileRequest request)
         {
-            var user = await userRepository.GetByIdAsync(request.UserId);
+            var user = await _userRepository.GetByIdAsync(request.UserId);
 
             if (user == null)
             {
                 return new ErrorApiResponse<MentorDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var registeredMentor = await mentorRepository.GetByUserIdAsync(user.Id);
+            var registeredMentor = await _mentorRepository.GetByUserIdAsync(user.Id);
 
             if (registeredMentor != null)
             {
@@ -111,14 +110,14 @@ namespace DevnotMentor.Services
 
             newMentor.UserId = user.Id;
 
-            mentor = mentorRepository.Create(newMentor);
+            mentor = _mentorRepository.Create(newMentor);
 
             if (mentor == null)
             {
                 return null;
             }
 
-            mentorLinksRepository.Create(mentor.Id, request.MentorLinks);
+            _mentorLinkRepository.Create(mentor.Id, request.MentorLinks);
 
             foreach (var mentorTag in request.MentorTags)
             {
@@ -127,19 +126,19 @@ namespace DevnotMentor.Services
                     continue;
                 }
 
-                var tag = tagRepository.Get(mentorTag);
+                var tag = _tagRepository.Get(mentorTag);
 
                 if (tag != null)
                 {
-                    mentorTagsRepository.Create(new MentorTag { TagId = tag.Id, MentorId = mentor.Id });
+                    _mentorTagRepository.Create(new MentorTag { TagId = tag.Id, MentorId = mentor.Id });
                 }
                 else
                 {
-                    var newTag = tagRepository.Create(new Tag { Name = mentorTag });
+                    var newTag = _tagRepository.Create(new Tag { Name = mentorTag });
 
                     if (newTag != null)
                     {
-                        mentorTagsRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = mentor.Id });
+                        _mentorTagRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = mentor.Id });
                     }
                 }
             }
@@ -149,9 +148,8 @@ namespace DevnotMentor.Services
 
         public async Task<ApiResponse<List<MentorDTO>>> SearchAsync(SearchRequest request)
         {
-            var mappedMentors = mapper.Map<List<MentorDTO>>(await mentorRepository.SearchAsync(request));
+            var mappedMentors = mapper.Map<List<MentorDTO>>(await _mentorRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MentorDTO>>(mappedMentors);
         }
-
     }
 }

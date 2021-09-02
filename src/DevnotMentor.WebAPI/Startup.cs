@@ -69,9 +69,9 @@ namespace DevnotMentor.Api
             services.AddScoped<IMenteeLinkRepository, MenteeLinkRepository>();
             services.AddScoped<IMenteeRepository, MenteeRepository>();
             services.AddScoped<IMenteeTagRepository, MenteeTagRepository>();
-            services.AddScoped<IApplicationsRepository, IApplicationRepository>();
+            services.AddScoped<IApplicationRepository, ApplicationRepository>();
             services.AddScoped<IMentorLinkRepository, MentorLinkRepository>();
-            services.AddScoped<IMentorshipsRepository, MentorshipsRepository>();
+            services.AddScoped<IMentorshipRepository, MentorshipRepository>();
             services.AddScoped<IMentorRepository, MentorRepository>();
             services.AddScoped<IMentorTagRepository, MentorTagRepository>();
             services.AddScoped<ITagRepository, TagRepository>();

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Data.Interfaces
 {
-    public interface IApplicationsRepository : IRepository<Application>
+    public interface IApplicationRepository : IRepository<Application>
     {
         Task<bool> AnyWaitingApplicationBetweenMentorAndMenteeAsync(int mentorId, int menteeId);
         Task<Application> GetWhichIsWaitingByIdAsync(int applicationId);

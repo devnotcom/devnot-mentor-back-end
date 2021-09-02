@@ -7,8 +7,8 @@ namespace DevnotMentor.Data.Entities
         public int Id { get; set; }
         public int? MentorId { get; set; }
         public int? MenteeId { get; set; }
-        public DateTime? MentorStartDate { get; set; }
-        public DateTime? MentorEndDate { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? FinishedAt { get; set; }
         public int? State { get; set; }
         public byte? MentorScore { get; set; }
         public string MentorComment { get; set; }

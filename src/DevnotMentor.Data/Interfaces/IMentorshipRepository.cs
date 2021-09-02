@@ -4,14 +4,13 @@ using DevnotMentor.Data.Entities;
 
 namespace DevnotMentor.Data.Interfaces
 {
-    public interface IMentorshipsRepository : IRepository<Mentorship>
+    public interface IMentorshipRepository : IRepository<Mentorship>
     {
         /// <summary>
         /// Get total status count which has continuing status by mentee id.
         /// </summary>
         /// <param name="menteeId"></param>
         /// <returns></returns>
-
         int GetCountForContinuingStatusByMenteeId(int menteeId);
         /// <summary>
         /// Get total status count which has continuing status by mentor id.
@@ -25,7 +24,7 @@ namespace DevnotMentor.Data.Interfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<Mentorship>> GetPairsByUserIdAsync(int userId);
+        Task<IEnumerable<Mentorship>> GetMentorshipsByUserIdAsync(int userId);
 
         /// <summary>
         /// Get mentor mentee pair which is not finished.

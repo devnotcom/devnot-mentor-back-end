@@ -4,14 +4,16 @@ using DevnotMentor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DevnotMentor.Data.Migrations
 {
     [DbContext(typeof(MentorDBContext))]
-    partial class MentorDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210902110843_update_datetime_prop_names")]
+    partial class update_datetime_prop_names
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

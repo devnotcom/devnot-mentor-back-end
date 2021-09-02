@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace DevnotMentor.Data
 {
-    public class MentorshipsRepository : BaseRepository<Mentorship>, IMentorshipsRepository
+    public class MentorshipRepository : BaseRepository<Mentorship>, IMentorshipRepository
     {
-        public MentorshipsRepository(MentorDBContext context) : base(context)
+        public MentorshipRepository(MentorDBContext context) : base(context)
         {
         }
 
-        public async Task<IEnumerable<Mentorship>> GetPairsByUserIdAsync(int userId)
+        public async Task<IEnumerable<Mentorship>> GetMentorshipsByUserIdAsync(int userId)
         {
             return await DbContext.Mentorships
                 .Include(x => x.Mentee).ThenInclude(x => x.User)
