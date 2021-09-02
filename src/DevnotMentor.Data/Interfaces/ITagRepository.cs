@@ -4,6 +4,6 @@ namespace DevnotMentor.Data.Interfaces
 {
     public interface ITagRepository : IRepository<Tag>
     {
-        Tag Get(string tagName);
+        Tag GetByName(string tagName);
     }
 }

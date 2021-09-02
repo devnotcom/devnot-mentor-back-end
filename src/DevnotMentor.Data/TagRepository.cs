@@ -10,7 +10,7 @@ namespace DevnotMentor.Data
         {
         }
 
-        public Tag Get(string tagName)
+        public Tag GetByName(string tagName)
         {
             return DbContext.Tags.Where(i => i.Name == tagName).FirstOrDefault();
         }

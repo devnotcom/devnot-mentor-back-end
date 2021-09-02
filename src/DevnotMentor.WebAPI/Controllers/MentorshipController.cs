@@ -12,29 +12,26 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class MentorshipController : BaseController
     {
-        private readonly IMentorshipService MentorshipService;
+        private readonly IMentorshipService _mentorshipService;
 
-        public MentorshipController(IMentorshipService pairsService)
+        public MentorshipController(IMentorshipService mentorshipService)
         {
-            this.MentorshipService = pairsService;
+            _mentorshipService = mentorshipService;
         }
         
-        //todo: paireds or mentorship
-        [HttpPost("/users/me/paireds/{id}/finish")]
+        [HttpPost("/users/me/mentorships/{id}/finish")]
         public async Task<IActionResult> FinishAsync([FromRoute] int id)
         {
             var authenticatedUserId = User.GetId();
-            var result = await MentorshipService.FinishContinuingPairAsync(authenticatedUserId, id);
-
+            var result = await _mentorshipService.FinishContinuingMentorshipAsync(authenticatedUserId, id);
             return ApiResponse(result);
         }
 
-        [HttpPost("/users/me/paireds/{id}/feedback")]
+        [HttpPost("/users/me/mentorships/{id}/feedback")]
         public async Task<IActionResult> FeedbackAsync([FromRoute] int id, [FromBody] MentorshipFeedbackRequest MentorshipFeedbackRequest)
         {
             var authenticatedUserId = User.GetId();
-            var result = await MentorshipService.GiveFeedbackToFinishedPairAsync(authenticatedUserId, id, MentorshipFeedbackRequest);
-
+            var result = await _mentorshipService.GiveFeedbackToFinishedMentorshipAsync(authenticatedUserId, id, MentorshipFeedbackRequest);
             return ApiResponse(result);
         }
     }

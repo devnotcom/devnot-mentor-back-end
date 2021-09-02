@@ -59,7 +59,7 @@ namespace DevnotMentor.Services
             return new SuccessApiResponse<List<MentorshipDTO>>(pairs);
         }
 
-        public async Task<ApiResponse> FinishContinuingPairAsync(int userId, int pairId)
+        public async Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int pairId)
         {
             var pair = await _mentorshipRepository.GetWhichIsNotFinishedYetByIdAsync(pairId);
 
@@ -83,7 +83,7 @@ namespace DevnotMentor.Services
             return new SuccessApiResponse();
         }
 
-        public async Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedPairAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest)
+        public async Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest)
         {
             var pair = await _mentorshipRepository.GetWhichIsFinishedByIdAsync(pairId);
 

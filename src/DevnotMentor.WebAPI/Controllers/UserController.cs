@@ -10,18 +10,18 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private readonly IUserService userService;
+        private readonly IUserService _userService;
 
         public UserController(IUserService userService)
         {
-            this.userService = userService;
+            _userService = userService;
         }
 
         [HttpPost]
         [Route("/users/login")]
         public async Task<IActionResult> Login(UserLoginRequest request)
         {
-            var result = await userService.LoginAsync(request);
+            var result = await _userService.LoginAsync(request);
 
             return ApiResponse(result);
         }
@@ -30,7 +30,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("/users/register")]
         public async Task<IActionResult> Register([FromForm] RegisterUserRequest request)
         {
-            var result = await userService.RegisterAsync(request);
+            var result = await _userService.RegisterAsync(request);
 
             return ApiResponse(result);
         }
@@ -42,7 +42,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.UserId = User.GetId();
 
-            var result = await userService.ChangePasswordAsync(request);
+            var result = await _userService.ChangePasswordAsync(request);
 
             return ApiResponse(result);
         }
@@ -54,7 +54,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.UserId = User.GetId();
 
-            var result = await userService.UpdateAsync(request);
+            var result = await _userService.UpdateAsync(request);
 
             return ApiResponse(result);
         }
@@ -63,7 +63,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> RemindPassword([FromRoute] string email)
         {
-            var result = await userService.RemindPasswordAsync(email);
+            var result = await _userService.RemindPasswordAsync(email);
 
             return ApiResponse(result);
         }
@@ -72,7 +72,7 @@ namespace DevnotMentor.Api.Controllers
         [Route("/users/me/remind-password-complete")]
         public async Task<IActionResult> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request)
         {
-            var result = await userService.RemindPasswordCompleteAsync(request);
+            var result = await _userService.RemindPasswordCompleteAsync(request);
 
             return ApiResponse(result);
         }

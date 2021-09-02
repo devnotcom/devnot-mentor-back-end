@@ -124,7 +124,7 @@ namespace DevnotMentor.Services
                     continue;
                 }
 
-                var tag = _tagRepository.Get(menteeTag);
+                var tag = _tagRepository.GetByName(menteeTag);
 
                 if (tag != null)
                 {

@@ -13,21 +13,21 @@ namespace DevnotMentor.Api.Controllers
     [Route("mentors")]
     public class MentorController : BaseController
     {
-        private readonly IMentorService mentorService;
-        private readonly IApplicationService applicationService;
-        private readonly IMentorshipService MentorshipService;
+        private readonly IMentorService _mentorService;
+        private readonly IApplicationService _applicationService;
+        private readonly IMentorshipService _mentorshipService;
 
-        public MentorController(IMentorService mentorService, IMentorshipService MentorshipService, IApplicationService applicationService)
+        public MentorController(IMentorService mentorService, IMentorshipService mentorshipService, IApplicationService applicationService)
         {
-            this.mentorService = mentorService;
-            this.MentorshipService = MentorshipService;
-            this.applicationService = applicationService;
+            _mentorService = mentorService;
+            _mentorshipService = mentorshipService;
+            _applicationService = applicationService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] SearchRequest request)
         {
-            var result = await mentorService.SearchAsync(request);
+            var result = await _mentorService.SearchAsync(request);
 
             return ApiResponse(result);
         }
@@ -35,7 +35,7 @@ namespace DevnotMentor.Api.Controllers
         [HttpGet("{userName}")]
         public async Task<IActionResult> GetMentorProfileAsync([FromRoute] string userName)
         {
-            var result = await mentorService.GetMentorProfileAsync(userName);
+            var result = await _mentorService.GetMentorProfileAsync(userName);
 
             return ApiResponse(result);
         }
@@ -46,7 +46,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetPairedMenteesAsync()
         {
             var authenticatedUserId = User.GetId();
-            var result = await mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
+            var result = await _mentorService.GetPairedMenteesByUserIdAsync(authenticatedUserId);
 
             return ApiResponse(result);
         }
@@ -56,7 +56,7 @@ namespace DevnotMentor.Api.Controllers
         public async Task<IActionResult> GetMentorshipProccesesAsync()
         {
             var authenticatedUserId = User.GetId();
-            var result = await MentorshipService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
+            var result = await _mentorshipService.GetMentorshipsOfMentorByUserIdAsync(authenticatedUserId);
 
             return ApiResponse(result);
         }
@@ -67,7 +67,7 @@ namespace DevnotMentor.Api.Controllers
         {
             request.UserId = User.GetId();
 
-            var result = await mentorService.CreateMentorProfileAsync(request);
+            var result = await _mentorService.CreateMentorProfileAsync(request);
 
             return ApiResponse(result);
         }
@@ -78,7 +78,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.ApproveWaitingApplicationByIdAsync(authenticatedUserId, id);
+            var result = await _applicationService.ApproveWaitingApplicationByIdAsync(authenticatedUserId, id);
 
             return ApiResponse(result);
         }
@@ -89,7 +89,7 @@ namespace DevnotMentor.Api.Controllers
         {
             var authenticatedUserId = User.GetId();
 
-            var result = await applicationService.RejectWaitingApplicationByIdAsync(authenticatedUserId, id);
+            var result = await _applicationService.RejectWaitingApplicationByIdAsync(authenticatedUserId, id);
 
             return ApiResponse(result);
         }

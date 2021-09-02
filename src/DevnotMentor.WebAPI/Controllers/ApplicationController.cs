@@ -9,17 +9,17 @@ namespace DevnotMentor.Api.Controllers
     [ApiController]
     public class ApplicationController : BaseController
     {
-        private readonly IApplicationService applicationService;
+        private readonly IApplicationService _applicationService;
         public ApplicationController(IApplicationService applicationService)
         {
-            this.applicationService = applicationService;
+            _applicationService = applicationService;
         }
 
         [HttpGet("/users/me/applications")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetApplicationsAsync()
         {
-            var result = await applicationService.GetApplicationsByUserIdAsync(User.GetId());
+            var result = await _applicationService.GetApplicationsByUserIdAsync(User.GetId());
             return ApiResponse(result);
         }
     }

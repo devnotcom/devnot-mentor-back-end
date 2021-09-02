@@ -126,7 +126,7 @@ namespace DevnotMentor.Services
                     continue;
                 }
 
-                var tag = _tagRepository.Get(mentorTag);
+                var tag = _tagRepository.GetByName(mentorTag);
 
                 if (tag != null)
                 {

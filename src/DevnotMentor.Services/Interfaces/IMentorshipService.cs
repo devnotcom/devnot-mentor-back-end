@@ -28,7 +28,7 @@ namespace DevnotMentor.Services.Interfaces
         /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="ApiResponse"/></returns>
-        Task<ApiResponse> FinishContinuingPairAsync(int userId, int pairId);
+        Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int pairId);
 
         /// <summary>
         /// Add feedback as a mentor or mentee to finished pair, If Authenticated User is a mentee or mentor for the pair.
@@ -37,6 +37,6 @@ namespace DevnotMentor.Services.Interfaces
         /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedPairAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest);
+        Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest);
     }
 }
