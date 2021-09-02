@@ -1,7 +1,7 @@
 ﻿using System;
 using DevnotMentor.Common.DTO;
 
-namespace DevnotMentor.Api.CustomEntities.Response.UserResponse
+namespace DevnotMentor.Common.Responses.User
 {
     public class UserLoginResponse
     {

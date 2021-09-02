@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DevnotMentor.Common;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Data.Interfaces;
 using DevnotMentor.Business.Repository.Interfaces;
@@ -13,8 +12,8 @@ using DevnotMentor.Common.API;
 using DevnotMentor.Configurations.Context;
 using DevnotMentor.Common.DTO;
 using DevnotMentor.Common.Requests.User;
-using DevnotMentor.Api.CustomEntities.Response.UserResponse;
 using DevnotMentor.Business.Utilities.File;
+using DevnotMentor.Common.Responses.User;
 
 namespace DevnotMentor.Business.Repository
 {

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DevnotMentor.Common.API;
 using DevnotMentor.Common.Requests.User;
-using DevnotMentor.Api.CustomEntities.Response.UserResponse;
+using DevnotMentor.Common.Responses.User;
 
 namespace DevnotMentor.Business.Repository.Interfaces
 {
