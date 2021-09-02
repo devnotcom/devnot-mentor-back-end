@@ -1,4 +1,4 @@
-﻿using DevnotMentor.Utilities.Security.Token;
+﻿using DevnotMentor.Services.Utilities.Security.Token;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;

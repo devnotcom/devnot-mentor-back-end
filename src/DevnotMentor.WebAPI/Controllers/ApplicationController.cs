@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using DevnotMentor.Api.ActionFilters;
 using DevnotMentor.Api.Helpers.Extensions;
-using DevnotMentor.Services.Interfaces;
+using DevnotMentor.Services.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.Api.Controllers

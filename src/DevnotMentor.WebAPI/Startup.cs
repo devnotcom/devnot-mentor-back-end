@@ -1,7 +1,7 @@
 using System;
 using DevnotMentor.Data.Entities;
-using DevnotMentor.Services;
-using DevnotMentor.Services.Interfaces;
+using DevnotMentor.Services.Repository;
+using DevnotMentor.Services.Repository.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -9,19 +9,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using DevnotMentor.Api.ActionFilters;
-using DevnotMentor.Utilities.Security.Token;
+using DevnotMentor.Services.Utilities.Security.Token;
 using DevnotMentor.Configurations.Context;
 using DevnotMentor.Configurations.Environment;
 using DevnotMentor.Api.Middlewares;
-using DevnotMentor.Utilities.Security.Hash;
-using DevnotMentor.Utilities.Security.Hash.Sha256;
-using DevnotMentor.Utilities.Email;
+using DevnotMentor.Services.Utilities.Security.Hash;
+using DevnotMentor.Services.Utilities.Security.Hash.Sha256;
+using DevnotMentor.Services.Utilities.Email;
 using DevnotMentor.Data;
 using DevnotMentor.Data.Interfaces;
-using DevnotMentor.Utilities.Email.SmtpMail;
-using DevnotMentor.Utilities.File;
-using DevnotMentor.Utilities.File.Local;
-using DevnotMentor.Utilities.Security.Token.Jwt;
+using DevnotMentor.Services.Utilities.Email.SmtpMail;
+using DevnotMentor.Services.Utilities.File;
+using DevnotMentor.Services.Utilities.File.Local;
+using DevnotMentor.Services.Utilities.Security.Token.Jwt;
 
 namespace DevnotMentor.Api
 {
