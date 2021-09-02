@@ -34,7 +34,6 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMenteeByUserId(int userId)
         {
             var mentee = await _menteeRepository.GetByUserIdAsync(userId);
-
             if (mentee == null)
             {
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
@@ -48,7 +47,6 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMentorByUserIdAsync(int userId)
         {
             var mentor = await _mentorRepository.GetByUserIdAsync(userId);
-
             if (mentor == null)
             {
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentor);
@@ -59,51 +57,47 @@ namespace DevnotMentor.Services
             return new SuccessApiResponse<List<MentorshipDTO>>(pairs);
         }
 
-        public async Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int pairId)
+        public async Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int mentorshipId)
         {
-            var pair = await _mentorshipRepository.GetWhichIsNotFinishedYetByIdAsync(pairId);
-
-            if (pair == null)
+            var toBeFinishedMentorship = await _mentorshipRepository.GetWhichIsNotFinishedYetByIdAsync(mentorshipId);
+            if (toBeFinishedMentorship == null)
             {
                 return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundNotFinishedMentorMenteePair);
             }
 
-            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
-
+            bool userRelatedToPair = toBeFinishedMentorship.Mentee.UserId == userId || toBeFinishedMentorship.Mentor.UserId == userId;
             if (!userRelatedToPair)
             {
                 return new ErrorApiResponse(ResponseStatus.Forbid, ResultMessage.Forbidden);
             }
 
-            pair.State = (int)MentorshipStatus.Finished;
-            pair.FinishedAt = System.DateTime.Now;
+            toBeFinishedMentorship.State = (int)MentorshipStatus.Finished;
+            toBeFinishedMentorship.FinishedAt = System.DateTime.Now;
 
-            _mentorshipRepository.Update(pair);
+            _mentorshipRepository.Update(toBeFinishedMentorship);
 
             return new SuccessApiResponse();
         }
 
-        public async Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest)
+        public async Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int mentorshipId, MentorshipFeedbackRequest MentorshipFeedbackRequest)
         {
-            var pair = await _mentorshipRepository.GetWhichIsFinishedByIdAsync(pairId);
-
-            if (pair == null)
+            var toBeGivenFeedbackMentorship = await _mentorshipRepository.GetWhichIsFinishedByIdAsync(mentorshipId);
+            if (toBeGivenFeedbackMentorship == null)
             {
                 return new ErrorApiResponse<MentorshipDTO>(ResponseStatus.NotFound, default, ResultMessage.NotFoundFinishedMentorMenteePair);
             }
 
-            bool userRelatedToPair = pair.Mentee.UserId == userId || pair.Mentor.UserId == userId;
-
+            bool userRelatedToPair = toBeGivenFeedbackMentorship.Mentee.UserId == userId || toBeGivenFeedbackMentorship.Mentor.UserId == userId;
             if (!userRelatedToPair)
             {
                 return new ErrorApiResponse<MentorshipDTO>(ResponseStatus.Forbid, default, ResultMessage.Forbidden);
             }
 
-            bool isUserMentee = userId == pair.Mentee.UserId;
-
+            bool isUserMentee = userId == toBeGivenFeedbackMentorship.Mentee.UserId;
+            
             return isUserMentee
-            ? GiveFeedbackFromMentee(pair, MentorshipFeedbackRequest)
-            : GiveFeedbackFromMentor(pair, MentorshipFeedbackRequest);
+                ? GiveFeedbackFromMentee(toBeGivenFeedbackMentorship, MentorshipFeedbackRequest)
+                : GiveFeedbackFromMentor(toBeGivenFeedbackMentorship, MentorshipFeedbackRequest);
         }
 
         private ApiResponse<MentorshipDTO> GiveFeedbackFromMentee(Mentorship mentorship, MentorshipFeedbackRequest MentorshipFeedbackRequest)

@@ -9,26 +9,26 @@ namespace DevnotMentor.Services.Interfaces
     public interface IMentorshipService
     {
         /// <summary>
-        /// Returns mentorship processes.
+        /// Returns mentorship processes for mentee.
         /// </summary>
         /// <param name="userId">Mentee UserId</param>
         /// <returns>List of <see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMenteeByUserId(int userId);
 
         /// <summary>
-        /// Returns mentorship processes.
+        /// Returns mentorship processes for mentor.
         /// </summary>
         /// <param name="userId">Mentor UserId</param>
         /// <returns>List of <see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMentorByUserIdAsync(int userId);
 
         /// <summary>
-        /// Finish a not finished pair, If Authenticated User is a mentee or mentor for the pair.
+        /// Finishs a not finished pair, If Authenticated User is a mentee or mentor for the pair.
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="ApiResponse"/></returns>
-        Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int pairId);
+        Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int mentorshipId);
 
         /// <summary>
         /// Add feedback as a mentor or mentee to finished pair, If Authenticated User is a mentee or mentor for the pair.
@@ -37,6 +37,6 @@ namespace DevnotMentor.Services.Interfaces
         /// <param name="userId"></param>
         /// <param name="pairId"></param>
         /// <returns><see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int pairId, MentorshipFeedbackRequest MentorshipFeedbackRequest);
+        Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int mentorshipId, MentorshipFeedbackRequest MentorshipFeedbackRequest);
     }
 }

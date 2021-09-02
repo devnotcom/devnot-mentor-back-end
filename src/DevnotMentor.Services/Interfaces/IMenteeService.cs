@@ -10,7 +10,7 @@ namespace DevnotMentor.Services.Interfaces
     public interface IMenteeService
     {
         /// <summary>
-        /// Get mentee profile by user name.
+        /// Gets mentee profile by user name.
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
@@ -24,14 +24,14 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse<List<MentorDTO>>> GetPairedMentorsByUserIdAsync(int userId);
         
         /// <summary>
-        /// Create mentee profile.
+        /// Creates mentee profile.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         Task<ApiResponse<MenteeDTO>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request);
 
         /// <summary>
-        /// Get mentee list which contains properties in search request.
+        /// Gets mentees by <see cref="SearchRequest" />
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

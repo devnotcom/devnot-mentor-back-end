@@ -33,20 +33,20 @@ namespace DevnotMentor.Data
             return DbContext.Mentorships.Count(i => i.MentorId == mentorId && i.State == (int)MentorshipStatus.Continues);
         }
 
-        public async Task<Mentorship> GetWhichIsNotFinishedYetByIdAsync(int pairId)
+        public async Task<Mentorship> GetWhichIsNotFinishedYetByIdAsync(int mentorshipId)
         {
             return await DbContext.Mentorships
                .Include(x => x.Mentee)
                .Include(x => x.Mentor)
-               .FirstOrDefaultAsync(x => x.Id == pairId && x.State != (int)MentorshipStatus.Finished);
+               .FirstOrDefaultAsync(x => x.Id == mentorshipId && x.State != (int)MentorshipStatus.Finished);
         }
 
-        public async Task<Mentorship> GetWhichIsFinishedByIdAsync(int pairId)
+        public async Task<Mentorship> GetWhichIsFinishedByIdAsync(int mentorshipId)
         {
             return await DbContext.Mentorships
                .Include(x => x.Mentee).ThenInclude(x=>x.User)
                .Include(x => x.Mentor).ThenInclude(x=>x.User)
-               .FirstOrDefaultAsync(x => x.Id == pairId && x.State == (int)MentorshipStatus.Finished);
+               .FirstOrDefaultAsync(x => x.Id == mentorshipId && x.State == (int)MentorshipStatus.Finished);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse<List<ApplicationDTO>>> GetApplicationsByUserIdAsync(int authenticatedUserId);
 
         /// <summary>
-        /// Approve the waiting application
+        /// Approves the waiting application
         /// <para>If Mentee or Mentor have already reached the max count for the continuing mentorship, cannot be approved.</para>
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
@@ -25,7 +25,7 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId);
 
         /// <summary>
-        /// Reject the waiting application
+        /// Rejects the waiting application
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
         /// <param name="toBeRejectedApplicationId">Id of the application to be rejected</param>
@@ -33,7 +33,7 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse> RejectWaitingApplicationByIdAsync(int authenticatedUserId, int toBeRejectedApplicationId);
 
         /// <summary>
-        /// Create application via <see cref="ApplicationRequest"/>
+        /// Creates application via <see cref="ApplicationRequest"/>
         /// <para>If there is any waiting application between Mentee and Mentor, cannot be created.</para>
         /// </summary>
         /// <param name="request"><see cref="ApplicationRequest"/></param>
