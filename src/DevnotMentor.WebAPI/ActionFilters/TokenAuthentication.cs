@@ -5,7 +5,7 @@ using System;
 using System.Security.Claims;
 using DevnotMentor.Common.API;
 
-namespace DevnotMentor.Api.ActionFilters
+namespace DevnotMentor.WebAPI.ActionFilters
 {
     public class TokenAuthentication : ActionFilterAttribute
     {

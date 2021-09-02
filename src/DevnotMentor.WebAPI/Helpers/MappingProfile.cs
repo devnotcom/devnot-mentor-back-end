@@ -5,7 +5,7 @@ using DevnotMentor.Common.Requests.Mentor;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Common.Requests.User;
 
-namespace DevnotMentor.Api.Helpers
+namespace DevnotMentor.WebAPI.Helpers
 {
     public class MappingProfile : Profile
     {

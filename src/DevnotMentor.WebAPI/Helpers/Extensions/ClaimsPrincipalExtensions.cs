@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 
-namespace DevnotMentor.Api.Helpers.Extensions
+namespace DevnotMentor.WebAPI.Helpers.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {

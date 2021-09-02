@@ -3,7 +3,7 @@ using DevnotMentor.Configurations.Environment;
 using DevnotMentor.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevnotMentor.Api.Controllers
+namespace DevnotMentor.WebAPI.Controllers
 {
     [ApiController]
     [Route("logs")]

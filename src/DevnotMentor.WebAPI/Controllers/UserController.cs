@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using DevnotMentor.Api.ActionFilters;
+using DevnotMentor.WebAPI.ActionFilters;
 using DevnotMentor.Common.Requests.User;
-using DevnotMentor.Api.Helpers.Extensions;
+using DevnotMentor.WebAPI.Helpers.Extensions;
 using DevnotMentor.Business.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevnotMentor.Api.Controllers
+namespace DevnotMentor.WebAPI.Controllers
 {
     [ApiController]
     public class UserController : BaseController

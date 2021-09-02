@@ -1,12 +1,12 @@
-﻿using DevnotMentor.Api.ActionFilters;
+﻿using DevnotMentor.WebAPI.ActionFilters;
 using DevnotMentor.Business.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DevnotMentor.Common.Requests;
 using DevnotMentor.Common.Requests.Mentee;
-using DevnotMentor.Api.Helpers.Extensions;
+using DevnotMentor.WebAPI.Helpers.Extensions;
 
-namespace DevnotMentor.Api.Controllers
+namespace DevnotMentor.WebAPI.Controllers
 {
     [ValidateModelState]
     [ApiController]

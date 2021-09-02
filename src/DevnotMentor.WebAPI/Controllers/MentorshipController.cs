@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using DevnotMentor.Api.ActionFilters;
-using DevnotMentor.Api.Helpers.Extensions;
+using DevnotMentor.WebAPI.ActionFilters;
+using DevnotMentor.WebAPI.Helpers.Extensions;
 using DevnotMentor.Business.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using DevnotMentor.Common.Requests.Mentorship;
 
-namespace DevnotMentor.Api.Controllers
+namespace DevnotMentor.WebAPI.Controllers
 {
     [ServiceFilter(typeof(TokenAuthentication))]
     [ValidateModelState]

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using DevnotMentor.Common.API;
 
-namespace DevnotMentor.Api.ActionFilters
+namespace DevnotMentor.WebAPI.ActionFilters
 {
     public class ValidateModelStateAttribute : ActionFilterAttribute
     {

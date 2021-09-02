@@ -8,7 +8,7 @@ using DevnotMentor.Data.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace DevnotMentor.Api.Middlewares
+namespace DevnotMentor.WebAPI.Middlewares
 {
     /// <summary>
     /// for all types of unexpected errors
