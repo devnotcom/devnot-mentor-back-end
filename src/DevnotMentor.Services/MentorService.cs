@@ -48,7 +48,7 @@ namespace DevnotMentor.Services
             _mentorshipRepository = MentorshipsRepository;
         }
 
-        public async Task<ApiResponse<MentorDTO>> GetMentorProfileAsync(string userName)
+        public async Task<ApiResponse<MentorDTO>> GetMentorProfileByUserNameAsync(string userName)
         {
             var mentor = await _mentorRepository.GetByUserNameAsync(userName);
 

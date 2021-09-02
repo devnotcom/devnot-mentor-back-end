@@ -11,31 +11,24 @@ namespace DevnotMentor.Services.Interfaces
         /// <summary>
         /// Returns mentorship processes for mentee.
         /// </summary>
-        /// <param name="userId">Mentee UserId</param>
         /// <returns>List of <see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMenteeByUserId(int userId);
+        Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsByMenteeUserIdAsync(int menteeUserId);
 
         /// <summary>
         /// Returns mentorship processes for mentor.
         /// </summary>
-        /// <param name="userId">Mentor UserId</param>
         /// <returns>List of <see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
-        Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMentorByUserIdAsync(int userId);
+        Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsByMentorUserIdAsync(int mentorUserId);
 
         /// <summary>
-        /// Finishs a not finished pair, If Authenticated User is a mentee or mentor for the pair.
+        /// Finishs a not finished mentorship, If Authenticated User is a mentee or mentor for the mentorship.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="pairId"></param>
-        /// <returns><see cref="ApiResponse"/></returns>
         Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int mentorshipId);
 
         /// <summary>
-        /// Add feedback as a mentor or mentee to finished pair, If Authenticated User is a mentee or mentor for the pair.
+        /// Add feedback as a mentor or mentee to finished mentorship, If Authenticated User is a mentee or mentor for the mentorship.
         /// <para>The decision mechanism for who makes the feedback is related to the Authenticated User.</para> 
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="pairId"></param>
         /// <returns><see cref="MentorshipDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<MentorshipDTO>> GiveFeedbackToFinishedMentorshipAsync(int userId, int mentorshipId, MentorshipFeedbackRequest MentorshipFeedbackRequest);
     }

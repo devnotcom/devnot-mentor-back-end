@@ -35,12 +35,11 @@ namespace DevnotMentor.Api.Controllers
         [HttpGet("{userName}")]
         public async Task<IActionResult> GetMenteeProfileAsync([FromRoute] string userName)
         {
-            var result = await _menteeService.GetMenteeProfileAsync(userName);
+            var result = await _menteeService.GetMenteeProfileByUserNameAsync(userName);
 
             return ApiResponse(result);
         }
         
-        //todo: paireds or mentorship
         [HttpGet("me/paireds/mentors")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetPairedMentorsAsync()
@@ -51,12 +50,12 @@ namespace DevnotMentor.Api.Controllers
             return ApiResponse(result);
         }
 
-        [HttpGet("me/paireds")]
+        [HttpGet("me/mentorships")]
         [ServiceFilter(typeof(TokenAuthentication))]
         public async Task<IActionResult> GetMentorshipsAsync()
         {
             var authenticatedUserId = User.GetId();
-            var result = await _mentorshipService.GetMentorshipsOfMenteeByUserId(authenticatedUserId);
+            var result = await _mentorshipService.GetMentorshipsByMenteeUserIdAsync(authenticatedUserId);
 
             return ApiResponse(result);
         }

@@ -31,7 +31,7 @@ namespace DevnotMentor.Services
             _mentorRepository = mentorRepository;
         }
 
-        public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMenteeByUserId(int userId)
+        public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsByMenteeUserIdAsync(int userId)
         {
             var mentee = await _menteeRepository.GetByUserIdAsync(userId);
             if (mentee == null)
@@ -39,12 +39,12 @@ namespace DevnotMentor.Services
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var pairs = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
+            var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
 
-            return new SuccessApiResponse<List<MentorshipDTO>>(pairs);
+            return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
-        public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsOfMentorByUserIdAsync(int userId)
+        public async Task<ApiResponse<List<MentorshipDTO>>> GetMentorshipsByMentorUserIdAsync(int userId)
         {
             var mentor = await _mentorRepository.GetByUserIdAsync(userId);
             if (mentor == null)
@@ -52,9 +52,9 @@ namespace DevnotMentor.Services
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentor);
             }
 
-            var pairs = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
+            var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
 
-            return new SuccessApiResponse<List<MentorshipDTO>>(pairs);
+            return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
         public async Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int mentorshipId)
@@ -62,7 +62,7 @@ namespace DevnotMentor.Services
             var toBeFinishedMentorship = await _mentorshipRepository.GetWhichIsNotFinishedYetByIdAsync(mentorshipId);
             if (toBeFinishedMentorship == null)
             {
-                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundNotFinishedMentorMenteePair);
+                return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundNotFinishedMentorship);
             }
 
             bool userRelatedToPair = toBeFinishedMentorship.Mentee.UserId == userId || toBeFinishedMentorship.Mentor.UserId == userId;
@@ -84,7 +84,7 @@ namespace DevnotMentor.Services
             var toBeGivenFeedbackMentorship = await _mentorshipRepository.GetWhichIsFinishedByIdAsync(mentorshipId);
             if (toBeGivenFeedbackMentorship == null)
             {
-                return new ErrorApiResponse<MentorshipDTO>(ResponseStatus.NotFound, default, ResultMessage.NotFoundFinishedMentorMenteePair);
+                return new ErrorApiResponse<MentorshipDTO>(ResponseStatus.NotFound, default, ResultMessage.NotFoundFinishedMentorship);
             }
 
             bool userRelatedToPair = toBeGivenFeedbackMentorship.Mentee.UserId == userId || toBeGivenFeedbackMentorship.Mentor.UserId == userId;

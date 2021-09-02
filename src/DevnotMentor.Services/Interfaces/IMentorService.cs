@@ -14,7 +14,7 @@ namespace DevnotMentor.Services.Interfaces
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        Task<ApiResponse<MentorDTO>> GetMentorProfileAsync(string userName);
+        Task<ApiResponse<MentorDTO>> GetMentorProfileByUserNameAsync(string userName);
 
         /// <summary>
         /// Creates mentor profile.

@@ -43,11 +43,9 @@
         public static string MenteeAlreadyHasTheMaxMentorCount => "messages.error.mentee.menteeAlreadyHasTheMaxMentorCount";
 
 
-        public static string NotFoundMentorMenteePair => "messages.error.pair.notFoundMentorMenteePair";
-        public static string NotFoundNotFinishedMentorMenteePair => "messages.error.pair.notFoundNotFinishedMentorMenteePair";
-        public static string NotFoundFinishedMentorMenteePair => "messages.error.pair.notFoundFinishedMentorMenteePair";
+        public static string NotFoundNotFinishedMentorship => "messages.error.mentorship.notFoundNotFinishedMentorMenteePair";
+        public static string NotFoundFinishedMentorship => "messages.error.mentorship.notFoundFinishedMentorMenteePair";
         public static string FeedbackWasAlreadyGiven => "messages.error.pair.feedbackWasAlreadyGiven";
-        public static string MentorMenteePairAlreadyExist => "messages.error.pair.mentorMenteePairAlreadyExist";
         public static string NotFoundWaitingApplication => "messages.error.pair.notFoundWaitingApplication";
         public static string ThereIsAlreadyWaitingApplication => "messages.error.application.thereIsAlreadyWaitingApplication";
     }
