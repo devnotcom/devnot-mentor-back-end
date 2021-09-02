@@ -9,7 +9,7 @@ namespace DevnotMentor.Services.Interfaces
     public interface IApplicationService
     {
         /// <summary>
-        /// Returns applications with mentee and mentor informations
+        /// Returns applications with mentee and mentor informations.
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor OR Mentee User Id</param>
         /// <returns>List of <see cref="ApplicationDTO"/> inside the <see cref="ApiResponse"/></returns>
@@ -25,7 +25,7 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId);
 
         /// <summary>
-        /// Rejects the waiting application
+        /// Rejects the waiting application.
         /// </summary>
         /// <param name="authenticatedUserId">Authenticated Mentor User Id</param>
         /// <param name="toBeRejectedApplicationId">Id of the application to be rejected</param>
@@ -33,11 +33,10 @@ namespace DevnotMentor.Services.Interfaces
         Task<ApiResponse> RejectWaitingApplicationByIdAsync(int authenticatedUserId, int toBeRejectedApplicationId);
 
         /// <summary>
-        /// Creates application via <see cref="ApplicationRequest"/>
+        /// Creates application.
         /// <para>If there is any waiting application between Mentee and Mentor, cannot be created.</para>
         /// </summary>
-        /// <param name="request"><see cref="ApplicationRequest"/></param>
-        /// <returns><see cref="ApiResponse"/></returns>
-        Task<ApiResponse> CreateApplicationAsync(ApplicationRequest request);
+        /// <returns>Created <see cref="ApplicationDTO" /> inside the <see cref="ApiResponse"/></returns>
+        Task<ApiResponse<ApplicationDTO>> CreateApplicationAsync(ApplicationRequest request);
     }
 }

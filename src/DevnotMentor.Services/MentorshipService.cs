@@ -40,7 +40,6 @@ namespace DevnotMentor.Services
             }
 
             var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
-
             return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
@@ -53,7 +52,6 @@ namespace DevnotMentor.Services
             }
 
             var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
-
             return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
@@ -75,7 +73,6 @@ namespace DevnotMentor.Services
             toBeFinishedMentorship.FinishedAt = System.DateTime.Now;
 
             _mentorshipRepository.Update(toBeFinishedMentorship);
-
             return new SuccessApiResponse();
         }
 
@@ -100,36 +97,36 @@ namespace DevnotMentor.Services
                 : GiveFeedbackFromMentor(toBeGivenFeedbackMentorship, MentorshipFeedbackRequest);
         }
 
-        private ApiResponse<MentorshipDTO> GiveFeedbackFromMentee(Mentorship mentorship, MentorshipFeedbackRequest MentorshipFeedbackRequest)
+        private ApiResponse<MentorshipDTO> GiveFeedbackFromMentee(Mentorship toBeGivenFeedbackMentorship, MentorshipFeedbackRequest MentorshipFeedbackRequest)
         {
-            if (mentorship.MenteeScore != null || mentorship.MenteeComment != null)
+            if (toBeGivenFeedbackMentorship.MenteeScore != null || toBeGivenFeedbackMentorship.MenteeComment != null)
             {
                 return new ErrorApiResponse<MentorshipDTO>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
-            mentorship.MenteeScore = MentorshipFeedbackRequest.Score;
-            mentorship.MenteeComment = MentorshipFeedbackRequest.Comment;
+            toBeGivenFeedbackMentorship.MenteeScore = MentorshipFeedbackRequest.Score;
+            toBeGivenFeedbackMentorship.MenteeComment = MentorshipFeedbackRequest.Comment;
 
-            _mentorshipRepository.Update(mentorship);
+            _mentorshipRepository.Update(toBeGivenFeedbackMentorship);
 
-            var MentorshipDTO = mapper.Map<MentorshipDTO>(mentorship);
-            return new SuccessApiResponse<MentorshipDTO>(MentorshipDTO);
+            var mappedMentorship = mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
+            return new SuccessApiResponse<MentorshipDTO>(mappedMentorship);
         }
 
-        private ApiResponse<MentorshipDTO> GiveFeedbackFromMentor(Mentorship mentorship, MentorshipFeedbackRequest MentorshipFeedbackRequest)
+        private ApiResponse<MentorshipDTO> GiveFeedbackFromMentor(Mentorship toBeGivenFeedbackMentorship, MentorshipFeedbackRequest MentorshipFeedbackRequest)
         {
-            if (mentorship.MentorScore != null || mentorship.MentorComment != null)
+            if (toBeGivenFeedbackMentorship.MentorScore != null || toBeGivenFeedbackMentorship.MentorComment != null)
             {
                 return new ErrorApiResponse<MentorshipDTO>(null, ResultMessage.FeedbackWasAlreadyGiven);
             }
 
-            mentorship.MentorScore = MentorshipFeedbackRequest.Score;
-            mentorship.MentorComment = MentorshipFeedbackRequest.Comment;
+            toBeGivenFeedbackMentorship.MentorScore = MentorshipFeedbackRequest.Score;
+            toBeGivenFeedbackMentorship.MentorComment = MentorshipFeedbackRequest.Comment;
 
-            _mentorshipRepository.Update(mentorship);
+            _mentorshipRepository.Update(toBeGivenFeedbackMentorship);
 
-            var MentorshipDTO = mapper.Map<MentorshipDTO>(mentorship);
-            return new SuccessApiResponse<MentorshipDTO>(MentorshipDTO);
+            var mappedMentorship = mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
+            return new SuccessApiResponse<MentorshipDTO>(mappedMentorship);
         }
     }
 }

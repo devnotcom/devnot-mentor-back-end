@@ -23,6 +23,7 @@ namespace DevnotMentor.Services.Interfaces
         /// <summary>
         /// Finishs a not finished mentorship, If Authenticated User is a mentee or mentor for the mentorship.
         /// </summary>
+        /// <returns><see cref="ApiResponse"/></returns>
         Task<ApiResponse> FinishContinuingMentorshipAsync(int userId, int mentorshipId);
 
         /// <summary>

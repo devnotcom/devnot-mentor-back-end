@@ -12,15 +12,13 @@ namespace DevnotMentor.Services.Interfaces
         /// <summary>
         /// Gets mentor profile by user name.
         /// </summary>
-        /// <param name="userName"></param>
-        /// <returns></returns>
+        /// <returns><see cref="MentorDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<MentorDTO>> GetMentorProfileByUserNameAsync(string userName);
 
         /// <summary>
         /// Creates mentor profile.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <returns>Created <see cref="MentorDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<MentorDTO>> CreateMentorProfileAsync(CreateMentorProfileRequest request);
 
         /// <summary>
@@ -33,8 +31,7 @@ namespace DevnotMentor.Services.Interfaces
         /// <summary>
         /// Gets mentors by <see cref="SearchRequest" />
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <returns>List of <see cref="MentorDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MentorDTO>>> SearchAsync(SearchRequest request);
     }
 }

@@ -12,8 +12,7 @@ namespace DevnotMentor.Services.Interfaces
         /// <summary>
         /// Gets mentee profile by user name.
         /// </summary>
-        /// <param name="userName"></param>
-        /// <returns></returns>
+        /// <returns><see cref="MenteeDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<MenteeDTO>> GetMenteeProfileByUserNameAsync(string userName);
 
         /// <summary>
@@ -22,19 +21,17 @@ namespace DevnotMentor.Services.Interfaces
         /// <param name="userId">Mentee UserId</param>
         /// <returns>List of <see cref="MentorDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MentorDTO>>> GetPairedMentorsByUserIdAsync(int userId);
-        
+
         /// <summary>
         /// Creates mentee profile.
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <returns>Created <see cref="MenteeDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<MenteeDTO>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request);
 
         /// <summary>
         /// Gets mentees by <see cref="SearchRequest" />
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <returns>List of <see cref="MenteeDTO"/> inside the <see cref="ApiResponse"/></returns>
         Task<ApiResponse<List<MenteeDTO>>> SearchAsync(SearchRequest request);
     }
 }

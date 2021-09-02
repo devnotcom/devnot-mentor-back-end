@@ -51,7 +51,6 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<MentorDTO>> GetMentorProfileByUserNameAsync(string userName)
         {
             var mentor = await _mentorRepository.GetByUserNameAsync(userName);
-
             if (mentor == null)
             {
                 return new ErrorApiResponse<MentorDTO>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
@@ -64,60 +63,53 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<List<MenteeDTO>>> GetPairedMenteesByUserIdAsync(int userId)
         {
             var mentor = await _mentorRepository.GetByUserIdAsync(userId);
-
             if (mentor == null)
             {
                 return new ErrorApiResponse<List<MenteeDTO>>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
-            var pairedMentees = mapper.Map<List<MenteeDTO>>(await _mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
-
-            return new SuccessApiResponse<List<MenteeDTO>>(pairedMentees);
+            var menteesPairedToMentor = mapper.Map<List<MenteeDTO>>(await _mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
+            return new SuccessApiResponse<List<MenteeDTO>>(menteesPairedToMentor);
         }
 
         public async Task<ApiResponse<MentorDTO>> CreateMentorProfileAsync(CreateMentorProfileRequest request)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
-
             if (user == null)
             {
                 return new ErrorApiResponse<MentorDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var registeredMentor = await _mentorRepository.GetByUserIdAsync(user.Id);
-
-            if (registeredMentor != null)
+            var userAlreadyMentor = await _mentorRepository.GetByUserIdAsync(user.Id) != null;
+            if (userAlreadyMentor)
             {
                 return new ErrorApiResponse<MentorDTO>(data: default, message: ResultMessage.MentorAlreadyRegistered);
             }
 
-            var mentor = CreateNewMentor(request, user);
-
-            if (mentor == null)
+            var newMentor = CreateNewMentor(request, user);
+            if (newMentor == null)
             {
                 return new ErrorApiResponse<MentorDTO>(data: default, message: ResultMessage.FailedToAddMentor);
             }
 
-            var mappedMentor = mapper.Map<MentorDTO>(mentor);
-            return new SuccessApiResponse<MentorDTO>(mappedMentor);
+            var mappedNewMentor = mapper.Map<MentorDTO>(newMentor);
+            return new SuccessApiResponse<MentorDTO>(ResponseStatus.Created, mappedNewMentor);
         }
 
         private Mentor CreateNewMentor(CreateMentorProfileRequest request, User user)
         {
-            Mentor mentor = null;
+            Mentor createdNewMentor = null;
 
             var newMentor = mapper.Map<CreateMentorProfileRequest, Mentor>(request);
-
             newMentor.UserId = user.Id;
 
-            mentor = _mentorRepository.Create(newMentor);
-
-            if (mentor == null)
+            createdNewMentor = _mentorRepository.Create(newMentor);
+            if (createdNewMentor == null)
             {
                 return null;
             }
 
-            _mentorLinkRepository.Create(mentor.Id, request.MentorLinks);
+            _mentorLinkRepository.Create(createdNewMentor.Id, request.MentorLinks);
 
             foreach (var mentorTag in request.MentorTags)
             {
@@ -127,23 +119,21 @@ namespace DevnotMentor.Services
                 }
 
                 var tag = _tagRepository.GetByName(mentorTag);
-
                 if (tag != null)
                 {
-                    _mentorTagRepository.Create(new MentorTag { TagId = tag.Id, MentorId = mentor.Id });
+                    _mentorTagRepository.Create(new MentorTag { TagId = tag.Id, MentorId = createdNewMentor.Id });
                 }
                 else
                 {
                     var newTag = _tagRepository.Create(new Tag { Name = mentorTag });
-
                     if (newTag != null)
                     {
-                        _mentorTagRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = mentor.Id });
+                        _mentorTagRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = createdNewMentor.Id });
                     }
                 }
             }
 
-            return mentor;
+            return createdNewMentor;
         }
 
         public async Task<ApiResponse<List<MentorDTO>>> SearchAsync(SearchRequest request)

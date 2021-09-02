@@ -45,9 +45,9 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<List<ApplicationDTO>>> GetApplicationsByUserIdAsync(int authenticatedUserId)
         {
             var applications = await _applicationRepository.GetApplicationsByUserIdAsync(authenticatedUserId);
-            var ApplicationDTO = mapper.Map<List<ApplicationDTO>>(applications);
+            var mappedApplications = mapper.Map<List<ApplicationDTO>>(applications);
 
-            return new SuccessApiResponse<List<ApplicationDTO>>(ApplicationDTO);
+            return new SuccessApiResponse<List<ApplicationDTO>>(mappedApplications);
         }
 
         public async Task<ApiResponse> ApproveWaitingApplicationByIdAsync(int authenticatedUserId, int toBeApprovedApplicationId)
@@ -131,39 +131,41 @@ namespace DevnotMentor.Services
             return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
         }
 
-        public async Task<ApiResponse> CreateApplicationAsync(ApplicationRequest request)
+        public async Task<ApiResponse<ApplicationDTO>> CreateApplicationAsync(ApplicationRequest request)
         {
             if (request.MenteeUserId == request.MentorUserId)
             {
-                return new ErrorApiResponse(ResultMessage.MenteeCanNotBeSelfMentor);
+                return new ErrorApiResponse<ApplicationDTO>(ResponseStatus.BadRequest, default, ResultMessage.MenteeCanNotBeSelfMentor);
             }
 
             int menteeId = await _menteeRepository.GetIdByUserIdAsync(request.MenteeUserId);
             if (menteeId == default)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentee);
+                return new ErrorApiResponse<ApplicationDTO>(ResponseStatus.NotFound, default, ResultMessage.NotFoundMentee);
             }
 
             int mentorId = await _mentorRepository.GetIdByUserIdAsync(request.MentorUserId);
             if (mentorId == default)
             {
-                return new ErrorApiResponse(ResultMessage.NotFoundMentor);
+                return new ErrorApiResponse<ApplicationDTO>(ResponseStatus.NotFound, default, ResultMessage.NotFoundMentor);
             }
 
             bool anyWaitingApplicationBetweenMentorAndMentee = await _applicationRepository.AnyWaitingApplicationBetweenMentorAndMenteeAsync(mentorId, menteeId);
             if (anyWaitingApplicationBetweenMentorAndMentee)
             {
-                return new ErrorApiResponse(ResultMessage.ThereIsAlreadyWaitingApplication);
+                return new ErrorApiResponse<ApplicationDTO>(ResponseStatus.BadRequest, default, ResultMessage.ThereIsAlreadyWaitingApplication);
             }
 
-            _applicationRepository.Create(new Application
-            {
-                Note = request.ApplicationNotes,
-                AppliedAt = System.DateTime.Now,
-                MenteeId = menteeId,
-                MentorId = mentorId,
-                Status = (int)ApplicationStatus.Waiting
-            });
+            var mappedNewApplication = mapper.Map<ApplicationDTO>(
+                _applicationRepository.Create(new Application
+                {
+                    Note = request.ApplicationNotes,
+                    AppliedAt = System.DateTime.Now,
+                    MenteeId = menteeId,
+                    MentorId = mentorId,
+                    Status = (int)ApplicationStatus.Waiting
+                })
+            );
 
             var mentorUser = await _userRepository.GetByIdAsync(request.MentorUserId);
             var menteeUser = await _userRepository.GetByIdAsync(request.MenteeUserId);
@@ -174,7 +176,7 @@ namespace DevnotMentor.Services
                 EmailTemplate.ApplicationSubject,
                 EmailTemplate.ApplicationAppliedBody(mentorUser, menteeUser));
 
-            return new SuccessApiResponse(ResponseStatus.Created);
+            return new SuccessApiResponse<ApplicationDTO>(ResponseStatus.Created, mappedNewApplication);
         }
     }
 }

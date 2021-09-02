@@ -51,7 +51,6 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<MenteeDTO>> GetMenteeProfileByUserNameAsync(string userName)
         {
             var mentee = await _menteeRepository.GetByUserNameAsync(userName);
-
             if (mentee == null)
             {
                 return new ErrorApiResponse<MenteeDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
@@ -64,58 +63,54 @@ namespace DevnotMentor.Services
         public async Task<ApiResponse<List<MentorDTO>>> GetPairedMentorsByUserIdAsync(int userId)
         {
             var mentee = await _menteeRepository.GetByUserIdAsync(userId);
-
             if (mentee == null)
             {
                 return new ErrorApiResponse<List<MentorDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var pairedMentors = mapper.Map<List<MentorDTO>>(await _menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
-            return new SuccessApiResponse<List<MentorDTO>>(pairedMentors);
+            var mentorsPairedToMentee = mapper.Map<List<MentorDTO>>(await _menteeRepository.GetPairedMentorsByMenteeIdAsync(mentee.Id));
+            return new SuccessApiResponse<List<MentorDTO>>(mentorsPairedToMentee);
         }
 
         public async Task<ApiResponse<MenteeDTO>> CreateMenteeProfileAsync(CreateMenteeProfileRequest request)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
-
             if (user == null)
             {
                 return new ErrorApiResponse<MenteeDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var registeredMentee = await _menteeRepository.GetByUserIdAsync(user.Id);
-
-            if (registeredMentee != null)
+            var userAlreadyMentee = await _menteeRepository.GetByUserIdAsync(user.Id) != null;
+            if (userAlreadyMentee)
             {
                 return new ErrorApiResponse<MenteeDTO>(data: default, message: ResultMessage.MenteeAlreadyRegistered);
             }
 
-            var mentee = CreateNewMentee(request, user);
-
-            if (mentee == null)
+            var newMentee = CreateNewMentee(request, user);
+            if (newMentee == null)
             {
                 return new ErrorApiResponse<MenteeDTO>(data: default, ResultMessage.FailedToAddMentee);
             }
 
-            var mappedMentee = mapper.Map<MenteeDTO>(mentee);
-            return new SuccessApiResponse<MenteeDTO>(mappedMentee);
+            var mappedNewMentee = mapper.Map<MenteeDTO>(newMentee);
+            return new SuccessApiResponse<MenteeDTO>(ResponseStatus.Created, mappedNewMentee);
         }
 
         private Mentee CreateNewMentee(CreateMenteeProfileRequest request, User user)
         {
-            Mentee mentee = null;
+            Mentee createdNewMentee = null;
 
             var newMentee = mapper.Map<Mentee>(request);
             newMentee.UserId = user.Id;
 
-            mentee = _menteeRepository.Create(newMentee);
+            createdNewMentee = _menteeRepository.Create(newMentee);
 
-            if (mentee == null)
+            if (createdNewMentee == null)
             {
                 return null;
             }
 
-            _menteeLinkRepository.Create(mentee.Id, request.MenteeLinks);
+            _menteeLinkRepository.Create(createdNewMentee.Id, request.MenteeLinks);
 
             foreach (var menteeTag in request.MenteeTags)
             {
@@ -125,29 +120,27 @@ namespace DevnotMentor.Services
                 }
 
                 var tag = _tagRepository.GetByName(menteeTag);
-
                 if (tag != null)
                 {
-                    _menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = mentee.Id });
+                    _menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = createdNewMentee.Id });
                 }
                 else
                 {
                     var newTag = _tagRepository.Create(new Tag { Name = menteeTag });
-
                     if (newTag != null)
                     {
-                        _menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = mentee.Id });
+                        _menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = createdNewMentee.Id });
                     }
                 }
             }
 
-            return mentee;
+            return createdNewMentee;
         }
+
         public async Task<ApiResponse<List<MenteeDTO>>> SearchAsync(SearchRequest request)
         {
             var mappedMentees = mapper.Map<List<MenteeDTO>>(await _menteeRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MenteeDTO>>(mappedMentees);
         }
-
     }
 }
