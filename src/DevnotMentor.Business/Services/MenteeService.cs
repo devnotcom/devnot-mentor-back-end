@@ -20,9 +20,6 @@ namespace DevnotMentor.Business.Services
         private readonly IMenteeTagRepository _menteeTagsRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IMentorRepository _mentorRepository;
-        private readonly IApplicationRepository _applicationRepository;
-        private readonly IMentorshipRepository _mentorshipRepository;
 
         public MenteeService(
             IMapper mapper,
@@ -31,9 +28,6 @@ namespace DevnotMentor.Business.Services
             IMenteeTagRepository menteeTagsRepository,
             ITagRepository tagRepository,
             IUserRepository userRepository,
-            IMentorRepository mentorRepository,
-            IApplicationRepository mentorApplicationsRepository,
-            IMentorshipRepository MentorshipsRepository,
             ILogRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             )
@@ -44,9 +38,6 @@ namespace DevnotMentor.Business.Services
             _menteeTagsRepository = menteeTagsRepository;
             _tagRepository = tagRepository;
             _userRepository = userRepository;
-            _mentorRepository = mentorRepository;
-            _applicationRepository = mentorApplicationsRepository;
-            _mentorshipRepository = MentorshipsRepository;
         }
 
         public async Task<ApiResponse<MenteeDTO>> GetMenteeProfileByUserNameAsync(string userName)
@@ -116,24 +107,27 @@ namespace DevnotMentor.Business.Services
                 _menteeLinkRepository.Create(createdNewMentee.Id, request.MenteeLinks);
             }
 
-            foreach (var menteeTag in request.MenteeTags)
+            if (request.MenteeTags != null)
             {
-                if (String.IsNullOrWhiteSpace(menteeTag))
+                foreach (var menteeTag in request.MenteeTags)
                 {
-                    continue;
-                }
-
-                var tag = _tagRepository.GetByName(menteeTag);
-                if (tag != null)
-                {
-                    _menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = createdNewMentee.Id });
-                }
-                else
-                {
-                    var newTag = _tagRepository.Create(new Tag { Name = menteeTag });
-                    if (newTag != null)
+                    if (String.IsNullOrWhiteSpace(menteeTag))
                     {
-                        _menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = createdNewMentee.Id });
+                        continue;
+                    }
+
+                    var tag = _tagRepository.GetByName(menteeTag);
+                    if (tag != null)
+                    {
+                        _menteeTagsRepository.Create(new MenteeTag { TagId = tag.Id, MenteeId = createdNewMentee.Id });
+                    }
+                    else
+                    {
+                        var newTag = _tagRepository.Create(new Tag { Name = menteeTag });
+                        if (newTag != null)
+                        {
+                            _menteeTagsRepository.Create(new MenteeTag { TagId = newTag.Id, MenteeId = createdNewMentee.Id });
+                        }
                     }
                 }
             }

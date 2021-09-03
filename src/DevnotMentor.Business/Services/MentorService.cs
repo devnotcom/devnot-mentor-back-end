@@ -15,37 +15,28 @@ namespace DevnotMentor.Business.Services
 {
     public class MentorService : BaseService, IMentorService
     {
-        private readonly IMentorRepository _mentorRepository;
-        private readonly IMenteeRepository _menteeRepository;
         private readonly IMentorLinkRepository _mentorLinkRepository;
         private readonly IMentorTagRepository _mentorTagRepository;
-        private readonly ITagRepository _tagRepository;
+        private readonly IMentorRepository _mentorRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IApplicationRepository _applicationRepository;
-        private readonly IMentorshipRepository _mentorshipRepository;
+        private readonly ITagRepository _tagRepository;
 
         public MentorService(
             IMapper mapper,
             IMentorRepository mentorRepository,
-            IMenteeRepository menteeRepository,
             IMentorLinkRepository mentorLinksRepository,
             IMentorTagRepository mentorTagsRepository,
             ITagRepository tagRepository,
             IUserRepository userRepository,
-            IApplicationRepository mentorApplicationsRepository,
-            IMentorshipRepository MentorshipsRepository,
             ILogRepository loggerRepository,
             IDevnotConfigurationContext devnotConfigurationContext
             ) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
             _mentorRepository = mentorRepository;
-            _menteeRepository = menteeRepository;
             _mentorLinkRepository = mentorLinksRepository;
             _mentorTagRepository = mentorTagsRepository;
             _tagRepository = tagRepository;
             _userRepository = userRepository;
-            _applicationRepository = mentorApplicationsRepository;
-            _mentorshipRepository = MentorshipsRepository;
         }
 
         public async Task<ApiResponse<MentorDTO>> GetMentorProfileByUserNameAsync(string userName)
@@ -114,24 +105,27 @@ namespace DevnotMentor.Business.Services
                 _mentorLinkRepository.Create(createdNewMentor.Id, request.MentorLinks);
             }
 
-            foreach (var mentorTag in request.MentorTags)
+            if (request.MentorTags != null)
             {
-                if (String.IsNullOrWhiteSpace(mentorTag))
+                foreach (var mentorTag in request.MentorTags)
                 {
-                    continue;
-                }
-
-                var tag = _tagRepository.GetByName(mentorTag);
-                if (tag != null)
-                {
-                    _mentorTagRepository.Create(new MentorTag { TagId = tag.Id, MentorId = createdNewMentor.Id });
-                }
-                else
-                {
-                    var newTag = _tagRepository.Create(new Tag { Name = mentorTag });
-                    if (newTag != null)
+                    if (String.IsNullOrWhiteSpace(mentorTag))
                     {
-                        _mentorTagRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = createdNewMentor.Id });
+                        continue;
+                    }
+
+                    var tag = _tagRepository.GetByName(mentorTag);
+                    if (tag != null)
+                    {
+                        _mentorTagRepository.Create(new MentorTag { TagId = tag.Id, MentorId = createdNewMentor.Id });
+                    }
+                    else
+                    {
+                        var newTag = _tagRepository.Create(new Tag { Name = mentorTag });
+                        if (newTag != null)
+                        {
+                            _mentorTagRepository.Create(new MentorTag { TagId = newTag.Id, MentorId = createdNewMentor.Id });
+                        }
                     }
                 }
             }
