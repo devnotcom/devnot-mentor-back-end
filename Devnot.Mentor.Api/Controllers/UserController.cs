@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.Api.Controllers
-{
-    [ApiController]
+{  
     public class UserController : BaseController
     {
         private IUserService userService;
