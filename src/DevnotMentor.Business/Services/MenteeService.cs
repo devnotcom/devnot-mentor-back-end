@@ -111,7 +111,10 @@ namespace DevnotMentor.Business.Services
                 return null;
             }
 
-            _menteeLinkRepository.Create(createdNewMentee.Id, request.MenteeLinks);
+            if (request.MenteeLinks != null)
+            {
+                _menteeLinkRepository.Create(createdNewMentee.Id, request.MenteeLinks);
+            }
 
             foreach (var menteeTag in request.MenteeTags)
             {

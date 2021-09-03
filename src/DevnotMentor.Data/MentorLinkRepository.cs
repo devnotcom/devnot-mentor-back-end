@@ -6,15 +6,13 @@ namespace DevnotMentor.Data
 {
     public class MentorLinkRepository : BaseRepository<MentorLink>, IMentorLinkRepository
     {
-        public MentorLinkRepository(MentorDBContext context) : base(context)
-        {
-        }
+        public MentorLinkRepository(MentorDBContext context) : base(context) { }
 
-        public void Create(int mentorId, List<string> list)
+        public void Create(int mentorId, List<string> links)
         {
-            foreach (var item in list)
+            foreach (var link in links)
             {
-                Create(new MentorLink { Link = item, MentorId = mentorId });
+                Create(new MentorLink { Link = link, MentorId = mentorId });
             }
         }
     }

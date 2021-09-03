@@ -109,7 +109,10 @@ namespace DevnotMentor.Business.Services
                 return null;
             }
 
-            _mentorLinkRepository.Create(createdNewMentor.Id, request.MentorLinks);
+            if (request.MentorLinks != null)
+            {
+                _mentorLinkRepository.Create(createdNewMentor.Id, request.MentorLinks);
+            }
 
             foreach (var mentorTag in request.MentorTags)
             {
