@@ -339,5 +339,14 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-Devnot.Mentor.Api/images/profile-images/
-Devnot.Mentor.Api/Migrations/
+src/DevnotMentor.WebAPI/images/profile-images/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
