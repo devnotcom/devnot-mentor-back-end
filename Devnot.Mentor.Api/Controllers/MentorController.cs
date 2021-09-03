@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 namespace DevnotMentor.Api.Controllers
 {
     [ValidateModelState]
-    [ApiController]
     public class MentorController : BaseController
     {
         IMentorService mentorService;
