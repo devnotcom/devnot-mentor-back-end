@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.WebAPI.Controllers
 {
-    [ApiController]
     public class ApplicationController : BaseController
     {
         private readonly IApplicationService _applicationService;

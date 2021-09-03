@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevnotMentor.WebAPI.Controllers
 {
-    [ApiController]
     public class UserController : BaseController
     {
         private readonly IUserService _userService;

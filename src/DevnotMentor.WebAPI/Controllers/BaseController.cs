@@ -3,6 +3,7 @@ using DevnotMentor.Common.API;
 
 namespace DevnotMentor.WebAPI.Controllers
 {
+    [ApiController]
     public class BaseController : ControllerBase
     {
         [NonAction]

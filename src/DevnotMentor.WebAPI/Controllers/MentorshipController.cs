@@ -9,7 +9,6 @@ namespace DevnotMentor.WebAPI.Controllers
 {
     [ServiceFilter(typeof(TokenAuthentication))]
     [ValidateModelState]
-    [ApiController]
     public class MentorshipController : BaseController
     {
         private readonly IMentorshipService _mentorshipService;

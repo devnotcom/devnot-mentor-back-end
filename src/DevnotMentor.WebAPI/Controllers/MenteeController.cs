@@ -9,7 +9,6 @@ using DevnotMentor.WebAPI.Helpers.Extensions;
 namespace DevnotMentor.WebAPI.Controllers
 {
     [ValidateModelState]
-    [ApiController]
     [Route("mentees")]
     public class MenteeController : BaseController
     {
