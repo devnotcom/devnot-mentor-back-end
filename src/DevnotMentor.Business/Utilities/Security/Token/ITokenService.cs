@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-
-namespace DevnotMentor.Business.Utilities.Security.Token
+﻿namespace DevnotMentor.Business.Utilities.Security.Token
 {
     public interface ITokenService
     {

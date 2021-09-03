@@ -8,9 +8,9 @@ using DevnotMentor.Common.Requests.Mentorship;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Common.Enums;
 using DevnotMentor.Data.Interfaces;
-using DevnotMentor.Business.Repository.Interfaces;
+using DevnotMentor.Business.Services.Interfaces;
 
-namespace DevnotMentor.Business.Repository
+namespace DevnotMentor.Business.Services
 {
     public class MentorshipService : BaseService, IMentorshipService
     {
@@ -39,7 +39,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentee);
             }
 
-            var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
+            var mentorships = _mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
             return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
@@ -51,7 +51,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<List<MentorshipDTO>>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundMentor);
             }
 
-            var mentorships = mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
+            var mentorships = _mapper.Map<List<MentorshipDTO>>(await _mentorshipRepository.GetMentorshipsByUserIdAsync(userId));
             return new SuccessApiResponse<List<MentorshipDTO>>(mentorships);
         }
 
@@ -109,7 +109,7 @@ namespace DevnotMentor.Business.Repository
 
             _mentorshipRepository.Update(toBeGivenFeedbackMentorship);
 
-            var mappedMentorship = mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
+            var mappedMentorship = _mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
             return new SuccessApiResponse<MentorshipDTO>(mappedMentorship);
         }
 
@@ -125,7 +125,7 @@ namespace DevnotMentor.Business.Repository
 
             _mentorshipRepository.Update(toBeGivenFeedbackMentorship);
 
-            var mappedMentorship = mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
+            var mappedMentorship = _mapper.Map<MentorshipDTO>(toBeGivenFeedbackMentorship);
             return new SuccessApiResponse<MentorshipDTO>(mappedMentorship);
         }
     }

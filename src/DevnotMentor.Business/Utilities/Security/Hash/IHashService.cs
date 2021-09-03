@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DevnotMentor.Business.Utilities.Security.Hash
+﻿namespace DevnotMentor.Business.Utilities.Security.Hash
 {
     public interface IHashService
     {

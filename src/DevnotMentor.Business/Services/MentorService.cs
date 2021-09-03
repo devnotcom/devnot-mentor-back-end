@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Data.Interfaces;
-using DevnotMentor.Business.Repository.Interfaces;
+using DevnotMentor.Business.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
 using DevnotMentor.Common.API;
@@ -11,7 +11,7 @@ using DevnotMentor.Common.Requests.Mentor;
 using System.Collections.Generic;
 using DevnotMentor.Common.Requests;
 
-namespace DevnotMentor.Business.Repository
+namespace DevnotMentor.Business.Services
 {
     public class MentorService : BaseService, IMentorService
     {
@@ -56,7 +56,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<MentorDTO>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
-            var mappedMentor = mapper.Map<MentorDTO>(mentor);
+            var mappedMentor = _mapper.Map<MentorDTO>(mentor);
             return new SuccessApiResponse<MentorDTO>(mappedMentor);
         }
 
@@ -68,7 +68,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<List<MenteeDTO>>(ResponseStatus.NotFound, data: default, ResultMessage.NotFoundMentor);
             }
 
-            var menteesPairedToMentor = mapper.Map<List<MenteeDTO>>(await _mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
+            var menteesPairedToMentor = _mapper.Map<List<MenteeDTO>>(await _mentorRepository.GetPairedMenteesByMentorIdAsync(mentor.Id));
             return new SuccessApiResponse<List<MenteeDTO>>(menteesPairedToMentor);
         }
 
@@ -92,7 +92,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<MentorDTO>(data: default, message: ResultMessage.FailedToAddMentor);
             }
 
-            var mappedNewMentor = mapper.Map<MentorDTO>(newMentor);
+            var mappedNewMentor = _mapper.Map<MentorDTO>(newMentor);
             return new SuccessApiResponse<MentorDTO>(ResponseStatus.Created, mappedNewMentor);
         }
 
@@ -100,7 +100,7 @@ namespace DevnotMentor.Business.Repository
         {
             Mentor createdNewMentor = null;
 
-            var newMentor = mapper.Map<CreateMentorProfileRequest, Mentor>(request);
+            var newMentor = _mapper.Map<CreateMentorProfileRequest, Mentor>(request);
             newMentor.UserId = user.Id;
 
             createdNewMentor = _mentorRepository.Create(newMentor);
@@ -138,7 +138,7 @@ namespace DevnotMentor.Business.Repository
 
         public async Task<ApiResponse<List<MentorDTO>>> SearchAsync(SearchRequest request)
         {
-            var mappedMentors = mapper.Map<List<MentorDTO>>(await _mentorRepository.SearchAsync(request));
+            var mappedMentors = _mapper.Map<List<MentorDTO>>(await _mentorRepository.SearchAsync(request));
             return new SuccessApiResponse<List<MentorDTO>>(mappedMentors);
         }
     }

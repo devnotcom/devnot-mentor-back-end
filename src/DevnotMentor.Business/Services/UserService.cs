@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Data.Interfaces;
-using DevnotMentor.Business.Repository.Interfaces;
+using DevnotMentor.Business.Services.Interfaces;
 using DevnotMentor.Business.Utilities.Email;
 using DevnotMentor.Business.Utilities.Security.Hash;
 using DevnotMentor.Business.Utilities.Security.Token;
@@ -15,18 +15,17 @@ using DevnotMentor.Common.Requests.User;
 using DevnotMentor.Business.Utilities.File;
 using DevnotMentor.Common.Responses.User;
 
-namespace DevnotMentor.Business.Repository
+namespace DevnotMentor.Business.Services
 {
     //TODO: Aynı username ile kayıt yapılabiliyor
 
     public class UserService : BaseService, IUserService
     {
-        private readonly IUserRepository userRepository;
-        private readonly IHashService hashService;
-        private readonly ITokenService tokenService;
-        private readonly IMailService mailService;
-
-        private readonly IFileService fileService;
+        private readonly IUserRepository _userRepository;
+        private readonly IHashService _hashService;
+        private readonly ITokenService _tokenService;
+        private readonly IMailService _mailService;
+        private readonly IFileService _fileService;
 
         public UserService(
             IMapper mapper,
@@ -38,36 +37,36 @@ namespace DevnotMentor.Business.Repository
             IFileService fileService,
             IDevnotConfigurationContext devnotConfigurationContext) : base(mapper, loggerRepository, devnotConfigurationContext)
         {
-            this.tokenService = tokenService;
-            this.hashService = hashService;
-            this.mailService = mailService;
-            this.userRepository = userRepository;
-            this.fileService = fileService;
+            this._tokenService = tokenService;
+            this._hashService = hashService;
+            this._mailService = mailService;
+            this._userRepository = userRepository;
+            this._fileService = fileService;
         }
 
         public async Task<ApiResponse> ChangePasswordAsync(UpdatePasswordRequest request)
         {
-            string hashedLastPassword = hashService.CreateHash(request.LastPassword);
+            string hashedLastPassword = _hashService.CreateHash(request.LastPassword);
 
-            var currentUser = await userRepository.GetAsync(request.UserId, hashedLastPassword);
+            var currentUser = await _userRepository.GetAsync(request.UserId, hashedLastPassword);
 
             if (currentUser == null)
             {
                 return new ErrorApiResponse(ResponseStatus.NotFound, ResultMessage.NotFoundUser);
             }
 
-            currentUser.Password = hashService.CreateHash(request.NewPassword);
+            currentUser.Password = _hashService.CreateHash(request.NewPassword);
 
-            userRepository.Update(currentUser);
+            _userRepository.Update(currentUser);
 
             return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse<UserLoginResponse>> LoginAsync(UserLoginRequest request)
         {
-            var hashedPassword = hashService.CreateHash(request.Password);
+            var hashedPassword = _hashService.CreateHash(request.Password);
 
-            var user = await userRepository.GetAsync(request.UserName, hashedPassword);
+            var user = await _userRepository.GetAsync(request.UserName, hashedPassword);
 
             if (user == null)
             {
@@ -79,12 +78,12 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<UserLoginResponse>(data: null, ResultMessage.UserNameIsNotValidated);
             }
 
-            var tokenData = tokenService.CreateToken(user.Id, user.UserName);
+            var tokenData = _tokenService.CreateToken(user.Id, user.UserName);
 
             user.Token = tokenData.Token;
             user.TokenExpireDate = tokenData.ExpiredDate;
 
-            var mappedUser = mapper.Map<User, UserDTO>(user);
+            var mappedUser = _mapper.Map<User, UserDTO>(user);
 
             var loginResponse = new UserLoginResponse(mappedUser, user.Token, user.TokenExpireDate);
 
@@ -93,7 +92,7 @@ namespace DevnotMentor.Business.Repository
 
         public async Task<ApiResponse> RegisterAsync(RegisterUserRequest request)
         {
-            var checkFileResult = await fileService.InsertProfileImageAsync(request.ProfileImage);
+            var checkFileResult = await _fileService.InsertProfileImageAsync(request.ProfileImage);
 
             if (!checkFileResult.IsSuccess)
             {
@@ -101,9 +100,9 @@ namespace DevnotMentor.Business.Repository
             }
 
             request.ProfileImageUrl = checkFileResult.RelativeFilePath;
-            request.Password = hashService.CreateHash(request.Password);
+            request.Password = _hashService.CreateHash(request.Password);
 
-            userRepository.Create(mapper.Map<User>(request));
+            _userRepository.Create(_mapper.Map<User>(request));
 
             return new SuccessApiResponse();
         }
@@ -115,7 +114,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse(ResultMessage.InvalidModel);
             }
 
-            var currentUser = await userRepository.GetByEmailAsync(email);
+            var currentUser = await _userRepository.GetByEmailAsync(email);
 
             if (currentUser == null)
             {
@@ -123,9 +122,9 @@ namespace DevnotMentor.Business.Repository
             }
 
             currentUser.SecurityKey = Guid.NewGuid();
-            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(devnotConfigurationContext.SecurityKeyExpiryFromHours);
+            currentUser.SecurityKeyExpiryDate = DateTime.Now.AddHours(_devnotConfigurationContext.SecurityKeyExpiryFromHours);
 
-            userRepository.Update(currentUser);
+            _userRepository.Update(currentUser);
 
             await SendRemindPasswordMailAsync(currentUser);
 
@@ -137,19 +136,19 @@ namespace DevnotMentor.Business.Repository
         {
             var to = new List<string> { user.Email };
             string subject = "Devnot Mentor Programı | Parola Sıfırlama İsteği";
-            string remindPasswordUrl = $"{devnotConfigurationContext.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
+            string remindPasswordUrl = $"{_devnotConfigurationContext.UpdatePasswordWebPageUrl}?securityKey={user.SecurityKey}";
             string body = $"Merhaba {user.Name} {user.SurName}, <a href='{remindPasswordUrl}' target='_blank'>buradan</a> parolanızı sıfırlayabilirsiniz.";
 
-            await mailService.SendEmailAsync(to, subject, body);
+            await _mailService.SendEmailAsync(to, subject, body);
         }
 
         public async Task<ApiResponse> UpdateAsync(UpdateUserRequest request)
         {
-            var currentUser = await userRepository.GetByIdAsync(request.UserId);
+            var currentUser = await _userRepository.GetByIdAsync(request.UserId);
 
             if (request.ProfileImage != null)
             {
-                var checkUploadedImageFileResult = await fileService.InsertProfileImageAsync(request.ProfileImage);
+                var checkUploadedImageFileResult = await _fileService.InsertProfileImageAsync(request.ProfileImage);
 
                 if (!checkUploadedImageFileResult.IsSuccess)
                 {
@@ -162,14 +161,14 @@ namespace DevnotMentor.Business.Repository
             currentUser.Name = request.Name;
             currentUser.SurName = request.SurName;
 
-            userRepository.Update(currentUser);
+            _userRepository.Update(currentUser);
 
             return new SuccessApiResponse();
         }
 
         public async Task<ApiResponse> RemindPasswordCompleteAsync(CompleteRemindPasswordRequest request)
         {
-            var currentUser = await userRepository.GetAsync(request.SecurityKey);
+            var currentUser = await _userRepository.GetAsync(request.SecurityKey);
 
             if (currentUser == null)
             {
@@ -182,9 +181,9 @@ namespace DevnotMentor.Business.Repository
             }
 
             currentUser.SecurityKey = null;
-            currentUser.Password = hashService.CreateHash(request.Password);
+            currentUser.Password = _hashService.CreateHash(request.Password);
 
-            userRepository.Update(currentUser);
+            _userRepository.Update(currentUser);
 
             return new SuccessApiResponse();
         }

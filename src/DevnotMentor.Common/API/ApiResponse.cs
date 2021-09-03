@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace DevnotMentor.Common.API
+﻿namespace DevnotMentor.Common.API
 {
     /// <summary>
     /// Api response with data.
@@ -30,8 +28,8 @@ namespace DevnotMentor.Common.API
 
         public ApiResponse(ResponseStatus status, string message)
         {
-            StatusCode = status;
-            Success = StatusCode < ResponseStatus.BadRequest;
+            StatusCode = (int)status;
+            Success = StatusCode < 400;
             Message = message;
         }
 
@@ -48,7 +46,6 @@ namespace DevnotMentor.Common.API
         /// <summary>
         /// HTTP response status code
         /// </summary>
-        [JsonIgnore]
-        public ResponseStatus StatusCode { get; set; }
+        public int StatusCode { get; set; }
     }
 }

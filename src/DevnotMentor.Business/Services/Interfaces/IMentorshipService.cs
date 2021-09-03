@@ -4,7 +4,7 @@ using DevnotMentor.Common.API;
 using DevnotMentor.Common.DTO;
 using DevnotMentor.Common.Requests.Mentorship;
 
-namespace DevnotMentor.Business.Repository.Interfaces
+namespace DevnotMentor.Business.Services.Interfaces
 {
     public interface IMentorshipService
     {

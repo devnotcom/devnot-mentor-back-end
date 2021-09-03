@@ -1,7 +1,7 @@
 using System;
 using DevnotMentor.Data.Entities;
-using DevnotMentor.Business.Repository;
-using DevnotMentor.Business.Repository.Interfaces;
+using DevnotMentor.Business.Services;
+using DevnotMentor.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;

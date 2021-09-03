@@ -8,10 +8,10 @@ using DevnotMentor.Common.Requests.Mentee;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Common.Enums;
 using DevnotMentor.Data.Interfaces;
-using DevnotMentor.Business.Repository.Interfaces;
+using DevnotMentor.Business.Services.Interfaces;
 using DevnotMentor.Business.Utilities.Email;
 
-namespace DevnotMentor.Business.Repository
+namespace DevnotMentor.Business.Services
 {
     public class ApplicationService : BaseService, IApplicationService
     {
@@ -45,7 +45,7 @@ namespace DevnotMentor.Business.Repository
         public async Task<ApiResponse<List<ApplicationDTO>>> GetApplicationsByUserIdAsync(int authenticatedUserId)
         {
             var applications = await _applicationRepository.GetApplicationsByUserIdAsync(authenticatedUserId);
-            var mappedApplications = mapper.Map<List<ApplicationDTO>>(applications);
+            var mappedApplications = _mapper.Map<List<ApplicationDTO>>(applications);
 
             return new SuccessApiResponse<List<ApplicationDTO>>(mappedApplications);
         }
@@ -122,13 +122,13 @@ namespace DevnotMentor.Business.Repository
         private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentee(int menteeId)
         {
             int count = _mentorshipRepository.GetCountForContinuingStatusByMenteeId(menteeId);
-            return count >= devnotConfigurationContext.MaxMentorCountOfMentee;
+            return count >= _devnotConfigurationContext.MaxMentorCountOfMentee;
         }
 
         private bool isCountOfContinuingMentorshipsGreaterThanOREqualToMaxCountForMentor(int mentorId)
         {
             int count = _mentorshipRepository.GetCountForContinuingStatusByMentorId(mentorId);
-            return count >= devnotConfigurationContext.MaxMenteeCountOfMentor;
+            return count >= _devnotConfigurationContext.MaxMenteeCountOfMentor;
         }
 
         public async Task<ApiResponse<ApplicationDTO>> CreateApplicationAsync(ApplicationRequest request)
@@ -156,7 +156,7 @@ namespace DevnotMentor.Business.Repository
                 return new ErrorApiResponse<ApplicationDTO>(ResponseStatus.BadRequest, default, ResultMessage.ThereIsAlreadyWaitingApplication);
             }
 
-            var mappedNewApplication = mapper.Map<ApplicationDTO>(
+            var mappedNewApplication = _mapper.Map<ApplicationDTO>(
                 _applicationRepository.Create(new Application
                 {
                     Note = request.ApplicationNotes,
