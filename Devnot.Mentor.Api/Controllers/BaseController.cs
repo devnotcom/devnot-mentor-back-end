@@ -3,6 +3,7 @@ using DevnotMentor.Api.Common.Response;
 
 namespace DevnotMentor.Api.Controllers
 {
+    [ApiController]
     public class BaseController : ControllerBase
     {
         public BaseController()
