@@ -1,9 +1,5 @@
 # Devnot Mentor  
 
-<p align="center">
-  <img src="http://devnot.com/wp-content/uploads/2017/09/devnot-logo.png">
-</p>
-
 ## Devnot Nedir?
 
 Güncel yazılım konularıyla ilgili yazılar yayınlayan, yazılım konferansları, buluşmalar ve kamplar düzenleyen yazılım geliştirici topluluğudur.  
@@ -32,27 +28,45 @@ dotnet run --launch-profile Test
 dotnet run --launch-profile Production
 ```
 
+## Database
+
+* Migration veya Update için [DevnotMentor.Configurations](./src/DevnotMentor.Configurations/) altında olan [appsettings.development.json](./src/DevnotMentor.Configurations/appsettings.development.json) dosyasında veya diğer environment dosyalarında bulunan SQL Server bağlantı dizisi düzeltilmelidir.
+
+* Migration veya Update için environment ataması yapılmalıdır.  
 Environment Key: DEVNOT_MENTOR_ENVIRONMENT  
-Powershell:  `env:DEVNOT_MENTOR_ENVIRONMENT='Development'`  
-Linux Terminal: `export DEVNOT_MENTOR_ENVIRONMENT='Development'`  
+Powershell:  
+`env:DEVNOT_MENTOR_ENVIRONMENT = 'Development'`  
+Linux Terminal:  
+`export DEVNOT_MENTOR_ENVIRONMENT = 'Development'`
 
 ### Database Migration
 
-Migration işlemini gerçekleştirmeden önce SQL Server'a bağlanmak için bulunan bağlantı dizisini kendinize göre ayarlamanız gerekmektedir. Bunun için [DevnotMentor.Configurations](./src/DevnotMentor.Configurations/) altında olan [appsettings.development.json](./src/DevnotMentor.Configurations/appsettings.development.json) dosyasında bulunan SQL Server bağlantı dizisi düzeltilmelidir.  
+**[DbContext](./src/DevnotMentor.Data/MentorDBContext.cs)'ın OnModelCreating metotunda bulunan ModelBuilder üzerinde bir değişiklik yapmadıysanız veya [Entities](./src/DevnotMentor.Data/Entities) klasöründeki tablo varlıklarını değiştirmediyseniz yeni bir migration oluşturmanıza gerek yok. Var olan migrationlar ile database'ı oluşturabilir veya güncelleyebilirsiniz.**
 
-Bu işlemden sonra Package Manager Console üzerinden aşağıdaki adımların takip edilmesi gerekmektedir;  
+Package Manager Console
 
 ```sh
-env:DEVNOT_MENTOR_ENVIRONMENT='Development'
 add-migration 'MentorDB_Initialization'
+```
+
+veya Terminal
+
+```sh
+cd src/DevnotMentor.Data 
+dotnet ef --startup-project ../DevnotMentor.WebAPI/ migrations add 'MentorDB_Initialization'
+```
+
+### Database Update
+
+Package Manager Console
+
+```sh
 Update-Database
 ```
 
-veya dotnet ef cli'i kullanabilirsiniz;
+veya Terminal
 
 ```sh
-export DEVNOT_MENTOR_ENVIRONMENT='Development'
 cd src/DevnotMentor.Data 
-dotnet ef --startup-project ../DevnotMentor.WebAPI/ migrations add 'MentorDB_Initialization'
 dotnet ef --startup-project ../DevnotMentor.WebAPI/ database update
 ```
