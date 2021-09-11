@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DevnotMentor.Common.API;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using DevnotMentor.Common.DTO;
 using DevnotMentor.Common.Requests.User;
 using DevnotMentor.Business.Utilities.File;

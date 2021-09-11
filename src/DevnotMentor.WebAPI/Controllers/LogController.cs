@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DevnotMentor.Configurations.Environment;
+using DevnotMentor.Configuration.Environment;
 using DevnotMentor.Data.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-namespace DevnotMentor.Configurations.Environment
+namespace DevnotMentor.Configuration.Environment
 {
     public class EnvironmentService : IEnvironmentService
     {

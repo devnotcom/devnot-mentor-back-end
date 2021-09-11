@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using DevnotMentor.WebAPI.ActionFilters;
-using DevnotMentor.Configurations.Environment;
+using DevnotMentor.Configuration.Environment;
 using DevnotMentor.WebAPI.Middlewares;
 using DevnotMentor.Data;
 using DevnotMentor.WebAPI.Helpers.Extensions;

@@ -5,7 +5,7 @@ using DevnotMentor.Business.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
 using DevnotMentor.Common.API;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using DevnotMentor.Common.DTO;
 using DevnotMentor.Common.Requests.Mentor;
 using System.Collections.Generic;

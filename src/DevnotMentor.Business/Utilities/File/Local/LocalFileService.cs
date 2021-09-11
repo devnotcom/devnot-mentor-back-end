@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DevnotMentor.Common.API;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using Microsoft.AspNetCore.Http;
 
 namespace DevnotMentor.Business.Utilities.File.Local

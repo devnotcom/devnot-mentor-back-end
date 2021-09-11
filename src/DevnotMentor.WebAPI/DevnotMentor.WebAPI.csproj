@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="../DevnotMentor.Configurations/*.json">
+    <Content Include="../DevnotMentor.Configuration/*.json">
       <Link>Configuration\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  

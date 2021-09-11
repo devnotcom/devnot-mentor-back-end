@@ -1,4 +1,4 @@
-﻿namespace DevnotMentor.Configurations.Context
+﻿namespace DevnotMentor.Configuration.Context
 {
     /// <summary>
     /// This interface provides value of configuration properties.

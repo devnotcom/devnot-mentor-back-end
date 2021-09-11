@@ -1,6 +1,6 @@
 ﻿using AutoFixture.Xunit2;
 using AutoMapper;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using DevnotMentor.Common.Requests.User;
 using DevnotMentor.Data.Entities;
 using DevnotMentor.Data.Interfaces;

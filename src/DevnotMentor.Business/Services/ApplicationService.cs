@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using DevnotMentor.Common.API;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using DevnotMentor.Common.DTO;
 using DevnotMentor.Common.Requests.Mentee;
 using DevnotMentor.Data.Entities;

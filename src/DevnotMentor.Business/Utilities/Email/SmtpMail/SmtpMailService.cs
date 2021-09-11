@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 
 namespace DevnotMentor.Business.Utilities.Email.SmtpMail
 {

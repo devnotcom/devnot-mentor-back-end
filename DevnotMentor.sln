@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevnotMentor.WebAPI", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevnotMentor.Common", "src\DevnotMentor.Common\DevnotMentor.Common.csproj", "{3A8ED797-5EFA-4A65-8C98-1DBD63034B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevnotMentor.Configurations", "src\DevnotMentor.Configurations\DevnotMentor.Configurations.csproj", "{BCCDAFBE-C4F1-4BB3-B237-8058F5B4A5F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevnotMentor.Configuration", "src\DevnotMentor.Configuration\DevnotMentor.Configuration.csproj", "{BCCDAFBE-C4F1-4BB3-B237-8058F5B4A5F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevnotMentor.Business", "src\DevnotMentor.Business\DevnotMentor.Business.csproj", "{80F9AF09-53F9-4A69-8667-F90CCA732712}"
 EndProject

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\DevnotMentor.Configurations\DevnotMentor.Configurations.csproj" />
+    <ProjectReference Include="..\DevnotMentor.Configuration\DevnotMentor.Configuration.csproj" />
     <ProjectReference Include="..\DevnotMentor.Data\DevnotMentor.Data.csproj" />
   </ItemGroup>
 

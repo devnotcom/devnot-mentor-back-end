@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace DevnotMentor.Configurations.Environment
+namespace DevnotMentor.Configuration.Environment
 {
     /// <summary>
     /// This service provides IConfiguration instance and environment flags.

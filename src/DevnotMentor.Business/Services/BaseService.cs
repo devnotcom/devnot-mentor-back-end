@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using DevnotMentor.Data.Interfaces;
 
 namespace DevnotMentor.Business.Services

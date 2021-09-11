@@ -1,6 +1,6 @@
-﻿using DevnotMentor.Configurations.Environment;
+﻿using DevnotMentor.Configuration.Environment;
 
-namespace DevnotMentor.Configurations.Context
+namespace DevnotMentor.Configuration.Context
 {
     public class DevnotConfigurationContext : IDevnotConfigurationContext
     {

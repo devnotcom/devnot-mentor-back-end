@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using DevnotMentor.Configurations.Context;
+using DevnotMentor.Configuration.Context;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DevnotMentor.Business.Utilities.Security.Token.Jwt

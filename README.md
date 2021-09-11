@@ -37,7 +37,7 @@ Powershell:
 Linux Terminal:  
 `export DEVNOT_MENTOR_ENVIRONMENT='Development'`
 
-* Update için [DevnotMentor.Configurations](./src/DevnotMentor.Configurations/) altında olan [appsettings.development.json](./src/DevnotMentor.Configurations/appsettings.development.json) dosyasında veya diğer environment dosyalarında bulunan SQL Server bağlantı dizisi düzeltilmelidir.
+* Update için [DevnotMentor.Configuration](./src/DevnotMentor.Configuration/) altında olan [appsettings.development.json](./src/DevnotMentor.Configuration/appsettings.development.json) dosyasında veya diğer environment dosyalarında bulunan SQL Server bağlantı dizisi düzeltilmelidir.
 
 ### Database Migration
 
