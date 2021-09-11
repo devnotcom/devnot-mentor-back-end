@@ -71,7 +71,7 @@ namespace DevnotMentor.Business.Services
                 return new ErrorApiResponse<MentorDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var userAlreadyMentor = await _mentorRepository.GetByUserIdAsync(user.Id) != null;
+            var userAlreadyMentor = user.IsMentor || await _mentorRepository.GetByUserIdAsync(user.Id) != null;
             if (userAlreadyMentor)
             {
                 return new ErrorApiResponse<MentorDTO>(data: default, message: ResultMessage.MentorAlreadyRegistered);
@@ -82,6 +82,9 @@ namespace DevnotMentor.Business.Services
             {
                 return new ErrorApiResponse<MentorDTO>(data: default, message: ResultMessage.FailedToAddMentor);
             }
+
+            user.IsMentor = true;
+            _userRepository.Update(user);
 
             var mappedNewMentor = _mapper.Map<MentorDTO>(newMentor);
             return new SuccessApiResponse<MentorDTO>(ResponseStatus.Created, mappedNewMentor);

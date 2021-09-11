@@ -30,18 +30,18 @@ dotnet run --launch-profile Production
 
 ## Database
 
-* Migration veya Update için [DevnotMentor.Configurations](./src/DevnotMentor.Configurations/) altında olan [appsettings.development.json](./src/DevnotMentor.Configurations/appsettings.development.json) dosyasında veya diğer environment dosyalarında bulunan SQL Server bağlantı dizisi düzeltilmelidir.
-
 * Migration veya Update için environment ataması yapılmalıdır.  
 Environment Key: DEVNOT_MENTOR_ENVIRONMENT  
 Powershell:  
-`env:DEVNOT_MENTOR_ENVIRONMENT = 'Development'`  
+`env:DEVNOT_MENTOR_ENVIRONMENT='Development'`  
 Linux Terminal:  
-`export DEVNOT_MENTOR_ENVIRONMENT = 'Development'`
+`export DEVNOT_MENTOR_ENVIRONMENT='Development'`
+
+* Update için [DevnotMentor.Configurations](./src/DevnotMentor.Configurations/) altında olan [appsettings.development.json](./src/DevnotMentor.Configurations/appsettings.development.json) dosyasında veya diğer environment dosyalarında bulunan SQL Server bağlantı dizisi düzeltilmelidir.
 
 ### Database Migration
 
-**[DbContext](./src/DevnotMentor.Data/MentorDBContext.cs)'ın OnModelCreating metotunda bulunan ModelBuilder üzerinde bir değişiklik yapmadıysanız veya [Entities](./src/DevnotMentor.Data/Entities) klasöründeki tablo varlıklarını değiştirmediyseniz yeni bir migration oluşturmanıza gerek yok. Var olan migrationlar ile database'ı oluşturabilir veya güncelleyebilirsiniz.**
+[DbContext](./src/DevnotMentor.Data/MentorDBContext.cs)'ın OnModelCreating metotunda bulunan ModelBuilder üzerinde bir değişiklik yapmadıysanız veya [Entities](./src/DevnotMentor.Data/Entities) klasöründeki tablo varlıklarını değiştirmediyseniz yeni bir migration oluşturmanıza gerek yok. Var olan migrationlar ile database'ı oluşturabilir veya güncelleyebilirsiniz.
 
 Package Manager Console
 

@@ -72,7 +72,7 @@ namespace DevnotMentor.Business.Services
                 return new ErrorApiResponse<MenteeDTO>(ResponseStatus.NotFound, data: default, message: ResultMessage.NotFoundUser);
             }
 
-            var userAlreadyMentee = await _menteeRepository.GetByUserIdAsync(user.Id) != null;
+            var userAlreadyMentee = user.IsMentee || await _menteeRepository.GetByUserIdAsync(user.Id) != null;
             if (userAlreadyMentee)
             {
                 return new ErrorApiResponse<MenteeDTO>(data: default, message: ResultMessage.MenteeAlreadyRegistered);
@@ -83,6 +83,9 @@ namespace DevnotMentor.Business.Services
             {
                 return new ErrorApiResponse<MenteeDTO>(data: default, ResultMessage.FailedToAddMentee);
             }
+
+            user.IsMentee = true;
+            _userRepository.Update(user);
 
             var mappedNewMentee = _mapper.Map<MenteeDTO>(newMentee);
             return new SuccessApiResponse<MenteeDTO>(ResponseStatus.Created, mappedNewMentee);
