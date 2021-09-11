@@ -11,8 +11,7 @@
         public int? UserState { get; set; }
         public string ProfileUrl { get; set; }
 
-        /* todo: hold this values on database
-        public bool IsMentee => Mentee.Any();
-        public bool IsMentor => Mentor.Any(); */
+        public bool IsMentee { get; set; }
+        public bool IsMentor { get; set; }
     }
 }

@@ -26,6 +26,9 @@ namespace DevnotMentor.Data.Entities
         public DateTime? SecurityKeyExpiryDate { get; set; }
         public Guid? SecurityKey { get; set; }
 
+        public bool IsMentee { get; set; }
+        public bool IsMentor { get; set; }
+
         public virtual ICollection<Mentee> Mentee { get; set; }
         public virtual ICollection<Mentor> Mentor { get; set; }
     }
